@@ -217,19 +217,6 @@ void loop(void){
 				//
 				if (readytoupdate){
 					strip.Paint();
-					//counter=0;
-					//while (counter<DMX_LED_CHANNELS)  //Update LED's
-					// {
-					//   if (dmx_update[counter]=1)
-					//  {
-					//
-					//Update the lights using the 4 MSB of the colors.  This should be updated to derive a brightness value
-					//and 4bit color values from the 8 bit color values.  Maybe in the next version....
-					// lights.set_color(counter,0xCC,lights.color(dmx_red[counter]>>4,dmx_green[counter]>>4,dmx_blue[counter]>>4));
-					// dmx_update[counter]=0;  //Reset the update flag for this channel
-					// }
-					// counter++;
-					// }
 					readytoupdate=false;
 				}
 			}
