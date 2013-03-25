@@ -38,17 +38,17 @@ RFPixelControl::~RFPixelControl() {
  * @param pPipes - the addressses to listen on
  *
  */
- bool RFPixelControl::Initalize( int  role, const uint64_t * pPipes ){
+ bool RFPixelControl::Initalize( int  pRole, const uint64_t * pPipes, int pChannel ){
 	bool r = false;
 	 this->begin();  //initalize RF
 	 this->setRetries(0,0);  //set # of retries & delay between retries
 	 this->setDataRate( RF24_250KBPS );  //set RF data rate
 	 this->setPayloadSize(32);   //set RF packet size
 	 this->setAutoAck(0);  //Turn off Auto Ack!!!!
-	 this->setChannel(100); //Change from the default channel...
+	 this->setChannel(pChannel); //Change from the default channel...
 	 this->setCRCLength(RF24_CRC_16 );  //Setup CRC
 
-	 if ( role == TRANSMITTER){
+	 if ( pRole == TRANSMITTER){
 		 this->openWritingPipe(pPipes[0]);  //Open pipe for Writing
 		 this->openReadingPipe(1,pPipes[1]);  //Open pipe for Reading...But we aren't reading anything....
 		 this->setPALevel(RF24_PA_HIGH);  //Set the power level to high!

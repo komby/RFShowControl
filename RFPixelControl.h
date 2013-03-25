@@ -36,6 +36,7 @@ public:
 	   *
 	   * @param _cepin The pin attached to Chip Enable on the RF module
 	   * @param _cspin The pin attached to Chip Select
+
 	   */
 	RFPixelControl(uint8_t _cepin, uint8_t _cspin) ;
 
@@ -45,7 +46,7 @@ public:
 	 * The values for this are stored in
 	 * the TRANSMITTER and RECEIVER values.
 	 */
-	bool Initalize( int  role, const uint64_t * pPipes );
+	bool Initalize( int  role, const uint64_t * pPipes, int pChannel );
 
 	/**
 	  * overriding method from base class
@@ -70,7 +71,7 @@ public:
 
 private:
 	  uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/
-
+      int _channel;  //channel to transmit on
 
 
 };

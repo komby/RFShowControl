@@ -34,11 +34,12 @@
 
 #include <Arduino.h>
 #include <RFPixelControl.h>
+#include <IPixelControl.h>
 #include <WM2999.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
+#include "printf.h"
 /**
  * The WM2999 receiver is only designed to control 1 string of lights at a time.
  *
@@ -82,8 +83,8 @@ bool readytoupdate=false;
 RFPixelControl radio(9,10);
 
 
-//Setup the lights on arduino pin 8 / 328P pin 14 / PB0
-WM2999<8> strip =  WM2999<8>();
+//Setup the lights on arduino pin A0 
+WM2999<A0> strip =  WM2999<A0>();
 
 
 // Radio pipe addresses for the 2 nodes to communicate.
@@ -91,56 +92,16 @@ const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 
 
-/**
- * Helper to initialize the string (make sure its working)
- * This may also be used for debugging...
- *
- * @Param c - the 24 bit RGB color value - this is the integer representation of a color
- * @param wait - the duration to wait after the color is set.
- */
-
-void colorWipe(uint32_t c, uint8_t wait) {
-	int i;
-
-	for (i=0; i < strip.GetPixelCount(); i++) {
-		strip.SetPixelColor(i, c);
-		delay(wait);
-	}
-	strip.Paint();
-	delay(5000);
-}
-
-/* Helper functions */
-
-/**
- * Create a 24 bit color value from R,G,B
- *
- * @param r - red 0-255 value
- * @param g - green 0-255 value
- * @param b - blue 0-255 value
- *
- * @return the color in a 24 bit pattern
- */
-uint32_t Color(byte r, byte g, byte b)
-{
-	uint32_t c;
-	c = b;
-	c <<= 8;
-	c |= g;
-	c <<= 8;
-	c |= r;
-	return c;
-}
-
 //Arduino setup function.
 void setup() {
-
+ printf_begin();
+ 
+ 
 	Serial.begin(57600);
 	Serial.write("Initializing reciever\n");
-
-	//The WM2999 Light string data line is connected to this pin.
-	pinMode(8, OUTPUT);
-	digitalWrite(8, LOW);
+Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
+	pinMode(A0, OUTPUT);
+	digitalWrite(A0,LOW);
 	delay(2);
 	strip.SetPixelCount(20);
 	strip.Start();
@@ -148,11 +109,12 @@ void setup() {
 
 
 	Serial.write("Initializing Radio\n");
-	radio.Initalize( radio.RECEIVER, pipes );
-
+	radio.Initalize( radio.RECEIVER, pipes,100 );
+  radio.printDetails(); 
 	Serial.write("Init and Paint LEDS for startup \n");
-	colorWipe(Color(255, 0, 0), 1000);
+	strip.ColorWipe(strip.Color(255, 0, 0), 100);
 	strip.Paint();
+delay (2000);
 }
 
 
