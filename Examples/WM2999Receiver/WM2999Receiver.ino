@@ -34,6 +34,7 @@
 
 #include <Arduino.h>
 #include <RFPixelControl.h>
+#include "WM2999PixelControl.h"
 #include <IPixelControl.h>
 #include <WM2999.h>
 #include <SPI.h>
@@ -84,7 +85,7 @@ RFPixelControl radio(9,10);
 
 
 //Setup the lights on arduino pin A0 
-WM2999<A0> strip =  WM2999<A0>();
+WM2999PixelControl strip =  WM2999PixelControl(A0);
 
 
 // Radio pipe addresses for the 2 nodes to communicate.
