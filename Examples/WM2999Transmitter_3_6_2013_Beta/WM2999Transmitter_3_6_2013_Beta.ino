@@ -38,6 +38,8 @@
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to listen to.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.
 
+#define TRANSMIT_CHANNEL 100     // This is the channel we are broadcasting on.
+
 enum
 {
   DMX_IDLE,
@@ -78,8 +80,8 @@ int fred;
 
 void setup()
 {
-
-	radio.Initalize( radio.TRANSMITTER, pipes );
+	
+	radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL);
 	delayMicroseconds(150);
 	update = 0;
 	// set default DMX state
