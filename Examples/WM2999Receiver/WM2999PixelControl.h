@@ -35,10 +35,10 @@ public:
                     paint();
                 }
 		uint32_t  GetPixelCount( void ){
-                    return getPixelCount();
+                    return WM2999::getPixelCount();
                 }
 		void  SetPixelCount( uint32_t pCount){
-                 setPixelCount(pCount);
+                 WM2999::setPixelCount(pCount);
                 }
 		void  Start( void ){
                   start();
@@ -48,16 +48,16 @@ public:
                 }
 
 		void  SetPixelColor(uint16_t n, uint32_t c){
-                 setPixelColor(n, c);
+                 WM2999::setPixelColor(n, c);
                 }
 		void  SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b){
-                    setPixelColor(n, r, g, b);
+                    WM2999::setPixelColor(n, r, g, b);
                 }
                 uint32_t Color(byte r, byte g, byte b){
-                   return color(r, g, b); 
+                   return WM2999::color(r, g, b); 
                 }
                 void ColorWipe(uint32_t c, uint8_t wait){
-                   colorWipe(c, wait); 
+                   colorWipe(c, wait);
                 }
 };
 
