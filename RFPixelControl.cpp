@@ -40,12 +40,22 @@ RFPixelControl::~RFPixelControl() {
  */
  bool RFPixelControl::Initalize( int  pRole, const uint64_t * pPipes, int pChannel ){
 	bool r = false;
+	this->dataRateSuccess = false;
+	this->payloadSizeSetSuccessful = false;
 	 this->begin();  //initalize RF
 	 this->setRetries(0,0);  //set # of retries & delay between retries
-	 this->setDataRate( RF24_250KBPS );  //set RF data rate
+	 this->dataRateSuccess=this->setDataRate( RF24_250KBPS );  //set RF data rate
 	 this->setPayloadSize(32);   //set RF packet size
+	 
+	 if ( this->getPayloadSize() == 32 ){
+	    this->payloadSizeSetSuccessful = true;
+	 }
+	 
 	 this->setAutoAck(0);  //Turn off Auto Ack!!!!
 	 this->setChannel(pChannel); //Change from the default channel...
+	 channelSetSuccessfully = false;
+	 if ( this->GetChannel() == pChannel)
+		this->channelSetSuccessfully = true;
 	 this->setCRCLength(RF24_CRC_16 );  //Setup CRC
 
 	 if ( pRole == TRANSMITTER){
@@ -69,6 +79,40 @@ RFPixelControl::~RFPixelControl() {
 
  }
 
+ void RFPixelControl::DisplayDiagnosticStartup(IPixelControl * string) {
+	   
+	     if ( payloadSizeSetSuccessful && dataRateSuccess && channelSetSuccessfully ) {
+			for ( int i = 0 ; i < string->GetPixelCount(); i++){
+				string->SetPixelColor(i, 0, 255, 0);
+
+			}
+		 }
+		 
+		 else {
+		 
+		 for ( int i = 0 ; i < string->GetPixelCount(); i++){
+				string->SetPixelColor(i, 255, 0, 0);
+
+			}
+		 
+		 }
+		 
+		 
+		 				string->Paint();
+						delay(10000);
+		
+		
+	  }
+ 
+ //helper to check the channel we tried to set;
+ uint8_t RFPixelControl::GetChannel(void){
+ 
+  //write_register(RF_CH,min(channel,max_channel));
+  return read_register(RF_CH);
+ 
+ }
+ 
+ 
  /**
   * Override base class method
   * This method was created so that we dont
@@ -98,3 +142,6 @@ RFPixelControl::~RFPixelControl() {
 	 	 return RF24::write_payload(buf, len);
  }
 
+uint8_t RFPixelControl::get_status(void){
+   return RF24::get_status();
+}

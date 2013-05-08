@@ -15,6 +15,7 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+#include <IPixelControl.h>
 
 typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 
@@ -48,6 +49,12 @@ public:
 	 */
 	bool Initalize( int  role, const uint64_t * pPipes, int pChannel );
 
+	
+	/**
+	 * Check what channel the radio is listeneing on
+	 */
+	 uint8_t GetChannel(void);
+	 
 	/**
 	  * overriding method from base class
 	  *
@@ -68,11 +75,17 @@ public:
 	   * @return Current value of status register
 	   */
 	  uint8_t write_payload(const void* buf, uint8_t len);
+	  
+	  void DisplayDiagnosticStartup(IPixelControl * string);
+	  uint8_t get_status(void);
 
 private:
 	  uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/
       int _channel;  //channel to transmit on
-
+	  bool dataRateSuccess;
+	  bool payloadSizeSetSuccessful;
+	  bool channelSetSuccessfully;
+	  
 
 };
 
