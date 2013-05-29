@@ -1,0 +1,111 @@
+/*
+ * LPD6803PixelControl.cpp
+ * This class is a wrappter of the Adafruit LPD6803 pixel library.
+ * 
+ *  Created on: May 28, 2013
+ *      Author: Greg Scull
+ */
+
+#include "LPD6803PixelControl.h"
+#include <TimerOne.h>
+LPD6803PixelControl::LPD6803PixelControl() : LPD6803(50, 2, 3){
+	//for now expect 50 pixel strings on rx and tx pins.
+	 //this->adaPixels =   new Adafruit_LPD6803(50, 2, 3);
+	//this->updatePins(2,3);
+        //this->updateOrder(0); 
+
+
+}
+
+LPD6803PixelControl::~LPD6803PixelControl() {
+}
+
+/**
+ * Paint method to keep compatibility with the other Pixel types
+ * Call the adafruit method show to update the string.
+ */
+void LPD6803PixelControl::Paint(uint8_t * colors , unsigned int count) {
+	this->show();
+        delay(2);  //Hold for 2 milliseconds to latch color. This may be 1MS longer than needed?? 
+        
+}
+
+/**
+ * Paint method to keep compatibility with the other Pixel types
+ * Call the adafruit method show to update the string.
+ */
+void LPD6803PixelControl::Paint() {
+	this->show();
+        delay(2);  //Hold for 2 milliseconds to latch color. This may be 1MS longer than needed?? 
+}
+
+
+uint32_t LPD6803PixelControl::GetPixelCount(void) {
+	
+	return this->numPixels();
+}
+
+void LPD6803PixelControl::SetPixelCount(uint32_t count) {
+//NOT SUPPORTED IN ADAFRUIT LIB,  MUST SET THIS VAR IN THE INIT
+}
+
+/**
+ *  method to keep compatibility with the other Pixel types
+ */
+void LPD6803PixelControl::Start(void) {
+	this->begin();
+}
+
+uint32_t LPD6803PixelControl::GetPixelColor(uint16_t n) {
+ return Color(0,0,0); // default to off - pixel does not support it
+}
+
+void LPD6803PixelControl::SetPixelColor(uint16_t n, uint32_t c) {
+	setPixelColor(n, c);
+}
+
+void LPD6803PixelControl::SetPixelColor(uint16_t n, uint8_t r, uint8_t g,
+		uint8_t b) {
+	this->setPixelColor(n, r, g, b);
+}
+
+/* Helper functions */
+
+/**
+ * Create a 24 bit color value from R,G,B
+ *
+ * @param r - red 0-255 value
+ * @param g - green 0-255 value
+ * @param b - blue 0-255 value
+ *
+ * @return the color in a 24 bit pattern
+ */
+uint32_t LPD6803PixelControl::Color(byte r, byte g, byte b)
+{
+  uint32_t c;
+  c = r;
+  c <<= 8;
+  c |= g;
+  c <<= 8;
+  c |= b;
+  return c;
+}
+
+/**
+ * Helper to initialize the string (make sure its working)
+ * This may also be used for debugging...
+ *
+ * @Param c - the 24 bit RGB color value - this is the integer representation of a color
+ * @param wait - the duration to wait after the color is set.
+ */
+// fill the dots one after the other with said color
+// good for testing purposes
+void LPD6803PixelControl::ColorWipe(uint32_t c, uint8_t wait) {
+  int i;
+  
+  for (i=0; i < this->numPixels(); i++) {
+      this->SetPixelColor(i, c);
+      this->Paint();
+      delay(wait);
+  }
+}
