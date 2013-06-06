@@ -28,16 +28,16 @@ Example Sketch: https://github.com/komby/RFPixelControl/tree/master/Examples/WS2
 Library Used: https://github.com/adafruit/Adafruit-WS2801-Library
 
 
-Multiple :  (beta support)
-LPD8806
-SM16716
-WS2801
-TM1809
-UCS1903
-US2811
-TM1803
-Example Sketch: https://github.com/komby/RFPixelControl/tree/master/Examples/FastSPI_LED2Receiver
-Library Used:  https://code.google.com/p/fastspi/downloads/list  (currently using FastSPI_LED2.Preview.20130325)
+Multiple :  (beta support) Using the New RC version of the FastSPI_LED2 library.
+LPD8806,
+SM16716,
+WS2801,
+TM1809,
+UCS1903,
+US2811,
+TM1803,
+Example Sketch: https://github.com/komby/RFPixelControl/tree/master/Examples/FastSPI_LED2ReceiverRCVersion
+Library Used:  https://code.google.com/p/fastspi/downloads/list  (currently using FastSPI_LED2.RC1)
 
 
 For Transmitter Devices: 
