@@ -69,9 +69,10 @@ int j=0;
 
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-//RFPixelControl radio(9,10);
+RFPixelControl radio(9,10);
 
-RFPixelControl radio(8,7);
+//RF1 controllers uncomment this line
+//RFPixelControl radio(8,7);
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 int fred;
