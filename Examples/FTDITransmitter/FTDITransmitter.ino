@@ -33,7 +33,6 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-#include <DMXSerial.h>
 
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to listen to.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.
@@ -70,9 +69,9 @@ int j=0;
 
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-RFPixelControl radio(9,10);
+//RFPixelControl radio(9,10);
 
-
+RFPixelControl radio(8,7);
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 int fred;
