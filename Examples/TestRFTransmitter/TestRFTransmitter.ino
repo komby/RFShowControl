@@ -7,9 +7,6 @@
  *      Author: Greg Scull
  */
 
-#ifndef TESTRANSMITTER_H_
-#define TESTTRANSMITTER_H_
-
 #include <RFPixelControl.h>
 #include <SPI.h>
 #include <nRF24L01.h>
@@ -157,5 +154,3 @@ uint32_t Wheel(byte WheelPos)
    return Color(0, WheelPos * 3, 255 - WheelPos * 3);
   }
 }
-
-#endif 
