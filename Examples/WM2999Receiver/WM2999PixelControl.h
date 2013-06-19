@@ -59,6 +59,21 @@ public:
                 void ColorWipe(uint32_t c, uint8_t wait){
                    colorWipe(c, wait);
                 }
+
+	
+	/**
+	*  This method will check the setup and output diagnostic information 
+	*
+	*/
+	void  CheckSetup() {
+	    
+			
+	
+	
+	}
+	
+	
+	   
 };
 
 #endif /* WM2999PIXELCONTROL_H_ */
