@@ -41,6 +41,9 @@ Library Used:  https://code.google.com/p/fastspi/downloads/list  (currently usin
 
 
 For Transmitter Devices: 
+NEW! (6/18/2013)   Arduino Ethernet E1.31 Transmitter
+  I added a new sketch which will handle a single universe of E1.31.  I tested using an Arduino Uno and Arduino Ethernet sheild.  Worked great!
+  https://github.com/komby/RFPixelControl/tree/master/Examples/ArduinoEthernetSheidUnicastE1_31Transmitter_ino
 
 USB(FTDI) Open DMX transmitter (Joe Johnson)
 This transmitter uses OpenDMX plugin in Vixen - It is called WM2999 but will work with all receiver types
@@ -55,13 +58,6 @@ https://github.com/komby/RFPixelControl/blob/master/Examples/WM2999Transmitter_3
 DEBUG / Test Transmitter 
 This transmitter utilizes the debug/rainbow methods provided in the Adafruit driver.  It will continuously stream RF data to the receivers.
 https://github.com/komby/RFPixelControl/tree/master/Examples/TestRFTransmitter
-
-
-E1.31 Transmitter Options
-
-Arduino Ethernet (Wiznet) - Arduino Transmitter
-Not a part of the RFPixelControl Library examples
-http://doityourselfchristmas.com/forums/showthread.php?22062-New-High-Speed-Wireless-GE-Color-Effects-Controller-RFColor2_4/page57  (Stephen Morgan)
 
 
 ENC28J60 - Arduino transmitter example.  
