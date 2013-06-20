@@ -28,6 +28,12 @@
 //Setup  a RF pixel control 
 //RF1 v.01 board uses Radio 9,10
 RFPixelControl radio(9,10);
+
+//RF1 v.1.2 and newer boards use Radio 8,7
+//The newer RF1 pins moved the radio pins so that
+//the PWM pins could be added to the 15 pin header
+//RFPixelControl radio(8,7);
+
 //kombyone due transmitter board radio settings.
 //RFPixelControl radio(33,10);
 
