@@ -27,6 +27,7 @@ GECEPixelControl::~GECEPixelControl()
 void
 GECEPixelControl::Paint(uint8_t * colors, unsigned int count)
 {
+  cli();
   int i;
   for ( i = 0; i < count; i++ )
   {
@@ -36,6 +37,7 @@ GECEPixelControl::Paint(uint8_t * colors, unsigned int count)
                                                        colors[2]>>4
                                                      ));
   }
+  sei();
 }
 
 /**
@@ -45,15 +47,17 @@ GECEPixelControl::Paint(uint8_t * colors, unsigned int count)
 void
 GECEPixelControl::Paint()
 {
+  cli();
   int i;
   for ( i = 0; i < numLEDs; i++ )
   {
     this->set_color(i, DEFAULT_INTENSITY, this->color(
-                                                      (pixels[(i*3)]<<16)>>4,
-                                                      (pixels[(i*3)+1]<<8)>>4,
+                                                      (pixels[(i*3)])>>4,
+                                                      (pixels[(i*3)+1])>>4,
                                                        pixels[(i*3)+2]>>4
                                                      ));
   }
+  sei();
 }
 
 

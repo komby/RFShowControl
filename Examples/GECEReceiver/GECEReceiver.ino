@@ -31,15 +31,15 @@
  * We need to make sure that we are listening to the right channels in the universe
  *
  * DMX_START_CHANNEL -   This is the first channel that will be used for this string
- * 					      if this is the first string in the universe it should be set to (0 or 1)//TODO Determine 0 or 1
- * DMX_NUM_CHANNELS - 	 This is the total number of channels needed for this string. For RGB (3) x number of pixels = #
+ * 					      if this is the first string in the universe it should be set to(0 or 1)//TODO Determine 0 or 1
+ * DMX_NUM_CHANNELS - 	 This is the total number of channels needed for this string. For RGB(3) x number of pixels = #
  * DMX_LED_CHANNELS 20 - This defines the # of LED Channels.  This could be the same as lightCount, but if grouping is used, this will be less.
  */
-#define DMX_START_CHANNEL 60
+#define DMX_START_CHANNEL 0
 
-#define DMX_LED_CHANNELS 50	//This defines the # of LED Channels.
+#define DMX_LED_CHANNELS 7	//This defines the # of LED Channels.
 
-#define DMX_NUM_CHANNELS 150	//Number of DMX channels to read...usually dmx_led_channels/3
+#define DMX_NUM_CHANNELS 150	//Number of DMX channels to read...usually dmx_led_channels*3
 
 #define LISTEN_CHANNEL 100	// the channel for the RF Radio
 
@@ -57,10 +57,10 @@ bool readytoupdate = false;
 
 
 // Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-RFPixelControl radio (9, 10);
+RFPixelControl radio(9, 10);
 
 //create the pixel control impl with the ws2801 driver
-GECEPixelControl strip = GECEPixelControl ();
+GECEPixelControl strip = GECEPixelControl();
 
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = {
@@ -70,47 +70,51 @@ const uint64_t pipes[2] = {
 
 //Arduino setup function.
 void
-setup ()
+setup()
 {
-  Serial.begin (57600);
-  printf_begin ();
-  strip.SetPixelCount (DMX_LED_CHANNELS);
-  strip.Start ();
+  Serial.begin(57600);
+  printf_begin();
+  strip.SetPixelCount(DMX_LED_CHANNELS);
+  strip.Start();
 
 
-  Serial.write ("Initializing Radio\n");
+  Serial.write("Initializing Radio\n");
 
-  radio.Initalize (radio.RECEIVER, pipes, LISTEN_CHANNEL);
-  radio.printDetails ();
-  Serial.write ("Init and Paint LEDS for startup \n");
-  strip.ColorWipe (strip.Color (255, 255, 0), 25);
-  strip.Paint ();
-  strip.ColorWipe (strip.Color (255, 0, 255), 25);
-  strip.Paint ();
-  delay (2);
+  radio.Initalize(radio.RECEIVER, pipes, LISTEN_CHANNEL);
+  radio.printDetails();
+  Serial.println("Init and Paint LEDS for startup");
+  strip.ColorWipe(strip.Color(255, 255, 0), 25);
+  strip.Paint();
+  Serial.println("wrote 255,255,0");
+  delay(200);
+  strip.ColorWipe(strip.Color(255, 0, 255), 25);
+  strip.Paint();
+  Serial.println("wrote 255,0,255");
+  delay(200);
 
-  for (int i = 0; i < strip.GetPixelCount (); i++)
-    strip.SetPixelColor (i, strip.Color (0, 0, 0));
-  strip.Paint ();
-  delay (2);
+  for (int i = 0; i < strip.GetPixelCount(); i++)
+    strip.SetPixelColor(i, strip.Color(0, 0, 0));
+  strip.Paint();
+  Serial.println("wrote 000");
+  delay(200);
 }
 
 
 int maxprint = 0;
 //RF Listening to DMX packets loop
 void
-loop (void)
+loop(void)
 {
   int updateChannelCount = 0;
   // See if there is any data in the RF buffer
-  if (radio.available ())
+  if (radio.available())
     {
 
       for (bool done = false; !done;)
 	{
 
 	  // Fetch the payload, and see if this was the last one.
-	  done = radio.read (&gotstr, 32);
+	  done = radio.read(&gotstr, 32);
 
 	  //Update the led_counter value from the packet address in position 30
 	  pkt_begin = gotstr[30] * 30;	//0=0.1=30.2=60
@@ -140,24 +144,24 @@ loop (void)
 	       * it is skipped.
 	       */
 	      for (;
-		   (dmx_counter < DMX_START_CHANNEL && z < 30)
+		  (dmx_counter < DMX_START_CHANNEL && z < 30)
 		   || dmx_counter >= dmxEnd; z++, dmx_counter++)
 		{
 		}
 
-	      led_counter = (dmx_counter - DMX_START_CHANNEL) / 3;
+	      led_counter =(dmx_counter - DMX_START_CHANNEL) / 3;
 	      for (;
 		   DMX_START_CHANNEL <= dmx_counter && dmx_counter < dmxEnd
 		   && z < 30;)
 		{
 
-		  strip.SetPixelColor (led_counter,
-				       strip.Color (gotstr[z], gotstr[z + 1],
+		  strip.SetPixelColor(led_counter,
+				       strip.Color(gotstr[z], gotstr[z + 1],
 						    gotstr[z + 2]));
 
 		  dmx_counter += 3;
 		  led_counter++;
-		  if ((dmx_counter >= dmxEnd) || (dmx_counter >= 508))
+		  if ((dmx_counter >= dmxEnd) ||(dmx_counter >= 508))
 		    {
 		      readytoupdate = true;
 		    }
@@ -170,7 +174,7 @@ loop (void)
 	      //If we have received a full set of data, Update all the LED's that have changed value since the last time
 	      //
 	      if (readytoupdate)
-		strip.Paint ();
+		strip.Paint();
 	      readytoupdate = false;
 
 	    }

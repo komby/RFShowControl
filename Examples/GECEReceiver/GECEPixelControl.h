@@ -21,7 +21,6 @@ class GECEPixelControl:public GEColorEffects, public IPixelControl
 {
 public:
   GECEPixelControl();
-  GECEPixelControl(int pixels, int pin);
   ~GECEPixelControl();
 
   void Paint(uint8_t * colors, unsigned int count);
