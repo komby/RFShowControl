@@ -21,10 +21,6 @@
 *      Author: Greg Scull
 */
 
-#ifndef ArduinoEthernetSheildUnicastE1_31_Transmitter_H
-#define ArduinoEthernetSheildUnicastE1_31_Transmitter_H
-
-
 
 /***************************  CONFIGURATION SECTION *************************************************/
 
@@ -123,5 +119,3 @@ void loop () {
                 }
 	}
 }
-
-#endif

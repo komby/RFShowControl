@@ -5,9 +5,6 @@
  *      Author: Greg
  */
 
-#ifndef E131TRANSMITTER_H_
-#define E131TRANSMITTER_H_
-
 // Present a "Will be back soon web page", as stand-in webserver.
 // 2011-01-30 <jc@wippler.nl> http://opensource.org/licenses/mit-license.php
 
@@ -138,13 +135,3 @@ void loop () {
       }
 
 }
-
-
-
-
-
-
-
-
-#endif /* RFDMXCONTROLLER_H_ */
-
