@@ -82,24 +82,18 @@ void setup() {
   Serial.begin(57600);
   printf_begin();
   strip.SetPixelCount(DMX_LED_CHANNELS );
-  strip.Start();
-
 
   Serial.write("Initializing Radio\n");
 
   radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL);
   radio.printDetails(); 
   Serial.write("Init and Paint LEDS for startup \n");
-   strip.ColorWipe(strip.Color(255, 255, 0), 25);
-   strip.Paint();
-   strip.ColorWipe(strip.Color(255, 0,255), 25);
-   strip.Paint();
   delay (2);
   
   for(int i=0;i<strip.GetPixelCount(); i++)
     strip.SetPixelColor(i, strip.Color(0,0,0));
-    strip.Paint();
-    delay(2);
+  strip.Paint();
+  delay(2);
 }
 
 

@@ -150,16 +150,6 @@ void setup() {
         memset(leds, 0,  NUM_LEDS * sizeof(struct CRGB));
       
         delay (200);
-
-  
-        ColorWipe(255, 0, 0, 25);
-        delay (200);
-        ColorWipe(0, 255, 0, 25);
-        delay (200);
-        ColorWipe(0, 0, 255, 25);
-        delay (200);
-  
-
 }
 
 void loop(void){
@@ -208,14 +198,5 @@ void loop(void){
            readytoupdate=false;
       }
     }
-  }
-}
-
-void ColorWipe(uint8_t red, uint8_t green, uint8_t blue, uint8_t wait) {
-  int i;
-  for (i=0; i < NUM_LEDS; i++) {
-     leds[i] = CRGB(red, green,blue);  
-     LEDS.show();
-      delay(wait);
   }
 }

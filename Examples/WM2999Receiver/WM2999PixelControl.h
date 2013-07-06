@@ -18,65 +18,12 @@
 #include <WM2999.h>
 
 
-class WM2999PixelControl : public WM2999, public IPixelControl {
+class WM2999PixelControl : public WM2999, public IPixelControl
+{
 public:
+	WM2999PixelControl(uint8_t ppin);
 
-        WM2999PixelControl(uint8_t ppin): WM2999(ppin){
-         
-        }
-	 ~WM2999PixelControl(void){
-
-          }
-
-	void Paint(uint8_t * colors , unsigned int count){
-                    paint(colors,count);
-                }
-		void  Paint(void){
-                    paint();
-                }
-		uint32_t  GetPixelCount( void ){
-                    return WM2999::getPixelCount();
-                }
-		void  SetPixelCount( uint32_t pCount){
-                 WM2999::setPixelCount(pCount);
-                }
-		void  Start( void ){
-                  start();
-                }
-		uint32_t  GetPixelColor(uint16_t n){
-                  return getPixelColor(n);
-                }
-
-		void  SetPixelColor(uint16_t n, uint32_t c){
-                 WM2999::setPixelColor(n, c);
-                }
-		void  SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b){
-                    WM2999::setPixelColor(n, r, g, b);
-                }
-                uint32_t Color(byte r, byte g, byte b){
-                   return WM2999::color(r, g, b); 
-                }
-                void ColorWipe(uint32_t c, uint8_t wait){
-                   colorWipe(c, wait);
-                }
-
-	
-	/**
-	*  This method will check the setup and output diagnostic information 
-	*
-	*/
-	void  CheckSetup() {
-	    
-			
-	
-	
-	}
-	
-	
-	   
+	void Paint(void);
 };
 
 #endif /* WM2999PIXELCONTROL_H_ */
-
-
-

@@ -105,7 +105,6 @@ Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
 	digitalWrite(A0,LOW);
 	delay(2);
 	strip.SetPixelCount(20);
-	strip.Start();
 	strip.Paint();
 
 
@@ -113,11 +112,7 @@ Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
 	radio.Initalize( radio.RECEIVER, pipes,100 );
   radio.printDetails(); 
 	Serial.write("Init and Paint LEDS for startup \n");
-	strip.ColorWipe(strip.Color(255, 0, 0), 100);
-	strip.Paint();
-delay (2000);
  radio.DisplayDiagnosticStartup(&strip) ;
-delay (9000);
 }
      
 

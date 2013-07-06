@@ -8,3 +8,12 @@
 
 #include "WM2999PixelControl.h"
 
+WM2999PixelControl::WM2999PixelControl(uint8_t ppin): WM2999(ppin)
+{
+	start();
+}
+
+void WM2999PixelControl::Paint(void)
+{
+	paint();
+}

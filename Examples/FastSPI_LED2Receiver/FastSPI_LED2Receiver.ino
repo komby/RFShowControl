@@ -122,15 +122,8 @@ void setup() {
   radio.printDetails(); 
 
   delay (200);
-  strip.InitFastSPI( (CLEDController *)  LED);
   strip.SetPixelCount(DMX_LED_CHANNELS );
-  strip.Start();
-  
-  for (int i=0;i< 10;i++){
-  strip.ColorWipe(strip.Color(0, 0, i), 25);
-
-  }
-
+  strip.InitFastSPI( (CLEDController *)  LED);
 }
 
 
