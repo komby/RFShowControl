@@ -10,15 +10,25 @@
 
 IPixelControl::IPixelControl()
 {
-	numLEDs = ((pixels = (uint8_t *)calloc(50, 3)) != NULL) ? 50 : 0;
+	//numLEDs = ((pixels = (uint8_t *)calloc(50, 3)) != NULL) ? 50 : 0;
 	dataPin=2;
 }
+
+
 
 IPixelControl::~IPixelControl()
 {
  	if (pixels != NULL)
 	free(pixels);
 }
+
+void IPixelControl::Begin(uint8_t* pDataPointer, int pNumLEDs)
+{
+	this->pixels = pDataPointer;
+	this->numLEDs  = pNumLEDs;
+}	
+
+
 
 uint16_t IPixelControl::GetPixelCount( void )
 {
@@ -83,4 +93,10 @@ uint32_t IPixelControl::Color(byte r, byte g, byte b)
 	c <<= 8;
 	c |= b;
 	return c;
+}
+
+void IPixelControl::SetDataBasePointer( uint8_t* dataPointer)
+{
+	this->pixels = dataPointer;
+
 }

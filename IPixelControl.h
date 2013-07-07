@@ -15,8 +15,17 @@
 class IPixelControl {
 public:
 	IPixelControl();
+	
+	
 	virtual ~IPixelControl();
 
+
+	/*
+	 *  Begin so we can have some initalization
+	 *
+	 */
+	void Begin(uint8_t* pDataPointer, int pNumLEDs);
+ 
 	/*
 	 * Return the protected value of the number
 	 * of pixels this instance is configured for.
@@ -77,6 +86,12 @@ public:
 	 * the color data stored in "pixels" to the LED string attached.
 	 */
 	void virtual Paint(void) = 0;
+	
+	/*
+	 * Set the base data pointer as provided by 
+	 * RFPixelControl and the OTAConfig
+	 */
+	void SetDataBasePointer( uint8_t* dataPointer);
 
 protected:
 	/*

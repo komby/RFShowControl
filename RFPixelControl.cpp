@@ -524,3 +524,8 @@ bool RFPixelControl::EnableOverTheAirConfiguration(uint8_t enabled)
 	else
 		this->_otaConfigEnable = false;
 }
+
+int RFPixelControl::GetNumberOfChannels(int pLogicalController)
+{
+	return this->_controllers[pLogicalController].numChannels;	
+}
