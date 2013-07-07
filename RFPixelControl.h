@@ -16,6 +16,15 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <IPixelControl.h>
+#include <OTAConfig.h>
+
+#define RF_CONFIG_STARTUP_WINDOW 10000
+#define RF_PACKET_LENGTH  32
+
+#define CHANNELS_PER_PACKET 30    //how many bytes of data are in each packet
+#define PACKET_SEQ_IDX 30         //each packet has a sequence number,  what index 0-31 is it?
+#define BYTES_PER_PACKET 30       //TODO refactor....
+
 
 typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 
@@ -47,7 +56,7 @@ public:
 	 * The values for this are stored in
 	 * the TRANSMITTER and RECEIVER values.
 	 */
-	bool Initalize( int  role, const uint64_t * pPipes, int pChannel );
+	bool Initalize( int  role, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pControllerId);
 
 	
 	/**
@@ -78,13 +87,48 @@ public:
 	  
 	  void DisplayDiagnosticStartup(IPixelControl * string);
 	  uint8_t get_status(void);
+	  
+	  /************************************************************************/
+	  /* Listen will be listening for all the data needed for an update        
+	  /* When it returns true its time to update all controllers
+	  /************************************************************************/
+	  bool Listen(void);
+	  
+	   int SaveConfigurationToEEPROM();
+	   
+	   
+	   int ReadConfigurationFromEEPROM();
+	   
+	   void PrintControllerConfig(ControllerInfo* pControllerInfo);
+	   
+	   bool GetControllerDataUpdate( void );
+	   bool ProcessPacket(byte*  dest, byte* src);
+	   uint8_t* GetControllerDataBase( uint8_t pLogicalControllerNumber );
+	   /** 
+		ConfigureReceiverAtStartup 
+		Returns true if OTAConfig is received.
+	 */
+    bool ConfigureReceiverAtStartup(uint32_t pReceiverId);	
+	
+	bool EnableOverTheAirConfiguration(uint8_t enabled);
 
 private:
 	  uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/
       int _channel;  //channel to transmit on
+	  rf24_datarate_e _rf_data_rate; //Data Rate for the RF.
+      
 	  bool dataRateSuccess;
 	  bool payloadSizeSetSuccessful;
 	  bool channelSetSuccessfully;
+	  ControllerInfo * _controllers;
+	  uint8_t _numControllers;
+	  uint32_t _controllerId;
+	  byte packetData[RF_PACKET_LENGTH];
+	  byte  channelData[512];
+	  int _startChannel;
+	  int _endChannel;
+	  bool _otaConfigEnable;
+	  
 	  
 
 };
