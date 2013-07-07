@@ -113,6 +113,7 @@ public:
 	bool EnableOverTheAirConfiguration(uint8_t enabled);
 	
 	int GetNumberOfChannels(int pLogicalController);
+	void AddLogicalController(int pLControllerName, int pLcontrollerStartChannel, int pLControllerNumChannels, int pLControllerBaudRate);
 
 private:
 	  uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/

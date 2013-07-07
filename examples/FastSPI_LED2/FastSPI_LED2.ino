@@ -103,7 +103,14 @@ void setup()
 	printf_begin();
 	// sanity check delay - allows reprogramming if accidently blowing power w/leds
 	delay(2000);
-	radio.enableOverTheAirConfig(OVER_THE_AIR_CONFIG_ENABLE);
+	 radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIGURATION);
+	 
+	 
+	 if(!OVER_THE_AIR_CONFIGURATION)
+	 {
+		 radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
+	 }
+	 
 	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	LEDS.setBrightness(LED_BRIGHTNESS);

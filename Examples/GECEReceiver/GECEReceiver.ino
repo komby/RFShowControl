@@ -30,6 +30,10 @@
  * DMX_NUM_CHANNELS - 	 This is the total number of channels needed for this string. For RGB(3) x number of pixels = #
  * DMX_LED_CHANNELS 20 - This defines the # of LED Channels.  This could be the same as lightCount, but if grouping is used, this will be less.
  */
+//Step 0.  Over The Air Configuration Enabled
+//change the 1 to a 0 if you do not want
+//to use OTA configuration
+#define  OVER_THE_AIR_CONFIGURATION 0
 
 #define RECEIVER_UNIQUE_ID 50  //make this different for each receiver.
 
@@ -80,7 +84,10 @@ void setup()
   //strip.SetPixelCount(DMX_LED_CHANNELS);
 
   Serial.write("Initializing Radio\n");
-
+ if(!OVER_THE_AIR_CONFIGURATION)
+ {
+	 radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, DMX_NUM_CHANNELS, 0);
+ }
   //radio.Initalize(radio.RECEIVER, pipes, LISTEN_CHANNEL);
   radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
   radio.printDetails();

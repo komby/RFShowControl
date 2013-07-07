@@ -22,7 +22,11 @@
  * @param _cepin The pin attached to Chip Enable on the RF module
  * @param _cspin The pin attached to Chip Select
  */
-RFPixelControl::RFPixelControl(uint8_t _cepin, uint8_t _cspin) :  RF24(_cepin, _cspin), csn_pin( _cspin ) {
+RFPixelControl::RFPixelControl(uint8_t _cepin, uint8_t _cspin) :  RF24(_cepin, _cspin), csn_pin( _cspin ) 
+{
+	this->_numControllers=0;
+	this->_startChannel=0;
+	this->_endChannel=0;
 }
 
 RFPixelControl::~RFPixelControl() {
@@ -174,8 +178,32 @@ RFPixelControl::~RFPixelControl() {
 	}
  } 	
 	
-  
-  
+  /************************************************************************/
+  /* AddLogicalController												  */
+  /************************************************************************/
+  void RFPixelControl::AddLogicalController(int pLControllerName, int pLcontrollerStartChannel, int pLControllerNumChannels, int pLControllerBaudRate)
+  {
+	  
+	  		ControllerInfo* t = this->_controllers;
+			  this->_controllers= new ControllerInfo[this->_numControllers+1];
+			  int i=0;
+	  for (; i< this->_numControllers; i++)
+	  {
+		 this->_controllers[i].baudRate = t[i].baudRate; 
+		  this->_controllers[i].numChannels =  t[i].numChannels;
+		  
+		 this->_controllers[i].startChannel = t[i].startChannel;
+		  this->_controllers[i].logicalControllerNumber = t[i].logicalControllerNumber;
+		  //t[i].customConfig;
+	      //t[i].reserved;//
+	  }
+	  
+	  
+	   this->_controllers[i].logicalControllerNumber = pLControllerName;
+	   this->_controllers[i].startChannel = pLcontrollerStartChannel;
+	   this->_controllers[i].numChannels = pLControllerNumChannels;
+	   this->_controllers[i].baudRate = pLControllerBaudRate;		  
+  }
  
  /************************************************************************/
  /* Diagnostic print                                                                     */
