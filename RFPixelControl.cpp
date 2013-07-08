@@ -203,6 +203,7 @@ RFPixelControl::~RFPixelControl() {
 	   this->_controllers[i].startChannel = pLcontrollerStartChannel;
 	   this->_controllers[i].numChannels = pLControllerNumChannels;
 	   this->_controllers[i].baudRate = pLControllerBaudRate;		  
+	   this->_numControllers ++;
   }
  
  /************************************************************************/
