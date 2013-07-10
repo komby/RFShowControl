@@ -264,7 +264,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 		//process it if we got one
 		//	for (bool done = false;!done;){
 		// Fetch the payload, and see if this was the last one.
-		read( &this->packetData, 32 );
+		this->read( &this->packetData, 32 );
 		//printf("done reading %d\n", done == true ? 1:0);
 		//	}
 		//if(this->read( &this->packetData, RF_PACKET_LENGTH ))
@@ -294,7 +294,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 			//get each logical controller
 			for(int i = 0; i < this->_numControllers;)
 			{
-				for(bool found=false; !read( &this->packetData, 32 ) && !found;)
+				for(bool found=false; !this->read( &this->packetData, 32 ) && !found;)
 				{
 					
 					//make sure we are on a logical controller packet
