@@ -296,7 +296,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 			{
 				for(bool found=false; !this->read( &this->packetData, 32 ) && !found;)
 				{
-					
+					delay(6);
 					//make sure we are on a logical controller packet
 					//that we have the next logical controller ID
 					//and that its for this physiacal receiver
