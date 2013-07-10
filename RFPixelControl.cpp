@@ -282,7 +282,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 			rfListenRate = this->packetData[IDX_RF_LISTEN_RATE];
 			this->_numControllers = this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
 			this->_channel = rfListenChannel;
-			//this->_rf_data_rate = rfListenRate;
+			this->_rf_data_rate = (rf24_datarate_e)rfListenRate;
 			
 			
 			//provision controlelr space for the configuration of logical controllers
