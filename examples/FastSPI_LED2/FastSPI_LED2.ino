@@ -108,6 +108,7 @@ void setup()
 	 
 	 if(!OVER_THE_AIR_CONFIG_ENABLE)
 	 {
+		
 		 radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
 	 }
 	 
@@ -147,6 +148,7 @@ void setup()
 	//Initalize the data for LEDs
 	memset(leds, 0,  NUM_LEDS * sizeof(struct CRGB));
 	delay (200);
+	radio.PrintControllerConfig();
 }
 
 void loop(void)

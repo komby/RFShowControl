@@ -33,7 +33,7 @@
 //Step 0.  Over The Air Configuration Enabled
 //change the 1 to a 0 if you do not want
 //to use OTA configuration
-#define  OVER_THE_AIR_CONFIGURATION 0
+#define  OVER_THE_AIR_CONFIG_ENABLE 1
 
 #define RECEIVER_UNIQUE_ID 50  //make this different for each receiver.
 
@@ -44,9 +44,6 @@
 #define DMX_NUM_CHANNELS 15	//Number of DMX channels to read...usually dmx_led_channels*3
 
 #define LISTEN_CHANNEL 100	// the channel for the RF Radio
-
-
-#define  OVER_THE_AIR_CONFIGURATION 1
 
 
 
@@ -82,16 +79,16 @@ void setup()
   Serial.begin(57600);
   printf_begin();
   //strip.SetPixelCount(DMX_LED_CHANNELS);
-
+radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
   Serial.write("Initializing Radio\n");
- if(!OVER_THE_AIR_CONFIGURATION)
+ if(!OVER_THE_AIR_CONFIG_ENABLE)
  {
 	 radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, DMX_NUM_CHANNELS, 0);
  }
   //radio.Initalize(radio.RECEIVER, pipes, LISTEN_CHANNEL);
   radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
   radio.printDetails();
-	
+	      radio.PrintControllerConfig();
   uint8_t logicalControllerNumber = 0; 
 
   strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));

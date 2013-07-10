@@ -26,7 +26,9 @@
 #include "printf.h"
 
 
-
+//to use OTA configuration
+#define  OVER_THE_AIR_CONFIG_ENABLE 1
+#define RECEIVER_UNIQUE_ID 20  //make this different for each receiver.
 
 #define RENARD_SERIAL_BAUD 57600
 #define PAD 0x7D
@@ -71,8 +73,13 @@ void setup() {
   Serial.begin(RENARD_SERIAL_BAUD);
   printf_begin();
   
+   if(!OVER_THE_AIR_CONFIG_ENABLE)
+   {
+	   radio.AddLogicalController(RECEIVER_UNIQUE_ID, START_CHANNEL, NUM_CHANNELS,RENARD_SERIAL_BAUD);
+   }
+  
  delay(200);
-  radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL);
+  radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
   delay(200);
  renardData[0]=   SYNC;
  renardData[1]= COMMAND;

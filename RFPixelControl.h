@@ -58,6 +58,8 @@ public:
 	 */
 	bool Initalize( int  role, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pControllerId);
 
+void SetStartAndEndChannels();
+
 	
 	/**
 	 * Check what channel the radio is listeneing on
@@ -99,7 +101,7 @@ public:
 	   
 	   int ReadConfigurationFromEEPROM();
 	   
-	   void PrintControllerConfig(ControllerInfo* pControllerInfo);
+	   void PrintControllerConfig(ControllerInfo pControllerInfo);
 	   
 	   bool GetControllerDataUpdate( void );
 	   bool ProcessPacket(byte*  dest, byte* src);
@@ -114,6 +116,8 @@ public:
 	
 	int GetNumberOfChannels(int pLogicalController);
 	void AddLogicalController(int pLControllerName, int pLcontrollerStartChannel, int pLControllerNumChannels, int pLControllerBaudRate);
+	
+	  void PrintControllerConfig(void);
 
 private:
 	  uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/
