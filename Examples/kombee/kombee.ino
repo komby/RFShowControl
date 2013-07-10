@@ -40,9 +40,6 @@
 #define START_CHANNEL 211 //Where in the universe do we start
 #define FINAL_CHANNEL 275 //TODO Refactory out, addition would be easy....
 
-#define DATA_BUFFER_LENGTH  128  //TODO Refactor so this is just the NUM_CHANNELS
-
-
 #define LISTEN_CHANNEL 100 // the channel for the RF Radio
 
 #define CHANNELS_PER_PACKET 30    //how many bytes of data are in each packet

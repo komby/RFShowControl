@@ -151,23 +151,19 @@ RFPixelControl::~RFPixelControl() {
 			r=true;
 		}
 		else {
-			
-			printf("OTA hater pchan: %d\n",pChannel );
+			printf("OTA Config Disabled: %d\n",pChannel );
 			this->setChannel(pChannel); //Change from the default channel...
 			//channelSetSuccessfully = false;
 			this->_channel = pChannel;
 			this->_rf_data_rate = pDataRate;
 			
-			//if ( this->GetChannel() == RF_NODE_CONFIGURATION_CHANNEL)
-			//{
 				this->channelSetSuccessfully = true;
 				
 				//Setup Receiver to listen for configuration packets on the Configuration Channel
 				this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
 				this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
 				this->startListening();  //Start Listening!
-				//r=true;
-			//}
+				
 		}
  this->PrintControllerConfig()	  ;
 		 return r;
@@ -313,26 +309,12 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 	int numberOfLogicalControllers = 0;
 	if (this->available())
 	{
-		//printf("DEBUG - this->Available - %d\n", pReceiverId);
-		//for (bool done = false;!done;){
-		// Fetch the payload
-		//process it if we got one
-		//	for (bool done = false;!done;){
 		// Fetch the payload, and see if this was the last one.
 		this->read( &this->packetData, 32 );
-		//printf("done reading %d\n", done == true ? 1:0);
-		//	}
-		//if(this->read( &this->packetData, RF_PACKET_LENGTH ))
-		//{
-		//first check and see if the packet received is for this receiver
-		//if (this->packetData[IDX_CONTROLLER_ID]  == this->_controllerId  && this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT)
-		//{
-	//	printf("DEBUG - ConfigurationPacketFor = Controller%d    Configpackettyupe: [%d]\n",this->packetData[IDX_CONTROLLER_ID],this->packetData[IDX_CONFIG_PACKET_TYPE]);
 		//The First Configuration Packet contains the number of logical controllers for a given controller
 		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && this->packetData[IDX_CONTROLLER_ID]  == pReceiverId)
 		{
 			returnValue = true;
-		//	printf("DEBUG -ConfigurationPacketFor = Controller%d FirstConfPacket configpackettyupe: [%d]\n",this->packetData[IDX_CONTROLLER_ID], this->packetData[IDX_CONFIG_PACKET_TYPE]);
 			rfListenChannel = this->packetData[IDX_RF_LISTEN_CHANNEL];
 			rfListenRate = this->packetData[IDX_RF_LISTEN_RATE];
 			this->_numControllers = this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
@@ -340,7 +322,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 			this->_rf_data_rate = (rf24_datarate_e)rfListenRate;
 			
 			
-			//provision controlelr space for the configuration of logical controllers
+			//provision controller space for the configuration of logical controllers
 			this->_controllers = new ControllerInfo[numberOfLogicalControllers];
 			//(ControllerInfo*) malloc( this->_numControllers * sizeof (ControllerInfo) );
 			//ControllerInfo* ciTemp = this->_controllers;
@@ -361,13 +343,9 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 						
 						this->_controllers[i].startChannel = this->packetData[IDX_LOGICAL_CONTROLLER_START_CHANNEL];
 						this->_controllers[i].numChannels = this->packetData[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS];
-						printf("***SetLogic TO %d\n",this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER] );
 						this->_controllers[i].logicalControllerNumber = this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER];
 						lControllerCount++;
-						
-						//ciTemp++;
 						found=true;
-					//	printf("IDX_CONFIG_PACKET_TYPE: %d\nIDX_CONTROLLER_ID %d \n",this->packetData[IDX_CONFIG_PACKET_TYPE], this->packetData[IDX_CONTROLLER_ID] );
 						this->_controllers[i].baudRate = 0;
 						//ciTemp->reserved = 0;
 						//ciTemp->customConfig = 0;
@@ -391,7 +369,6 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 				}
 			}
 		}
-		//printf("DEBUGfGetControllerConfig%d : controller %d Type %d\n", returnValue, this->packetData[IDX_CONTROLLER_ID],this->packetData[IDX_CONFIG_PACKET_TYPE] );
 	}
 	if (returnValue)
 	printf("ReturnValue : true\n");
@@ -403,30 +380,21 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 
 
 
- void RFPixelControl::DisplayDiagnosticStartup(IPixelControl * string) {
-	   
-	     if ( payloadSizeSetSuccessful && dataRateSuccess && channelSetSuccessfully ) {
-			for ( int i = 0 ; i < string->GetPixelCount(); i++){
-				string->SetPixelColor(i, 0, 255, 0);
-
-			}
-		 }
-		 
-		 else {
-		 
-		 for ( int i = 0 ; i < string->GetPixelCount(); i++){
-				string->SetPixelColor(i, 255, 0, 0);
-
-			}
-		 
-		 }
-		 
-		 
-		 				string->Paint();
-						delay(10000);
-		
-		
-	  }
+ void RFPixelControl::DisplayDiagnosticStartup(IPixelControl * string) 
+ {
+	    if ( payloadSizeSetSuccessful && dataRateSuccess && channelSetSuccessfully ) {
+		    for ( int i = 0 ; i < string->GetPixelCount(); i++){
+			    string->SetPixelColor(i, 0, 255, 0);
+		    }
+	    }
+	    else {
+		    for ( int i = 0 ; i < string->GetPixelCount(); i++){
+			    string->SetPixelColor(i, 255, 0, 0);
+		    }
+	    }
+	    string->Paint();
+	    delay(10000);
+}
  
  //helper to check the channel we tried to set;
  uint8_t RFPixelControl::GetChannel(void){
@@ -493,8 +461,8 @@ bool RFPixelControl::Listen(void)
 /**
 *  processPacket - handles copying the needed channels from the radio data into the Renard data.
 *        This method takes a different approach for getting the data.  Originally I was looping through
-*        all the channels and I got bored.  So I wrote this convoluded code hoping to make things faster by using memcpy
-*        I havent done performance timining so who knows?  It passed my tests :)
+*        all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
+*        I haven't done performance timing so who knows?  It passed my tests :)
 *
 *  return - true if the last channel was found and its time for an update, otherwise false.
 */
@@ -570,7 +538,7 @@ bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
 	}
 	else
 	{
-		//final channel is before the end of this pacekt  (packetEndChannel >= finalChann )
+		//final channel is before the end of this packet  (packetEndChannel >= finalChann )
 		if (finalChannel >= packetStartChann)
 		{
 			//Because final is less than the packet end
