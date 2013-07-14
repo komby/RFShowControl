@@ -13,11 +13,6 @@ GECEPixelControl::GECEPixelControl() : GEColorEffects(50,2)
 }
 
 
-//GECEPixelControl::begin(uint8_t* pDataPointer, int pNumLEDs)
-//{
-	//IPixelControl::begin(pDataPointer, pNumLEDs)	;
-//}
-//
 /**
  * Paint method to keep compatibility with the other Pixel types
  * Call the adafruit method show to update the string.
