@@ -26,6 +26,20 @@
 #define BYTES_PER_PACKET 30       //TODO refactor....
 
 
+//NRF PINOUTS
+#define RF1_1_2				1
+#define RF1_1_3				2
+#define MINIMALIST_SHIELD	3
+#define RF1_0_2				4
+#define RF1_12V_0_1			5
+
+//PIXEL TYPES
+#define GECE				1
+#define WS2801				2
+#define WS2811				3
+#define RENARD				4
+
+
 typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 
 
