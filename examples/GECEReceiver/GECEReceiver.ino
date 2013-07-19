@@ -80,6 +80,20 @@ void setup()
 	strip.Paint();
 }
 
+void print_data(char *data)
+{
+	printf("--%3d:", 0);
+	for ( int i = 0; i < strip.GetPixelCount(); i++ )
+	{
+		printf(" 0x%02X", data[i] & 0xFF);
+		if ( (i-7) % 8 == 0 )
+		{
+			printf("\n\r--%3d:", i);
+		}
+	}
+	printf("\n\r\n");
+}
+
 //RF Listening to DMX packets loop
 void loop(void)
 {
@@ -87,6 +101,7 @@ void loop(void)
     //When Radio.Listen returns true its time to update the LEDs for all controlelrs,  A full update was made
     if (radio.Listen() )
     {
+		print_data((char *)radio.GetControllerDataBase(0));
 	    strip.Paint();
     }
 }
