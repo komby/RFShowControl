@@ -68,7 +68,8 @@ void setup()
 	Serial.begin(RENARD_SERIAL_BAUD);
 	Serial.println("\n[RenardTransmitter test]\n");
     printf_begin();
-    radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, RF24_250KBPS, 50 );
+	  //radio.Initalize( radio.TRANSMITTER, pipes, 100 , RF24_1MBPS , 0);
+    radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, RF24_1MBPS, 50 );
 	delayMicroseconds(150);
     radio.printDetails();
 }

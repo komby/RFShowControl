@@ -11,12 +11,12 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
+#include "printf.h"
 
 /***************************  CONFIGURATION SECTION BEGIN *************************************************/
 
 //How many pixels do you want to transmit data for (NOTE: Pixels, not channels)
-#define NUM_PIXELS 50
+#define NUM_PIXELS 170
 
 //Delay between RF transmissions (in microseconds)
 #define RF_DELAY      2000
@@ -26,17 +26,14 @@
 
 //Setup an RF pixel control
 //RF1 v.01 board uses Radio 9,10
-RFPixelControl radio(9,10);
-
+//RFPixelControl radio(9,10);
+//<<<<<<< HEAD
+//RFPixelControl radio(9,8);
 //RF1 v.1.2 and newer boards use Radio 8,7
 //The newer RF1 pins moved the radio pins so that
 //the PWM pins could be added to the 15 pin header
-//RFPixelControl radio(8,7);
+RFPixelControl radio(8,7);
 
-//kombyone due transmitter board radio settings.
-//RFPixelControl radio(33,10);
-
-/***************************  CONFIGURATION SECTION END *************************************************/
 
 //Initialize the RF packet buffer
 byte str[32];
@@ -52,10 +49,11 @@ void setup()
 {
   Serial.begin(57600);
   Serial.println("\n[TEST SENDER]\n");
-
-  radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL );
-  delayMicroseconds(150);
-
+ printf_begin();
+//
+  radio.Initalize( radio.TRANSMITTER, pipes, 100 , RF24_1MBPS , 0);
+ // radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL );
+  delayMicroseconds(300);
   radio.printDetails();
 }
 
@@ -66,7 +64,7 @@ void loop ()
 }
 
 
-// Show update method handles the transmission of the RF packets.  Its using the RF DMX tecnnique used by Joe Johnson for the RFColor2_4 library
+// Show update method handles the transmission of the RF packets.  Its using the RF DMX technique used by Joe Johnson for the RFColor2_4 library
 void showUpdate()
 {
   byte status = 0;
