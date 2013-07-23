@@ -11,8 +11,7 @@
 #include <IPixelControl.h>
 
 
-/*
-
+/*\
 *  Created on: June 30 2013
 *      Author: Greg Scull
 */
