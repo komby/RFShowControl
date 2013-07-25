@@ -121,8 +121,10 @@ void loop()
     if (packetready )
        //If there is a packet ready to write to the radio...Write it!
        {
+         packetready=false;
         radio.write_payload( &str[sub1-1], 32 );
-        packetready=false;
+        
+        //delay(2);
         }
 }
 
@@ -142,10 +144,10 @@ ISR(USART_RX_vect)
   case SYNC:
   
 
-      if (sub2>0)  //Check to see if we got here with a partial final packet we didn't yet send....  If we did, send it now.
+      if (sub2>0 && sub2 < 30)  //Check to see if we got here with a partial final packet we didn't yet send....  If we did, send it now.
          {
            
-            str[sub1][30]=sub1;
+            str[sub1++][30]=sub1;
             
             packetready=true;
          }
@@ -166,9 +168,11 @@ ISR(USART_RX_vect)
         break;
     
   case PAD:
+    delayMicroseconds(1);
     break;
 
   case ESCAPE:
+      delayMicroseconds(1);
         break;
 
 default:
@@ -188,4 +192,3 @@ default:
 //    break;
   }
 }
-

@@ -20,11 +20,11 @@
 
 
 /***************************  CONFIGURATION SECTION *************************************************/
+#define NRF_TYPE MINIMALIST_SHIELD
+//#define NRF_TYPE RF1_1_3
 
-#define NRF_TYPE RF1_1_3
-
-#define NRF_TRANSMITTER_DATARATE RF24_250KBPS
-
+//#define NRF_TRANSMITTER_DATARATE RF24_250KBPS
+#define NRF_TRANSMITTER_DATARATE RF24_1MBPS
 /***************************  CONFIGURATION SECTION *************************************************/
 
 #include <RFPixelControlConfig.h>
@@ -47,7 +47,7 @@ void setup(){
 	
 	printf_begin();
 	//radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL );
-       radio.Initalize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, NRF_TRANSMITTER_DATARATE, 1);
+	radio.Initalize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, NRF_TRANSMITTER_DATARATE, 1);
 	delayMicroseconds(5000);
 
 	radio.printDetails();
@@ -60,78 +60,77 @@ long durationAfter = 0;
 long checkduration = 0;
 boolean status;
 void loop () {
-       
-     //FirstPacket
-     //ConfigurationDataForReceiver 1
-     //
-     //COntroller 1  ID 50
-     int logicalSequence = 0;
-      str[IDX_CONTROLLER_ID]  = 50;
-     //The First Configuration Packet contains the number of logical controllers for a given controller
-      str[IDX_CONFIG_PACKET_TYPE] = CONTROLLERINFOINIT;
-      str[IDX_RF_LISTEN_CHANNEL] = 100;
-      str[IDX_RF_LISTEN_RATE] = NRF_TRANSMITTER_DATARATE;
-      str[IDX_NUMBER_OF_LOGICAL_CONTROLLERS] = 1;
-       printf("WritingPayloadFor init packet\n");
-       radio.write_payload( &str[0], 32 );
-       delayMicroseconds(5000);
-       status = radio.get_status();
-       while (status & 0x01) {
-          status = radio.get_status();
-      }
-      
-      
-      str[IDX_CONFIG_PACKET_TYPE] =LOGICALCONTROLLER_LED ;
-      str[IDX_CONTROLLER_ID] = 50;
-      str[IDX_LOGICAL_CONTROLLER_NUMBER] = logicalSequence;
-      str[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS] = 3;
-      str[IDX_LOGICAL_CONTROLLER_START_CHANNEL] = 1;
-      printf("WritingPayloadFor config packet\n");	
-     
-       radio.write_payload( &str[0], 32 );
-       delayMicroseconds(5000);
-       status = radio.get_status();
-       while (status & 0x01) {
-          status = radio.get_status();
-      }
-       //FirstPacket
-     //ConfigurationDataForReceiver 1
-     //
-     //COntroller 1  ID 33
-      str[IDX_CONTROLLER_ID]  = 33;
-      logicalSequence = 0;
-     //The First Configuration Packet contains the number of logical controllers for a given controller
-      str[IDX_CONFIG_PACKET_TYPE] = CONTROLLERINFOINIT;
-      str[IDX_RF_LISTEN_CHANNEL] = 100;
-      str[IDX_RF_LISTEN_RATE] = NRF_TRANSMITTER_DATARATE;
-      str[IDX_NUMBER_OF_LOGICAL_CONTROLLERS] = 1;
-       printf("WritingPayloadFor init packet\n");
-       radio.write_payload( &str[0], 32 );
-       delayMicroseconds(5000);
-       status = radio.get_status();
-       while (status & 0x01) {
-          status = radio.get_status();
-      }
-      
-      
-      str[IDX_CONFIG_PACKET_TYPE] = LOGICALCONTROLLER_LED;
-      str[IDX_CONTROLLER_ID] = 33;
-      str[IDX_LOGICAL_CONTROLLER_NUMBER] = logicalSequence;
-      str[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS] = 150;
-      str[IDX_LOGICAL_CONTROLLER_START_CHANNEL] = 4;
+	
+	//FirstPacket
+	//ConfigurationDataForReceiver 1
+	//
+	//COntroller 1  ID 50
+	int logicalSequence = 0;
+	str[IDX_CONTROLLER_ID]  = 50;
+	//The First Configuration Packet contains the number of logical controllers for a given controller
+	str[IDX_CONFIG_PACKET_TYPE] = CONTROLLERINFOINIT;
+	str[IDX_RF_LISTEN_CHANNEL] = 100;
+	str[IDX_RF_LISTEN_RATE] = NRF_TRANSMITTER_DATARATE;
+	str[IDX_NUMBER_OF_LOGICAL_CONTROLLERS] = 1;
+	printf("WritingPayloadFor init packet\n");
+	radio.write_payload( &str[0], 32 );
+	delayMicroseconds(5000);
+	status = radio.get_status();
+	while (status & 0x01) {
+		status = radio.get_status();
+	}
+	
+	
+	str[IDX_CONFIG_PACKET_TYPE] =LOGICALCONTROLLER_LED ;
+	str[IDX_CONTROLLER_ID] = 50;
+	str[IDX_LOGICAL_CONTROLLER_NUMBER] = logicalSequence;
+	str[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS] = 3;
+	str[IDX_LOGICAL_CONTROLLER_START_CHANNEL] = 1;
+	printf("WritingPayloadFor config packet\n");
+	
+	radio.write_payload( &str[0], 32 );
+	delayMicroseconds(5000);
+	status = radio.get_status();
+	while (status & 0x01) {
+		status = radio.get_status();
+	}
+	//FirstPacket
+	//ConfigurationDataForReceiver 1
+	//
+	//COntroller 1  ID 33
+	str[IDX_CONTROLLER_ID]  = 33;
+	logicalSequence = 0;
+	//The First Configuration Packet contains the number of logical controllers for a given controller
+	str[IDX_CONFIG_PACKET_TYPE] = CONTROLLERINFOINIT;
+	str[IDX_RF_LISTEN_CHANNEL] = 100;
+	str[IDX_RF_LISTEN_RATE] = NRF_TRANSMITTER_DATARATE;
+	str[IDX_NUMBER_OF_LOGICAL_CONTROLLERS] = 1;
+	printf("WritingPayloadFor init packet\n");
+	radio.write_payload( &str[0], 32 );
+	delayMicroseconds(5000);
+	status = radio.get_status();
+	while (status & 0x01) {
+		status = radio.get_status();
+	}
+	
+	
+	str[IDX_CONFIG_PACKET_TYPE] = LOGICALCONTROLLER_LED;
+	str[IDX_CONTROLLER_ID] = 33;
+	str[IDX_LOGICAL_CONTROLLER_NUMBER] = logicalSequence;
+	str[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS] = 150;
+	str[IDX_LOGICAL_CONTROLLER_START_CHANNEL] = 4;
 
 
-	 printf("WritingPayloadFor config packet\n");	
-     
-       radio.write_payload( &str[0], 32 );
-       delayMicroseconds(5000);
-       status = radio.get_status();
-       while (status & 0x01) {
-          status = radio.get_status();
-      }
-      
-      
-      
+	printf("WritingPayloadFor config packet\n");
+	
+	radio.write_payload( &str[0], 32 );
+	delayMicroseconds(5000);
+	status = radio.get_status();
+	while (status & 0x01) {
+		status = radio.get_status();
+	}
+	
+	
+	
 }
-
 

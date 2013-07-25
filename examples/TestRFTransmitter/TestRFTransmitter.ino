@@ -24,6 +24,11 @@
 //Use channel 100
 #define TRANSMIT_CHANNEL 100
 
+#define NRF_TYPE			RF1_1_2
+
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
+
 //Setup an RF pixel control
 //RF1 v.01 board uses Radio 9,10
 //RFPixelControl radio(9,10);
@@ -32,7 +37,7 @@
 //RF1 v.1.2 and newer boards use Radio 8,7
 //The newer RF1 pins moved the radio pins so that
 //the PWM pins could be added to the 15 pin header
-RFPixelControl radio(8,7);
+//RFPixelControl radio(8,7);
 
 
 //Initialize the RF packet buffer
