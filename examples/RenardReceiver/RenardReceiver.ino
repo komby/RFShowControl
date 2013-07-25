@@ -23,9 +23,9 @@
 
 // REQUIRED VARIABLES
 #define RECEIVER_UNIQUE_ID 50
-#define NRF_TYPE			RF1_1_2
+#define NRF_TYPE			RF1_1_3
 #define PIXEL_TYPE			RENARD
-#define RENARD_BAUD_RATE	57600
+#define RENARD_BAUD_RATE		57600
 #define PIXEL_PIN			3
 
 
@@ -33,14 +33,14 @@
 // your RF1s in the field.  This will cause the RF1s to search for a
 // configuration broadcast for 5 seconds after power-on before attempting to
 // read EEPROM for the last known working configuration.
-#define OTA_CONFIG 1
+#define OTA_CONFIG 			0
 
 
 // If you're not using Over-The-Air configuration these variables are required:
-#define DMX_START_CHANNEL 0
-#define DMX_NUM_PIXELS 50
-#define LISTEN_CHANNEL 100	// the channel for the RF Radio
-
+#define DMX_START_CHANNEL 		0
+#define DMX_NUM_PIXELS 			50
+#define LISTEN_CHANNEL 			100	// the channel for the RF Radio
+#define DATA_RATE 			RF24_1MBPS
 
 //*****************************************************************************
 
@@ -56,7 +56,7 @@
 //Arduino setup function.
 void setup()
 {
-	Serial.begin(57600);
+	Serial.begin(RENARD_BAUD_RATE);
 #ifdef DEBUG
 	printf_begin();
 #endif
@@ -68,7 +68,7 @@ void setup()
 	radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
 #endif
 
-	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, RF24_250KBPS, RECEIVER_UNIQUE_ID);
+	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 //	radio.printDetails();
 	//radio.PrintControllerConfig();
 	
