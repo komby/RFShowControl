@@ -1,8 +1,8 @@
 /*
- * GECERFReceiver.cpp
+ * RenardReceiver.ino
  *
  *  Created on: Mar  2013
- *      Author: Greg Scull, komby@komby.com
+ *      Author: Materdaddy
  *      
  *      Users of this software agree to hold harmless the creators and contributors
  *      of this software. You, by using this software, are assuming all legal responsibility
