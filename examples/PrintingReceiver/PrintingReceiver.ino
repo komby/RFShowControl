@@ -1,34 +1,10 @@
 /*
- * WM2999Receiver.cpp
+ * 
  *
  *  Created on: Mar  2013
  *      Author: Greg Scull, komby@komby.com
  *
- *      This code is a derivative of the original work done by
- *      Joe Johnson RFColor_24 Receiver Program
- *
- *      The Code which Joe wrote inspired this software, the related hardware and
- *      it was also used as a starting point for this class.
- *
- *      As with the RFColor_24 The commercial Use of this software is Prohibited.
- *      Use this software and (especially) the hardware at your own risk.
- *
- *      !!!!WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING !!!!
- *
- *      The WM2999 controller is a HIGH VOLTAGE DEVICE
- *
- *      DO NOT, I REPEAT... DO NOT TOUCH, LICK, or otherwise MOLEST THE WM2999 Controller
- *      OR the Original Holiday time color changing lights controller while it is plugged in a power outlet.
- *      Without proper isolation hardware you MUST not connect the controller
- *      to your computer while it is plugged in.
- *
- *      Users of this software agree to hold harmless the creators and contributors
- *      of this software.  By using this software you agree that you are doing so at your own risk, you
- *      could kill yourself or someone else by using this software and/or modifying the
- *      factory controller.  You, by using this software, are assuming all legal responsibility
- *      for the use of the software and any hardware it is used on.
- *
- *      The Commercial Use of this Software is Prohibited.
+ *   Print packet content and optionally packet data snooping on transmitter channels
  */
 
 
@@ -45,23 +21,16 @@
  
  */
 
-//Uncomment for serial
-#define DEBUG 0
+//Uncomment for serial output of all data
+#define FULL_PRINT_DEBUG 0
+
 
 //NRF24L01+ Items
 
-//#define outPin 19  //Arduino pin # that Lights are Connected to.  This is actually Pin #28 on the Atmega 328 IC
-#define lightCount 20  //Total # of lights on string (usually 50, 48, or 36)
 
 
 byte gotstr[32];
-uint16_t counter=0;
-uint8_t led_counter=0;
-uint16_t dmx_counter=0;
-int pkt_begin=0;
-int  pkt_max=0;
-int  z=0;
-bool readytoupdate=false;
+
 
 
 
@@ -91,17 +60,12 @@ void setup() {
 		 radio.AddLogicalController(0, 1, 464,  0);
 	 }
 	Serial.begin(57600);
-	Serial.write("Initializing reciever\n");
+	Serial.write("Initializing DEBUG listener\n");
 
-
-
-	Serial.write("Initializing Radio\n");
-//	 radio.Initalize( radio.RECIEVER pipes, TRANSMIT_CHANNEL, RF24_250KBPS, 50 );
 	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,0);
   radio.printDetails(); 
 	Serial.write("Init and Paint LEDS for startup \n");
- //radio.DisplayDiagnosticStartup(&strip) ;
-// channels = radio.GetControllerDataBase(0);
+
 }
      
 
@@ -109,20 +73,21 @@ void setup() {
 
 //RF Listening to DMX packets loop
 void loop(void){
-int packetOffset = 0;
- boolean done= radio.read( &data, 32 );
-  if (done){
-    packetOffset =  data[30] *30;
-    printf("\n\r--%3d:", packetOffset);
-      for ( int i =0;i<30;i++){
+  int packetOffset = 0;
+  if ( radio.available() )
+  {
+     radio.read( &data, 32 );
     
-		printf(" 0x%02X", data[i]);
-		if ( (i-7) % 8 == 0 )
-		{
-			printf("\n\r--%3d:", i  + packetOffset);
-		}
-  
+        packetOffset =  data[30] *30;
+        printf("\n\r--%3d:",  data[30] );
+        for ( int i =0;i<30 && FULL_PRINT_DEBUG;i++)
+        {
+          printf(" 0x%02X", data[i]);
+  	  if ( (i-7) % 8 == 0 )
+	  {
+	    printf("\n\r--%3d:", i  + packetOffset);
+	  }
+        }
+     
   }
-
-}
 }
