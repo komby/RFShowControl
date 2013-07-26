@@ -27,8 +27,8 @@
 #define NRF_TYPE			RF1_1_3
 #define PIXEL_TYPE			FAST_SPI
 #define PIXEL_PROTOCOL		WS2801
-#define PIXEL_DATA_PIN			2
-#define PIXEL_CLOCK_PIN			4
+#define PIXEL_DATA_PIN 2
+#define PIXEL_CLOCK_PIN 4
 
 // Set OTA_CONFIG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
@@ -74,17 +74,19 @@ void setup()
 	Serial.begin(57600);
 	
 	printf_begin();
+	
+	LEDS.setBrightness(LED_BRIGHTNESS);
 	// sanity check delay - allows reprogramming if accidently blowing power w/leds
 	delay(2000);
-	 radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-	 
-	 
-	 if(!OVER_THE_AIR_CONFIG_ENABLE)
-	 {
+	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+	
+	
+	if(!OVER_THE_AIR_CONFIG_ENABLE)
+	{
 		
-		 radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
-	 }
-	 
+		radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
+	}
+	
 	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	LEDS.setBrightness(LED_BRIGHTNESS);
@@ -95,28 +97,24 @@ void setup()
 	
 	
 
-	#if (PIXEL_TYPE == FAST_SPI)
-LEDS.setBrightness(LED_BRIGHTNESS);
-#if (PIXEL_PROTOCOL == WS2801)
-	LEDS.addLeds<WS2801, PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB, DATA_RATE_MHZ(1)>(leds, NUM_LEDS);
-#else
-#if  (PIXEL_PROTOCOL == LPD8806)
+
+	#if (PIXEL_PROTOCOL == LPD8806)
 	LEDS.addLeds<LPD8806,PIXEL_DATA_PIN, PIXEL_CLOCK_PIN>(leds, NUM_LEDS);
-#else
-#if  (PIXEL_PROTOCOL == WS2811)
+	//LEDS.addLeds<WS2801, 11, 13, BGR, DATA_RATE_MHZ(1)>(leds, NUM_LEDS);
+	#elif (PIXEL_PROTOCOL == WS2801)
+	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
+	//LEDS.addLeds<WS2801, PIXEL_DATA_PIN , PIXEL_CLOCK_PIN , RGB >(leds , NUM_LEDS);
+	#elif (PIXEL_PROTOCOL == WS2811)
 	LEDS.addLeds<WS2811,PIXEL_DATA_PIN>(leds, NUM_LEDS);
-#else
-#if  (PIXEL_PROTOCOL == UCS1903)
+	#elif  (PIXEL_PROTOCOL == UCS1903)
 	LEDS.addLeds<UCS1903, PIXEL_DATA_PIN>(leds, NUM_LEDS);
-#else
-#if  (PIXEL_PROTOCOL == TM1803)
+	#elif  (PIXEL_PROTOCOL == TM1803)
 	LEDS.addLeds<TM1803, PIXEL_DATA_PIN>(leds, NUM_LEDS);
-#else
-#if  (PIXEL_PROTOCOL == SM16716)
+	#elif  (PIXEL_PROTOCOL == SM16716)
 	LEDS.addLeds<SM16716,PIXEL_DATA_PIN>(leds, NUM_LEDS);
-#else Must define PIXEL_PROTOCOL : (WS2801,LPD8806,WS2811,UCS1903,TM1803,SM16716)
-#endif
-#endif
+	#else Must define PIXEL_PROTOCOL : (WS2801,LPD8806,WS2811,UCS1903,TM1803,SM16716)
+	#endif
+
 	
 	//Initalize the data for LEDs
 	memset(leds, 0,  NUM_LEDS * sizeof(struct CRGB));
