@@ -22,66 +22,39 @@
 
 
 /**************CONFIGURATION SECTION ***************************/
+// REQUIRED VARIABLES
+#define RECEIVER_UNIQUE_ID 50
+#define NRF_TYPE			RF1_1_3
+#define PIXEL_TYPE			FAST_SPI
+#define PIXEL_PROTOCOL		WS2801
+#define PIXEL_DATA_PIN			2
+#define PIXEL_CLOCK_PIN			4
+
+// Set OTA_CONFIG to 1 if you are making a configuration node to re-program
+// your RF1s in the field.  This will cause the RF1s to search for a
+// configuration broadcast for 5 seconds after power-on before attempting to
+// read EEPROM for the last known working configuration.
 #define OVER_THE_AIR_CONFIG_ENABLE 1
 
-//Step 0.  Over The Air Configuration Enabled
-//Make this number unique for every receiver that you enable
-//the OTA configuration will need it
-#define RECEIVER_UNIQUE_ID 33
+// If you're not using Over-The-Air configuration these variables are required:
+//If you are using OTA then your done,  ignore this stuff.
+#define DMX_START_CHANNEL 0
+#define DMX_NUM_PIXELS 50
+#define LISTEN_CHANNEL 100	// the channel for the RF Radio
+#define DATA_RATE RF24_1MBPS
 
-//change the 1 to a 0 if you do not want
-//to use OTA configuration
-// #define  OVER_THE_AIR_CONFIGURATION 1
-
-//Step 1.
-//Radio Configuration -
-//What Channel do you want this nRF24L01+ to listen on?
-//will be used for fallback if EEPROM and OTA do not work
-#define LISTEN_CHANNEL 100
-
-//Step 2.
-//What Pins is your nRF24L01+ CE and CSN connected to?
-//Usage:   RFPixelControl radio(CE, CSN);
-
-//RF1 v0.2 & RF1_12V 0.1 PCB ises( PB0, Arduino Pin 8  for CE ) (PD7 Arduino pin 7 for CSN)
-RFPixelControl radio(8,7);
-//RFPixelControl radio(9,10); //RF1 Version 0.1 (maniacbug wiring)
-
-
-
-//Step 3.
 //How Many Pixels are in your string?  This is the number of pixels not the number of LEDs or channels
 #define NUM_LEDS 50
 #define NUM_LEDS_PER_PIXEL 3
 
-//struct CRGB leds[NUM_LEDS];
-//Step 4.
+
+//You dont really need to change these.
 //How Bright should our LEDs start at
 #define LED_BRIGHTNESS 128 //50%
 
-//Step 5.
-//Which channels are you planning for using on this controller?  Most transmitters are broadcasting 512 Channels
-//Use this range (starting at 0)
-
-//For example if this is the first string of lights  listening to nRF24L01+ RFChannel 100 starting at DMX channel 0
-//It will use channels 0-149
-#define DMX_START_CHANNEL 0
-
-//Second controller listening to channels 150-349
-//#define DMX_START_CHANNEL 150
-
-//  One More Step - This one is in the Setup Method
-//  Scroll down to Step 6.
-
 /**************END CONFIGURATION SECTION ***************************/
-
-// Radio pipe addresses for the 2 nodes to communicate.
-//these should not need to be modified
-const uint64_t pipes[2] = {
-0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
-
-//create the pixel control impl with the  driver
-//Fast_SPI2_RFPixelControl strip =  Fast_SPI2_RFPixelControl();
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
 
 byte gotstr[32];
 uint16_t counter=0;
@@ -120,30 +93,30 @@ void setup()
 	
 	leds =(CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
 	
-	//Step 6.
-	//Choose your light controller  Comment/Uncomment as needed
+	
 
-	
-	// Put ws2801 strip on the hardware SPI pins with a BGR ordering of rgb and limited to a 1Mhz data rate
-	LEDS.addLeds<WS2801, 2, 4, RGB, DATA_RATE_MHZ(1)>(leds, NUM_LEDS);
-
-	// LEDS.addLeds<LPD8806, 2, 4>(leds, NUM_LEDS);
-	// LEDS.addLeds<WS2811, 13, BRG>(leds, NUM_LEDS);
-	// LEDS.addLeds<LPD8806, BGR>(leds, NUM_LEDS);
-	
-	
-	//Unused Hardware SPI
-	// LEDS.addLeds<WS2811, 13>(leds, NUM_LEDS);
-	// LEDS.addLeds<TM1809, 13>(leds, NUM_LEDS);
-	// LEDS.addLeds<UCS1903, 13>(leds, NUM_LEDS);
-	// LEDS.addLeds<TM1803, 13>(leds, NUM_LEDS);
-
-	//LEDS.addLeds<LPD8806>(leds, NUM_LEDS)->clearLeds(300);
-	// LEDS.addLeds<WS2801>(leds, NUM_LEDS);
-	// LEDS.addLeds<SM16716>(leds, NUM_LEDS);
-	
-	// LEDS.addLeds<WS2811, 11>(leds, NUM_LEDS);
-	//All done.  You dont need to modify anything else.
+	#if (PIXEL_TYPE == FAST_SPI)
+LEDS.setBrightness(LED_BRIGHTNESS);
+#if (PIXEL_PROTOCOL == WS2801)
+	LEDS.addLeds<WS2801, PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB, DATA_RATE_MHZ(1)>(leds, NUM_LEDS);
+#else
+#if  (PIXEL_PROTOCOL == LPD8806)
+	LEDS.addLeds<LPD8806,PIXEL_DATA_PIN, PIXEL_CLOCK_PIN>(leds, NUM_LEDS);
+#else
+#if  (PIXEL_PROTOCOL == WS2811)
+	LEDS.addLeds<WS2811,PIXEL_DATA_PIN>(leds, NUM_LEDS);
+#else
+#if  (PIXEL_PROTOCOL == UCS1903)
+	LEDS.addLeds<UCS1903, PIXEL_DATA_PIN>(leds, NUM_LEDS);
+#else
+#if  (PIXEL_PROTOCOL == TM1803)
+	LEDS.addLeds<TM1803, PIXEL_DATA_PIN>(leds, NUM_LEDS);
+#else
+#if  (PIXEL_PROTOCOL == SM16716)
+	LEDS.addLeds<SM16716,PIXEL_DATA_PIN>(leds, NUM_LEDS);
+#else Must define PIXEL_PROTOCOL : (WS2801,LPD8806,WS2811,UCS1903,TM1803,SM16716)
+#endif
+#endif
 	
 	//Initalize the data for LEDs
 	memset(leds, 0,  NUM_LEDS * sizeof(struct CRGB));
