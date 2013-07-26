@@ -23,9 +23,13 @@
 
 /**************CONFIGURATION SECTION ***************************/
 // REQUIRED VARIABLES
-#define RECEIVER_UNIQUE_ID 50
-#define NRF_TYPE			RF1_1_3
-#define PIXEL_TYPE			FAST_SPI
+#define RECEIVER_UNIQUE_ID 33
+
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE  RF1_1_3
+
+//What Kind of pixels? Valid Values: LPD8806,WS2801,SM16716,TM1809, TM1803, UCS1903, WS2811
 #define PIXEL_PROTOCOL		WS2801
 #define PIXEL_DATA_PIN 2
 #define PIXEL_CLOCK_PIN 4
@@ -45,14 +49,15 @@
 
 //How Many Pixels are in your string?  This is the number of pixels not the number of LEDs or channels
 #define NUM_LEDS 50
-#define NUM_LEDS_PER_PIXEL 3
 
 
+/**************END CONFIGURATION SECTION ***************************/
+#define PIXEL_TYPE			FAST_SPI
 //You dont really need to change these.
 //How Bright should our LEDs start at
 #define LED_BRIGHTNESS 128 //50%
+#define NUM_LEDS_PER_PIXEL 3
 
-/**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 
@@ -99,19 +104,20 @@ void setup()
 
 
 	#if (PIXEL_PROTOCOL == LPD8806)
-	LEDS.addLeds<LPD8806,PIXEL_DATA_PIN, PIXEL_CLOCK_PIN>(leds, NUM_LEDS);
-	//LEDS.addLeds<WS2801, 11, 13, BGR, DATA_RATE_MHZ(1)>(leds, NUM_LEDS);
+	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
 	#elif (PIXEL_PROTOCOL == WS2801)
 	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
-	//LEDS.addLeds<WS2801, PIXEL_DATA_PIN , PIXEL_CLOCK_PIN , RGB >(leds , NUM_LEDS);
-	#elif (PIXEL_PROTOCOL == WS2811)
-	LEDS.addLeds<WS2811,PIXEL_DATA_PIN>(leds, NUM_LEDS);
-	#elif  (PIXEL_PROTOCOL == UCS1903)
-	LEDS.addLeds<UCS1903, PIXEL_DATA_PIN>(leds, NUM_LEDS);
-	#elif  (PIXEL_PROTOCOL == TM1803)
-	LEDS.addLeds<TM1803, PIXEL_DATA_PIN>(leds, NUM_LEDS);
 	#elif  (PIXEL_PROTOCOL == SM16716)
-	LEDS.addLeds<SM16716,PIXEL_DATA_PIN>(leds, NUM_LEDS);
+	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
+	#elif  (PIXEL_PROTOCOL == TM1809)
+	LEDS.addLeds(  new TM1809Controller800Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
+	#elif  (PIXEL_PROTOCOL == TM1803)
+	LEDS.addLeds(  new TM1803Controller400Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
+	#elif  (PIXEL_PROTOCOL == UCS1903)
+	LEDS.addLeds(  new UCS1903Controller400Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
+	#elif (PIXEL_PROTOCOL == WS2811)
+	LEDS.addLeds(  new WS2811Controller800Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
+	
 	#else Must define PIXEL_PROTOCOL : (WS2801,LPD8806,WS2811,UCS1903,TM1803,SM16716)
 	#endif
 
@@ -129,4 +135,4 @@ void loop(void)
 	{
 		LEDS.show();
 	}
-}
+}s
