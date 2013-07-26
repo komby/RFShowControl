@@ -1,8 +1,8 @@
 /*
  * GECERFReceiver.cpp
  *
- *  Created on: Mar  2013
- *      Author: Greg Scull, komby@komby.com
+ *  Created on: June 20th, 2013
+ *      Author: Mat Mrosko
  *      
  *      Users of this software agree to hold harmless the creators and contributors
  *      of this software. You, by using this software, are assuming all legal responsibility
@@ -17,16 +17,24 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
-
-
+#include <OTAConfig.h>
+#include <GECEPixelControl.h>
+#include <GEColorEffects.h>
 //*****************************************************************************
 
 // REQUIRED VARIABLES
-#define RECEIVER_UNIQUE_ID 50
-#define NRF_TYPE			MINIMALIST_SHIELD
-#define PIXEL_TYPE			GECE
-#define PIXEL_PIN			3
+//Make sure you choose a unique ID if you are using OTA config!
+#define RECEIVER_UNIQUE_ID 33
 
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE			RF1_1_3
+#define PIXEL_TYPE			GECE
+#define PIXEL_PIN			2
+
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_1MBPS
 
 // Set OTA_CONFIG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
@@ -39,6 +47,7 @@
 #define DMX_START_CHANNEL 0
 #define DMX_NUM_PIXELS 50
 #define LISTEN_CHANNEL 100	// the channel for the RF Radio
+
 
 
 //*****************************************************************************
@@ -67,7 +76,7 @@ void setup()
 	radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
 #endif
 
-	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, RF24_250KBPS, RECEIVER_UNIQUE_ID);
+	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	//radio.PrintControllerConfig();
 	

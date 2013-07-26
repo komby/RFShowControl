@@ -6,7 +6,7 @@
  *      Author: Mat Mrosko
  */
 
-#include "GECEPixelControl.h"
+#include <GECEPixelControl.h>
 
 GECEPixelControl::GECEPixelControl(uint8_t pin) : GEColorEffects(50,pin)
 {
@@ -33,4 +33,3 @@ void GECEPixelControl::Paint()
 
 	sei();
 }
-
