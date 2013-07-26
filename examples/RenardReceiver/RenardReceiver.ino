@@ -22,7 +22,7 @@
 //*****************************************************************************
 
 // REQUIRED VARIABLES
-#define RECEIVER_UNIQUE_ID 50
+#define RECEIVER_UNIQUE_ID 33
 #define NRF_TYPE			RF1_1_3
 #define PIXEL_TYPE			RENARD
 #define RENARD_BAUD_RATE		57600
@@ -33,7 +33,7 @@
 // your RF1s in the field.  This will cause the RF1s to search for a
 // configuration broadcast for 5 seconds after power-on before attempting to
 // read EEPROM for the last known working configuration.
-#define OTA_CONFIG 			0
+#define OTA_CONFIG 			1
 
 
 // If you're not using Over-The-Air configuration these variables are required:
@@ -69,8 +69,7 @@ void setup()
 #endif
 
 	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
-//	radio.printDetails();
-	//radio.PrintControllerConfig();
+
 	
 	uint8_t logicalControllerNumber = 0;
 
@@ -95,14 +94,13 @@ void print_data(char *data)
 	printf("\n\r\n");
 }
 
-//RF Listening to DMX packets loop
+//RF Listening for data
 void loop(void)
 {
     
     //When Radio.Listen returns true its time to update the LEDs for all controlelrs,  A full update was made
     if (radio.Listen() )
     {
-//		print_data((char *)radio.GetControllerDataBase(0));
 	    strip.Paint();
     }
 }
