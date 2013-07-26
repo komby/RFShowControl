@@ -64,16 +64,18 @@ void setup()
 	Serial.println("Initializing Radio");
 
 	radio.EnableOverTheAirConfiguration(OTA_CONFIG);
+		
+		uint8_t logicalControllerNumber = 0;
 #if (OTA_CONFIG == 0)
-	radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
+	
+	radio.AddLogicalController(logicalControllerNumber++, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
 #endif
 
 	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
-	
-	uint8_t logicalControllerNumber = 0;
 
-	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
+	logicalControllerNumber = 0;
+	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber++));
 
 	for (int i = 0; i < strip.GetPixelCount(); i++)
 		strip.SetPixelColor(i, strip.Color(0, 0, 0));

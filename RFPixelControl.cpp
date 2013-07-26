@@ -217,7 +217,7 @@ RFPixelControl::~RFPixelControl() {
 	 printf("LogicalControllerNumber:%d\n", pControllerInfo.logicalControllerNumber );
 	 printf("CntrlStartChannel:%d\n", pControllerInfo.startChannel );
 	 printf("CntrlNumChannels:%d\n", pControllerInfo.numChannels);
-	 //printf("CntrlBaudRate:%d\n", pControllerInfo->baudRate);
+	 printf("CntrlBaudRate:%d\n", pControllerInfo.baudRate);
 
  }
  

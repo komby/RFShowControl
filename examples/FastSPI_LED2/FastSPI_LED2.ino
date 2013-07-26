@@ -85,18 +85,18 @@ void setup()
 	delay(2000);
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 	
-	
+	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
 		
-		radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
+		radio.AddLogicalController(logicalControllerNumber, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
 	}
 	
 	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	LEDS.setBrightness(LED_BRIGHTNESS);
 	
-	uint8_t logicalControllerNumber = 0;
+	logicalControllerNumber = 0;
 	
 	leds =(CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
 	
@@ -135,4 +135,4 @@ void loop(void)
 	{
 		LEDS.show();
 	}
-}s
+}
