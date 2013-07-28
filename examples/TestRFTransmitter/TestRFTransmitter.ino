@@ -45,16 +45,18 @@ void setup()
 	Serial.begin(57600);
 	Serial.println("\n[TEST RF Transmitter]\n");
 	printf_begin();
-
-	radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL , DATA_RATE , 0);
+	delay(5);
+	radio.Initalize( 1, pipes, TRANSMIT_CHANNEL , DATA_RATE , 0);
 	
-	delayMicroseconds(300);
+	delay(5);
 	radio.printDetails();
+	delay(5);
 }
 
 
 void loop ()
 {
+	
 	rainbow( NUM_PIXELS);
 }
 

@@ -25,7 +25,7 @@ void RenardControl::Paint()
 	Serial.write(0x7E);
 	Serial.write(0x80);
 
-	for ( int i = 0; i < (numLEDs*3); i++ )
+	for ( int i = 0; i < (numLEDs); i++ )
 	{
 		switch (pixels[i])
 		{

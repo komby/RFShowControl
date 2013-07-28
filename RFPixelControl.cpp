@@ -74,7 +74,9 @@ RFPixelControl::~RFPixelControl() {
 		 }
 		 this->openWritingPipe(pPipes[0]);  //Open pipe for Writing
 		 this->openReadingPipe(1,pPipes[1]);  //Open pipe for Reading...But we aren't reading anything....
-		 this->setPALevel(RF24_PA_HIGH);  //Set the power level to high!
+		 //this->setPALevel(RF24_PA_HIGH);  //Set the power level to high!
+		 this->setPALevel(RF24_PA_MAX);  //Set the power level to high!
+		 
 		 this->write_register(CONFIG, ( this->read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );  //set up radio for writing!
 		 this->flush_tx();  //Clear the TX FIFO Buffers
 		 this->powerUp();  //Fire up the radio
