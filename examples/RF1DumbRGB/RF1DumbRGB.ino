@@ -78,22 +78,21 @@
 
 
 #define LISTEN_CHANNEL 100 // the channel for the RF Radio
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_1MBPS
 
+ 
+ /**************END CONFIGURATION SECTION ***************************/
 
-
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
 
 bool readytoupdate=false;
 
 byte * buffer;
 
- 
- 
-/**************END CONFIGURATION SECTION ***************************/
 
-// Radio pipe addresses for the 2 nodes to communicate.
-//these should not need to be modified
-const uint64_t pipes[2] = { 
-  0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 //Uncomment for serial
 #define DEBUG 0
 
