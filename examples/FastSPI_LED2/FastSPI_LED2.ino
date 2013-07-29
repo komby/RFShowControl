@@ -103,27 +103,28 @@ void setup()
 	
 
 
-	#if (PIXEL_PROTOCOL == LPD8806)
-	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
-	#elif (PIXEL_PROTOCOL == WS2801)
-	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
-	#elif  (PIXEL_PROTOCOL == SM16716)
-	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, NUM_LEDS, 0);
-	#elif  (PIXEL_PROTOCOL == TM1809)
-	LEDS.addLeds(  new TM1809Controller800Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
-	#elif  (PIXEL_PROTOCOL == TM1803)
-	LEDS.addLeds(  new TM1803Controller400Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
-	#elif  (PIXEL_PROTOCOL == UCS1903)
-	LEDS.addLeds(  new UCS1903Controller400Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
-	#elif (PIXEL_PROTOCOL == WS2811)
-	LEDS.addLeds(  new WS2811Controller800Khz<PIXEL_DATA_PIN>(), leds, NUM_LEDS, 0);
+	#if (PIXEL_PROTOCOL == LPD_8806)
+	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, HARDCODED_NUM_PIXELS, 0);
+	#elif (PIXEL_PROTOCOL == WS_2801)
+	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, HARDCODED_NUM_PIXELS, 0);
+	#elif  (PIXEL_PROTOCOL == SM_16716)
+	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, HARDCODED_NUM_PIXELS, 0);
+	#elif  (PIXEL_PROTOCOL == TM_1809)
+	LEDS.addLeds(  new TM1809Controller800Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	#elif  (PIXEL_PROTOCOL == TM_1803)
+	LEDS.addLeds(  new TM1803Controller400Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	#elif  (PIXEL_PROTOCOL == UCS_1903)
+	LEDS.addLeds(  new UCS1903Controller400Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	#elif (PIXEL_PROTOCOL == WS_2811)
+	LEDS.addLeds(  new WS2811Controller800Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
 	
 	#else Must define PIXEL_PROTOCOL : (WS2801,LPD8806,WS2811,UCS1903,TM1803,SM16716)
 	#endif
 
 	
 	//Initalize the data for LEDs
-	memset(leds, 0,  NUM_LEDS * sizeof(struct CRGB));
+	//todo eventually this will be a bug
+	memset(leds, 0,  HARDCODED_NUM_PIXELS * sizeof(struct CRGB));
 	delay (200);
 	radio.PrintControllerConfig();
 }

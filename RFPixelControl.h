@@ -35,8 +35,8 @@
 
 //PIXEL TYPES
 #define GECE				1
-#define WS2801				2
-#define WS2811				3
+#define WS_2801				2
+#define WS_2811				3
 #define RENARD				4
 #define WM_2999				5
 #define LPD_6803			6
