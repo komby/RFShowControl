@@ -37,15 +37,15 @@
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to listen to.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.
 
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE			RF1_1_3
 //What Speed do you want to use to transmit?
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
 //Use channel 100
 #define TRANSMIT_CHANNEL 100
-
-#define NRF_TYPE MINIMALIST_SHIELD
-//#define NRF_TYPE RF1_1_3
 
 
 //Include this after all configuration variables are set
@@ -86,7 +86,8 @@ int fred;
 void setup()
 {
 	
-	radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL);
+       radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE ,0);
+
 	delayMicroseconds(150);
 	update = 0;
 	// set default DMX state
@@ -183,4 +184,3 @@ ISR(USART_RX_vect)
     break;
   }
 }
-
