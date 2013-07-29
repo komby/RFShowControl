@@ -1,13 +1,13 @@
 /*
- * RenardReceiver.ino
- *
- *  Created on: Mar  2013
- *      Author: Materdaddy
- *      
- *      Users of this software agree to hold harmless the creators and contributors
- *      of this software. You, by using this software, are assuming all legal responsibility
- *      for the use of the software and any hardware it is used on.
- */
+* RenardReceiver.ino
+*
+*  Created on: Mar  2013
+*      Author: Materdaddy
+*
+*      Users of this software agree to hold harmless the creators and contributors
+*      of this software. You, by using this software, are assuming all legal responsibility
+*      for the use of the software and any hardware it is used on.
+*/
 
 
 #include <Arduino.h>
@@ -22,6 +22,9 @@
 //*****************************************************************************
 
 // REQUIRED VARIABLES
+//Make sure you choose a unique ID if you are using OTA config!
+#define RECEIVER_UNIQUE_ID 33
+
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
@@ -29,7 +32,7 @@
 
 #define PIXEL_TYPE			RENARD
 #define RENARD_BAUD_RATE		57600
-//#define PIXEL_PIN			3
+
 
 
 // Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
@@ -43,7 +46,10 @@
 #define START_CHANNEL 		0
 #define NUM_CHANNELS 			400
 #define LISTEN_CHANNEL 			100	// the channel for the RF Radio
-#define DATA_RATE 			RF24_1MBPS
+
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_1MBPS
 
 //*****************************************************************************
 
@@ -55,24 +61,22 @@
 #include <RFPixelControlConfig.h>
 
 
-
-//Arduino setup function.
 void setup()
 {
 	Serial.begin(RENARD_BAUD_RATE);
-#ifdef DEBUG
+	#ifdef DEBUG
 	printf_begin();
-#endif
+	#endif
 
 	Serial.println("Initializing Radio");
 
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-		
-		uint8_t logicalControllerNumber = 0;
-#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
+	
+	uint8_t logicalControllerNumber = 0;
+	#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
 	
 	radio.AddLogicalController(logicalControllerNumber++, START_CHANNEL, NUM_CHANNELS, 0);
-#endif
+	#endif
 
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
@@ -81,7 +85,7 @@ void setup()
 	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber++));
 
 	for (int i = 0; i < strip.GetPixelCount(); i++)
-		strip.SetPixelColor(i, strip.Color(0, 0, 0));
+	strip.SetPixelColor(i, strip.Color(0, 0, 0));
 	strip.Paint();
 }
 
@@ -102,10 +106,10 @@ void print_data(char *data)
 //RF Listening for data
 void loop(void)
 {
-    
-    //When Radio.Listen returns true its time to update the LEDs for all controllers,  A full update was made
-    if (radio.Listen() )
-    {
-	    strip.Paint();
-    }
+	
+	//When Radio.Listen returns true its time to update the LEDs for all controllers,  A full update was made
+	if (radio.Listen() )
+	{
+		strip.Paint();
+	}
 }
