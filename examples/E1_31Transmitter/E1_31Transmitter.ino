@@ -1,11 +1,10 @@
 /*
- * RFDmxController.h
+ * ENC28j60 based controller for E1.31 and RFPixel control
  *
  *  Created on: Mar 7, 2013
  *      Author: Greg
  */
 
-// Present a "Will be back soon web page", as stand-in webserver.
 // 2011-01-30 <jc@wippler.nl> http://opensource.org/licenses/mit-license.php
 
 #include <EtherCard.h>
@@ -15,16 +14,24 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <tcpip.h>
+/***************************  CONFIGURATION SECTION *************************************************/
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE MINIMALIST_SHIELD
 
-//#include "printf.h"
-//#define STATIC 1  // set to 1 to disable DHCP (adjust myip/gwip values below)
-//static BufferFiller bfill;  // used as cursor while filling the buffer
-//#if STATIC
-//// ethernet interface ip address
-//static byte myip[] = { 192,168,1,76 };
-//// gateway ip address
-//static byte gwip[] = { 192,168,1,254};
-//#endif
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+//How many pixels do you want to transmit data for
+//#define NUM_CHANNELS 512
+#define RF_DELAY      2000
+
+//use channel 100
+#define TRANSMIT_CHANNEL 100
+
+
+/***************************  CONFIGURATION SECTION *************************************************/
+#include <RFPixelControlConfig.h>
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to send.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.
 #define DMX_CHANNEL_DATA_START  168//DMX Packet Position 0xA8
@@ -36,12 +43,7 @@ volatile unsigned int dmx_start_addr = 1;
 volatile unsigned int dmx_addr;
 // this is used to keep track of the channels
 volatile unsigned int chan_cnt;
-// array subscripts 1&2
-//volatile unsigned int sub1=0;
-//volatile unsigned int sub2=0;
-// this holds the dmx data
-//unsigned char dmx_data[DMX_NUM_CHANNELS];
-// tell us when to update
+
 //Initialize the RF packet buffer
 byte str[32];
 
@@ -54,11 +56,7 @@ myport;
 
 uint16_t PortNr = 5568;
 
-RFPixelControl radio(9,10);
 
-
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 // ethernet mac address - must be unique on your network
 static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
@@ -66,22 +64,10 @@ static byte mymac[] = { 0x74,0x69,0x69,0x2D,0x30,0x31 };
 byte Ethernet::buffer[690]; // tcp/ip send and receive buffe
 
 void setup(){
-	//Serial.begin(57600);
-	//Serial.println("\n[rf dmx REPEATER]");
-       // printf_begin();
 
-
-
-  
-  
 	if (ether.begin(sizeof Ethernet::buffer, mymac) == 0);
-	//	Serial.println( "Failed to access Ethernet controller");
-//#if STATIC
-//	ether.staticSetup(myip, gwip);
-//#else
+
 	while(!ether.dhcpSetup());
-		//Serial.println("DHCP failed");
-//#endif
 
 	ether.printIp("IP:  ", ether.myip);
 	ether.printIp("GW:  ", ether.gwip);
@@ -90,7 +76,9 @@ void setup(){
 	myport.PortByte[0] = 0x15;
 	myport.PortByte[1] = 0xC0;
 
-radio.Initalize( radio.TRANSMITTER, pipes, 100 );
+
+radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE ,0);
+
 	delayMicroseconds(150);
 
   radio.printDetails();
