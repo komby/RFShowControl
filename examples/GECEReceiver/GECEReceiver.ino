@@ -46,7 +46,7 @@
 
 // If you're not using Over-The-Air configuration these variables are required:
 #define HARDCODED_START_CHANNEL 0
-#define HARDCODED_NUM_PIXELS 50
+#define HARDCODED_NUM_CHANNELS 150
 
 
 
@@ -73,15 +73,17 @@ void setup()
 	Serial.println("Initializing Radio");
 
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
-	radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
-#endif
+		uint8_t logicalControllerNumber = 0;
+		#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
+		
+		radio.AddLogicalController(logicalControllerNumber++, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS, 0);
+		#endif
 
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	//radio.PrintControllerConfig();
 	
-	uint8_t logicalControllerNumber = 0;
+ logicalControllerNumber = 0;
 
 	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
 
