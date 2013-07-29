@@ -90,21 +90,30 @@ int  z=0;
 bool readytoupdate=false;
 
 
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 
-  0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
-
 
 //Arduino setup function.
 void setup() {
   Serial.begin(57600);
   printf_begin();
-  strip.SetPixelCount(DMX_LED_CHANNELS );
+  strip.SetPixelCount(HARDCODED_NUM_PIXELS );
 
   Serial.write("Initializing Radio\n");
 
- radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-  radio.printDetails(); 
+ radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+ uint8_t logicalControllerNumber = 0;
+ #if (OVER_THE_AIR_CONFIG_ENABLE == 0)
+ 
+ radio.AddLogicalController(logicalControllerNumber++, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS, 0);
+ #endif
+
+ radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
+ radio.printDetails();
+ //radio.PrintControllerConfig();
+ 
+ logicalControllerNumber = 0;
+
+ strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
+
   Serial.write("Init and Paint LEDS for startup \n");
   delay (2);
   
@@ -115,72 +124,12 @@ void setup() {
 }
 
 
-int maxprint=0;
-//RF Listening to DMX packets loop
+
+
 void loop(void){
-   int updateChannelCount = 0;
-  // See if there is any data in the RF buffer
-  if ( radio.available() ){
-
-    for (bool done = false;!done;){
-
-      // Fetch the payload, and see if this was the last one.
-      done = radio.read( &gotstr, 32 );
-
-      //Update the led_counter value from the packet address in position 30
-      pkt_begin=gotstr[30]*30;//0=0.1=30.2=60
-
-      dmx_counter=pkt_begin;
-   
-      pkt_max=pkt_begin+29;
-    
-      /* This is the current packet format,  it may be revised
-       * pending the outcome of the packet DMX format on DICY
-       * z is the packet byte counter
-       * dmx data is in packet bytes 0 to 29.
-       * Packet address is in byte 30.
-       * Packet byte 31 is not used yet.
-       */
-      z=0;
-
-      int dmxEnd = DMX_START_CHANNEL + DMX_NUM_CHANNELS;  //150 for a 50 pixel string
-      
-      //Make sure the numbers make sense
-      if (pkt_max>=DMX_START_CHANNEL && pkt_begin< dmxEnd) 
-      {
-     
-        /* This loop is checking to make sure that the packet being looked at
-         				 * is a channel which is in the subset of channels from the DMX Universe
-         				 * that this pixel string is in.   If the packet is outside that range
-         				 * it is skipped.
-         				 */
-        for (;(dmx_counter<DMX_START_CHANNEL && z<30)||dmx_counter>=dmxEnd;z++, dmx_counter++){}
-     
-         led_counter=(dmx_counter-DMX_START_CHANNEL)/3; 
-         for(;   DMX_START_CHANNEL <= dmx_counter && dmx_counter < dmxEnd && z<30;)     
-         {
-               
-            strip.SetPixelColor(led_counter, strip.Color(gotstr[z], gotstr[z+1], gotstr[z+2]));
-        
-            dmx_counter+=3;
-            led_counter++;
-            if ((dmx_counter>=dmxEnd) || (dmx_counter>=508)){
-              readytoupdate=true;
-            }
-  
-            //Move the index counter past the 3 LEDs of the current pixel.
-            z=z+3;
-        }
-        
-        
-        //If we have received a full set of data, Update all the LED's that have changed value since the last time
-        //
-        if(readytoupdate)
-          strip.Paint();
-         readytoupdate=false;
-        
-      }
-    }
+  if (radio.Listen() )
+  {
+	  strip.Paint();
   }
 }
 
