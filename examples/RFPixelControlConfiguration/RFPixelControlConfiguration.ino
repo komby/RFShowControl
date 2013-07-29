@@ -73,7 +73,7 @@ void loop () {
 	//The First Configuration Packet contains the number of logical controllers for a given controller
 	str[IDX_CONFIG_PACKET_TYPE] = CONTROLLERINFOINIT;
 	str[IDX_RF_LISTEN_CHANNEL] = 100;
-	str[IDX_RF_LISTEN_RATE] = NRF_TRANSMITTER_DATARATE;
+	str[IDX_RF_LISTEN_RATE] = DATA_RATE;
 	str[IDX_NUMBER_OF_LOGICAL_CONTROLLERS] = 1;
 	printf("WritingPayloadFor init packet\n");
 	radio.write_payload( &str[0], 32 );
@@ -106,7 +106,7 @@ void loop () {
 	//The First Configuration Packet contains the number of logical controllers for a given controller
 	str[IDX_CONFIG_PACKET_TYPE] = CONTROLLERINFOINIT;
 	str[IDX_RF_LISTEN_CHANNEL] = 100;
-	str[IDX_RF_LISTEN_RATE] = NRF_TRANSMITTER_DATARATE;
+	str[IDX_RF_LISTEN_RATE] = DATA_RATE;
 	str[IDX_NUMBER_OF_LOGICAL_CONTROLLERS] = 1;
 	printf("WritingPayloadFor init packet\n");
 	radio.write_payload( &str[0], 32 );
