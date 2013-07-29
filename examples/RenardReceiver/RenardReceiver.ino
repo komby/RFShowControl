@@ -22,23 +22,26 @@
 //*****************************************************************************
 
 // REQUIRED VARIABLES
-#define RECEIVER_UNIQUE_ID 33
+
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE			RF1_1_3
+
 #define PIXEL_TYPE			RENARD
 #define RENARD_BAUD_RATE		57600
-#define PIXEL_PIN			3
+//#define PIXEL_PIN			3
 
 
-// Set OTA_CONFIG to 1 if you are making a configuration node to re-program
+// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
-// configuration broadcast for 5 seconds after power-on before attempting to
+// configuration broadcast for a short period after power-on before attempting to
 // read EEPROM for the last known working configuration.
-#define OTA_CONFIG 			1
+#define OVER_THE_AIR_CONFIG_ENABLE 0
 
 
 // If you're not using Over-The-Air configuration these variables are required:
-#define DMX_START_CHANNEL 		0
-#define DMX_NUM_PIXELS 			50
+#define START_CHANNEL 		0
+#define NUM_CHANNELS 			400
 #define LISTEN_CHANNEL 			100	// the channel for the RF Radio
 #define DATA_RATE 			RF24_1MBPS
 
@@ -63,15 +66,15 @@ void setup()
 
 	Serial.println("Initializing Radio");
 
-	radio.EnableOverTheAirConfiguration(OTA_CONFIG);
+	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 		
 		uint8_t logicalControllerNumber = 0;
-#if (OTA_CONFIG == 0)
+#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
 	
-	radio.AddLogicalController(logicalControllerNumber++, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
+	radio.AddLogicalController(logicalControllerNumber++, START_CHANNEL, NUM_CHANNELS, 0);
 #endif
 
-	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
+	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
 
 	logicalControllerNumber = 0;
@@ -85,7 +88,7 @@ void setup()
 void print_data(char *data)
 {
 	printf("--%3d:", 0);
-	for ( int i = 0; i < strip.GetPixelCount()*3; i++ )
+	for ( int i = 0; i < strip.GetPixelCount(); i++ )
 	{
 		printf(" 0x%02X", data[i] & 0xFF);
 		if ( (i-7) % 8 == 0 )
@@ -100,7 +103,7 @@ void print_data(char *data)
 void loop(void)
 {
     
-    //When Radio.Listen returns true its time to update the LEDs for all controlelrs,  A full update was made
+    //When Radio.Listen returns true its time to update the LEDs for all controllers,  A full update was made
     if (radio.Listen() )
     {
 	    strip.Paint();

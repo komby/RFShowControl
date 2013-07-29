@@ -39,26 +39,44 @@
  * Use at your own risk.
  * As the receiver is listening to a Transmitter capable of transmitting 512 channels
  * We need to make sure that we are listening to the right channels in the universe
- *
- * DMX_START_CHANNEL -   This is the first channel that will be used for this string
- * 					      if this is the first string in the universe it should be set to (0 or 1)//TODO Determine 0 or 1
- * DMX_NUM_CHANNELS - 	 This is the total number of channels needed for this string. For RGB (3) x number of pixels = #
- * DMX_LED_CHANNELS 20 - This defines the # of LED Channels.  This could be the same as lightCount, but if grouping is used, this will be less.
  */
-#define DMX_START_CHANNEL 0
+// REQUIRED VARIABLES
+#define RECEIVER_UNIQUE_ID 33
 
-#define DMX_LED_CHANNELS 50  //This defines the # of LED Channels. 
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE  RF1_1_3
 
-#define DMX_NUM_CHANNELS 150 //Number of DMX channels to read...usually dmx_led_channels/3
+//What Kind of pixels? Valid Values: LPD_6803
+#define PIXEL_TYPE			LPD_6803
+#define PIXEL_DATA_PIN 2
+#define PIXEL_CLOCK_PIN 4
 
-#define LISTEN_CHANNEL 100 // the channel for the RF Radio
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+
+// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
+// your RF1s in the field.  This will cause the RF1s to search for a
+// configuration broadcast for a short period after power-on before attempting to
+// read EEPROM for the last known working configuration.
+#define OVER_THE_AIR_CONFIG_ENABLE 0
 
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-RFPixelControl radio(9,10);
+// If you are not using Over the air configuration you will need to specify the following options
+ #define HARDCODED_START_CHANNEL 0
+ #define HARDCODED_NUM_PIXELS 50  //This defines the # of LED Channels.
+ #define HARDCODED_NUM_CHANNELS 150 //Number of DMX channels to read...usually dmx_led_channels/3
+ #define LISTEN_CHANNEL 100 // the channel for the RF Radio
 
-//create the pixel control impl with the LPD6803 driver
-LPD6803PixelControl  strip =  LPD6803PixelControl();
+
+
+
+
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
+
+
 
 #define DEBUG 0
 
@@ -85,7 +103,7 @@ void setup() {
 
   Serial.write("Initializing Radio\n");
 
-  radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL);
+ radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
   radio.printDetails(); 
   Serial.write("Init and Paint LEDS for startup \n");
   delay (2);

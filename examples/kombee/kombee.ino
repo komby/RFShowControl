@@ -81,7 +81,7 @@ void setup() {
 
   
  delay(200);
-  radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
+  radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
       renardData = radio.GetControllerDataBase(0);
   delay(200);
 

@@ -30,23 +30,24 @@
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE			RF1_1_3
 #define PIXEL_TYPE			GECE
-#define PIXEL_PIN			2
+#define PIXEL_DATA_PIN			2
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_1MBPS
+#define LISTEN_CHANNEL 100	// the channel for the RF Radio
 
-// Set OTA_CONFIG to 1 if you are making a configuration node to re-program
+
+// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
-// configuration broadcast for 5 seconds after power-on before attempting to
+// configuration broadcast for a short period after power-on before attempting to
 // read EEPROM for the last known working configuration.
-#define OTA_CONFIG 1
-
+#define OVER_THE_AIR_CONFIG_ENABLE 0 
 
 // If you're not using Over-The-Air configuration these variables are required:
-#define DMX_START_CHANNEL 0
-#define DMX_NUM_PIXELS 50
-#define LISTEN_CHANNEL 100	// the channel for the RF Radio
+#define HARDCODED_START_CHANNEL 0
+#define HARDCODED_NUM_PIXELS 50
+
 
 
 
@@ -71,12 +72,12 @@ void setup()
 
 	Serial.println("Initializing Radio");
 
-	radio.EnableOverTheAirConfiguration(OTA_CONFIG);
-#if (OTA_CONFIG == 0)
+	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
 	radio.AddLogicalController(RECEIVER_UNIQUE_ID, DMX_START_CHANNEL, (DMX_NUM_PIXELS*3), 0);
 #endif
 
-	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
+	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	//radio.PrintControllerConfig();
 	

@@ -9,7 +9,7 @@
 #include "LPD6803PixelControl.h"
 #include <TimerOne.h>
 
-LPD6803PixelControl::LPD6803PixelControl() : LPD6803(50, 2, 3)
+LPD6803PixelControl::LPD6803PixelControl(uint8_t pClock, uint8_t pData) : LPD6803(50,pClock,pData)
 {
 	this->begin();
 }

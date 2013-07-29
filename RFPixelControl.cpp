@@ -43,7 +43,7 @@ RFPixelControl::~RFPixelControl() {
  * @param pPipes - the addressses to listen on
  *
  */
- bool RFPixelControl::Initalize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pNodeId )
+ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pNodeId )
  {
 	bool r = false;
 	this->_controllerId = pNodeId;

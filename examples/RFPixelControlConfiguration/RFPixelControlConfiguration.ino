@@ -20,11 +20,14 @@
 
 
 /***************************  CONFIGURATION SECTION *************************************************/
-#define NRF_TYPE MINIMALIST_SHIELD
-//#define NRF_TYPE RF1_1_3
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE  RF1_1_3
 
-//#define NRF_TRANSMITTER_DATARATE RF24_250KBPS
-#define NRF_TRANSMITTER_DATARATE RF24_1MBPS
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+
 /***************************  CONFIGURATION SECTION *************************************************/
 
 #include <RFPixelControlConfig.h>
@@ -47,7 +50,7 @@ void setup(){
 	
 	printf_begin();
 	//radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL );
-	radio.Initalize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, NRF_TRANSMITTER_DATARATE, 1);
+	radio.Initialize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, DATA_RATE, 1);
 	delayMicroseconds(5000);
 
 	radio.printDetails();

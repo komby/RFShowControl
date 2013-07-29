@@ -34,30 +34,39 @@
 
 #include <Arduino.h>
 #include <RFPixelControl.h>
-#include "WM2999PixelControl.h"
+#include <WM2999PixelControl.h>
 #include <IPixelControl.h>
 #include <WM2999.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
-/**
- * The WM2999 receiver is only designed to control 1 string of lights at a time.
- *
- * As the receiver is listening to a Transmitter capable of transmitting 512 channels
- * We need to make sure that we are listening to the right channels in the universe
- *
- * DMX_START_CHANNEL -   This is the first channel that will be used for this string
- * 					      if this is the first string in the universe it should be set to (0 or 1)//TODO Determine 0 or 1
- * DMX_NUM_CHANNELS - 	 This is the total number of channels needed for this string. For RGB (3) x number of pixels = #
- * DMX_LED_CHANNELS 20 - This defines the # of LED Channels.  This could be the same as lightCount, but if grouping is used, this will be less.
- */
-#define DMX_START_CHANNEL 0
 
-#define DMX_LED_CHANNELS 20  //This defines the # of LED Channels.  This could be the same as lightCount, but if grouping is used, this will be less.
+// REQUIRED VARIABLES
+#define RECEIVER_UNIQUE_ID 33
 
-#define DMX_NUM_CHANNELS 60 //Number of DMX channels to read...usually dmx_led_channels/3
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE  RF1_1_3
+#define PIXEL_TYPE			WM_2999
+#define PIXEL_DATA_PIN			A0
 
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_1MBPS
+#define LISTEN_CHANNEL 100	// the channel for the RF Radio
+
+
+
+// Set OTA_CONFIG to 1 if you are making a configuration node to re-program
+// your RF1s in the field.  This will cause the RF1s to search for a
+// configuration broadcast for 5 seconds after power-on before attempting to
+// read EEPROM for the last known working configuration.
+#define OVER_THE_AIR_CONFIG_ENABLE 0
+
+// If you're not using Over-The-Air configuration these variables are required:
+#define HARDCODED_START_CHANNEL 0
+#define HARDCODED_NUM_PIXELS 20
 
 //Uncomment for serial
 #define DEBUG 0
@@ -80,12 +89,11 @@ bool readytoupdate=false;
 
 
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-RFPixelControl radio(9,10);
+
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
 
 
-//Setup the lights on arduino pin A0 
-WM2999PixelControl strip =  WM2999PixelControl(A0);
 
 
 // Radio pipe addresses for the 2 nodes to communicate.
@@ -107,81 +115,38 @@ Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
 	strip.SetPixelCount(20);
 	strip.Paint();
 
-
 	Serial.write("Initializing Radio\n");
-	radio.Initalize( radio.RECEIVER, pipes,100 );
+	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+	
+	uint8_t logicalControllerNumber = 0;
+	if(!OVER_THE_AIR_CONFIG_ENABLE)
+	{
+		
+		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3,  RECEIVER_UNIQUE_ID);
+	}
+	
+	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
   radio.printDetails(); 
 	Serial.write("Init and Paint LEDS for startup \n");
- radio.DisplayDiagnosticStartup(&strip) ;
+	
+	//Both OTA and NON ota will need to set their data base pointers.
+	logicalControllerNumber = 0;
+	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
+	
+	
+    radio.DisplayDiagnosticStartup(&strip) ;
 }
-     
+      
 
 
 
 //RF Listening to DMX packets loop
 void loop(void){
 
-	// See if there is any data in the RF buffer
-	if ( radio.available() ){
-
-		for (bool done = false;!done;){
-
-			// Fetch the payload, and see if this was the last one.
-			done = radio.read( &gotstr, 32 );
-
-			//Update the led_counter value from the packet address in position 30
-			pkt_begin=gotstr[30]*30;
-			dmx_counter=pkt_begin;
-			pkt_max=pkt_begin+29;
-
-			/* z is the packet byte counter
-			 * dmx data is in packet bytes 0 to 29.
-			 * Packet address is in byte 30.
-			 * Packet size could be reduced to 30...//TODO possibly reduce packet size to 30
-			 */
-			z=0;
-
-
-			//Make sure the numbers make sense
-			if (pkt_max>=DMX_START_CHANNEL && pkt_begin<DMX_START_CHANNEL+DMX_NUM_CHANNELS) {
-
-				/* This loop is checking to make sure that the packet being looked at
-				 * is a channel which is in the subset of channels from the DMX Universe
-				 * that this pixel string is in.   If the packet is outside that range
-				 * it is skipped.
-				 */
-				while (dmx_counter<DMX_START_CHANNEL){
-					dmx_counter++;
-					z=z+1;
-				}
-				while ((dmx_counter>=DMX_START_CHANNEL) && (dmx_counter<DMX_START_CHANNEL+DMX_NUM_CHANNELS) && (z<30)  && (dmx_counter<508))
-				{
-
-
-					//TODO re-implement the code (removed)  which joe had checking to see if the pixel data had changed before telling it to update.
-					//     in this early release of code I have removed this functionality.
-					led_counter=(dmx_counter-DMX_START_CHANNEL)/3;
-
-					strip.SetPixelColor(led_counter, gotstr[z], gotstr[z+1], gotstr[z+2]);
-
-					dmx_counter=dmx_counter+3;
-					if ((dmx_counter>=DMX_START_CHANNEL+DMX_NUM_CHANNELS) || (dmx_counter>=508)){
-						readytoupdate=true;
-					}
-
-					//Move the index counter past the 3 LEDs of the current pixel.
-					z=z+3;
-				}
-
-				//
-				//If we have received a full set of data, Update all the LED's that have changed value since the last time
-				//
-				if (readytoupdate){
-					strip.Paint();
-					readytoupdate=false;
-				}
-			}
-		}
+	//When Radio.Listen returns true its time to update
+	if (radio.Listen() )
+	{
+		strip.Paint();
 	}
 }
 

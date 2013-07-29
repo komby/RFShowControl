@@ -34,21 +34,23 @@
 #define PIXEL_DATA_PIN 2
 #define PIXEL_CLOCK_PIN 4
 
+//What Speed is your transmitter using?
+//Valid Values   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+
 // Set OTA_CONFIG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
 // configuration broadcast for 5 seconds after power-on before attempting to
 // read EEPROM for the last known working configuration.
-#define OVER_THE_AIR_CONFIG_ENABLE 1
+#define OVER_THE_AIR_CONFIG_ENABLE 0
 
 // If you're not using Over-The-Air configuration these variables are required:
 //If you are using OTA then your done,  ignore this stuff.
-#define DMX_START_CHANNEL 0
-#define DMX_NUM_PIXELS 50
+#define HARDCODED_START_CHANNEL 0
+#define HARDCODED_NUM_PIXELS 3
 #define LISTEN_CHANNEL 100	// the channel for the RF Radio
-#define DATA_RATE RF24_1MBPS
 
-//How Many Pixels are in your string?  This is the number of pixels not the number of LEDs or channels
-#define NUM_LEDS 50
+
 
 
 /**************END CONFIGURATION SECTION ***************************/
@@ -56,7 +58,6 @@
 //You dont really need to change these.
 //How Bright should our LEDs start at
 #define LED_BRIGHTNESS 128 //50%
-#define NUM_LEDS_PER_PIXEL 3
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
@@ -69,7 +70,6 @@ int pkt_begin=0;
 int  pkt_max=0;
 int  z=0;
 bool readytoupdate=false;
-
 
 CRGB* leds;
 
@@ -89,10 +89,10 @@ void setup()
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
 		
-		radio.AddLogicalController(logicalControllerNumber, DMX_START_CHANNEL, NUM_LEDS * NUM_LEDS_PER_PIXEL,  0);
+		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3,  0);
 	}
 	
-	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,RECEIVER_UNIQUE_ID);
+	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	LEDS.setBrightness(LED_BRIGHTNESS);
 	

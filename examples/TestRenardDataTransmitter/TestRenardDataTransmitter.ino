@@ -20,6 +20,10 @@
 //use channel 100
 #define TRANSMIT_CHANNEL 100
 
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+
 //Setup  a RF pixel control 
 //RF1 v.01 board uses Radio 9,10
 RFPixelControl radio(8,7);
@@ -69,7 +73,7 @@ void setup()
 	Serial.println("\n[RenardTransmitter test]\n");
     printf_begin();
 	  //radio.Initalize( radio.TRANSMITTER, pipes, 100 , RF24_1MBPS , 0);
-    radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, RF24_1MBPS, 50 );
+    radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, RF24_1MBPS, 50 );
 	delayMicroseconds(150);
     radio.printDetails();
 }

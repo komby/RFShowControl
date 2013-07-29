@@ -28,7 +28,7 @@ RFPixelControl radio(33,10);
 #if (PIXEL_TYPE == GECE)
 #include "GECEPixelControl.h"
 #include <GEColorEffects.h>
-GECEPixelControl strip = GECEPixelControl(PIXEL_PIN);
+GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN);
 #endif
 
 
@@ -37,11 +37,25 @@ GECEPixelControl strip = GECEPixelControl(PIXEL_PIN);
 RenardControl strip = RenardControl(RENARD_BAUD_RATE);
 #endif
 
+#if (PIXEL_TYPE == WM_2999)
+#include <WM2999.h>
+#include "WM2999PixelControl.h"
+WM2999PixelControl strip =  WM2999PixelControl(PIXEL_DATA_PIN);
+#endif
+
+#if (PIXEL_TYPE == LPD_6803)
+#ifndef ADAFRUITILIB6803
+#define ADAFRUITILIB6803
+#include <LPD6803.h>
+#endif
+#include "LPD6803PixelControl.h"
+#include <TimerOne.h>
+LPD6803PixelControl  strip =  LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
+#endif
 
 
-
-
-// Radio pipe addresses for the 2 nodes to communicate.
+// Radio pipe
+// addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = {
 	0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
 };

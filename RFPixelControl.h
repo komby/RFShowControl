@@ -38,7 +38,8 @@
 #define WS2801				2
 #define WS2811				3
 #define RENARD				4
-
+#define WM_2999				5
+#define LPD_6803			6
 
 typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 
@@ -71,7 +72,7 @@ class RFPixelControl : public RF24 {
 	* The values for this are stored in
 	* the TRANSMITTER and RECEIVER values.
 	*/
-	bool Initalize( int  role, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pControllerId);
+	bool Initialize( int  role, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pControllerId);
 
 	void SetStartAndEndChannels();
 
@@ -105,10 +106,10 @@ class RFPixelControl : public RF24 {
 	void DisplayDiagnosticStartup(IPixelControl * string);
 	uint8_t get_status(void);
 	
-	/************************************************************************/
-	/* Listen will be listening for all the data needed for an update
-	/* When it returns true its time to update all controllers
-	/************************************************************************/
+	/************************************************************************
+	* Listen will be listening for all the data needed for an update
+	* When it returns true its time to update all controllers
+	************************************************************************/
 	bool Listen(void);
 	
 	int SaveConfigurationToEEPROM();

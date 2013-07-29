@@ -45,6 +45,15 @@
 #include "printf.h"
 
 
+
+// REQUIRED VARIABLES
+#define RECEIVER_UNIQUE_ID 33
+
+ //What board are you using to connect your nRF24L01+?
+ //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+ #define NRF_TYPE  RF1_1_3
+
+
 //#define RENARD_SERIAL_BAUD 57600
 //#define PAD 0x7D
 //#define SYNC 0x7E
@@ -53,21 +62,14 @@
 #define REDPIN 10
 #define GREENPIN 5
 #define BLUEPIN 9
- 
- 
- //Step 2.
-//What Pins is your nRF24L01+ CE and CSN connected to?  
-//Usage:   RFPixelControl radio(CE, CSN);
-
-//RF1 v0.2 & RF1_12V 0.1 PCB ises( PB0, Arduino Pin 8  for CE ) (PD7 Arduino pin 7 for CSN)
-RFPixelControl radio(8,7);
-//RFPixelControl radio(9,10); //RF1 Version 0.1 (maniacbug wiring)
 
 
- //to use OTA configuration
-#define  OVER_THE_AIR_CONFIG_ENABLE 1
-#define RECEIVER_UNIQUE_ID 50  //make this different for each receiver.
- 
+// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
+// your RF1s in the field.  This will cause the RF1s to search for a
+// configuration broadcast for a short period after power-on before attempting to
+// read EEPROM for the last known working configuration.
+#define OVER_THE_AIR_CONFIG_ENABLE 0
+
 #define NUM_CHANNELS 3  
 #define START_CHANNEL 1 //Where in the universe do we start
 #define FINAL_CHANNEL 3 //DO Refactory out, addition would be easy....
@@ -118,7 +120,7 @@ void setup() {
 	
    	delay(2000);
 
-      radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL, RF24_1MBPS ,50);
+     radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
       radio.printDetails(); 
       //initalize data buffer
       buffer= radio.GetControllerDataBase(0);

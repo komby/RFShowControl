@@ -1,14 +1,14 @@
-//#include <EEPROM.h>
-//#include <controller.h>
-//#include <FastSPI_LED2.h>
-//#include <controller.h>
-//#include <fastpin.h>
-//#include <fastspi.h>
-//#include <clockless.h>
-//#include <lib8tion.h>
-//#include <hsv2rgb.h>
-//#include <chipsets.h>
-//#include <dmx.h>
+#include <EEPROM.h>
+#include <controller.h>
+#include <FastSPI_LED2.h>
+#include <controller.h>
+#include <fastpin.h>
+#include <fastspi.h>
+#include <clockless.h>
+#include <lib8tion.h>
+#include <hsv2rgb.h>
+#include <chipsets.h>
+#include <dmx.h>
 
 #ifndef __OTA_CONFIG_H
 #define __OTA_CONFIG_H
@@ -87,7 +87,7 @@ struct ControllerInfo {
 	uint32_t baudRate;  //if outputting on a dmx or serial device this will be set	
 	uint8_t reserved[RESERVED_BYTES_LEN] ;
 	uint8_t customConfig[CUSTOM_CONFIG_INFO_LEN];
-	
+
 	};
-	
+
 #endif;

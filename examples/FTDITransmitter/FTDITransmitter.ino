@@ -37,8 +37,19 @@
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to listen to.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.
 
-#define TRANSMIT_CHANNEL 100     // This is the channel we are broadcasting on.
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
 
+//Use channel 100
+#define TRANSMIT_CHANNEL 100
+
+#define NRF_TYPE MINIMALIST_SHIELD
+//#define NRF_TYPE RF1_1_3
+
+
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
 enum
 {
   DMX_IDLE,
@@ -68,20 +79,14 @@ int i=0;
 int j=0;
 
 
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-RFPixelControl radio(9,10);
 
-//RF1 controllers uncomment this line
-//RFPixelControl radio(8,7);
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 int fred;
 
 
 void setup()
 {
 	
-	radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL);
+	radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL);
 	delayMicroseconds(150);
 	update = 0;
 	// set default DMX state

@@ -21,7 +21,10 @@
 //Delay between RF transmissions (in microseconds)
 #define RF_DELAY      2000
 
-#define DATA_RATE RF24_1MBPS
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+
 //Use channel 100
 #define TRANSMIT_CHANNEL 100
 
@@ -46,7 +49,7 @@ void setup()
 	Serial.println("\n[TEST RF Transmitter]\n");
 	printf_begin();
 	delay(5);
-	radio.Initalize( 1, pipes, TRANSMIT_CHANNEL , DATA_RATE , 0);
+	radio.Initialize( 1, pipes, TRANSMIT_CHANNEL , DATA_RATE , 0);
 	
 	delay(5);
 	radio.printDetails();

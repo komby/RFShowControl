@@ -10,13 +10,22 @@
 #include <RF24.h>
 
 // REQUIRED VARIABLES
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE			RF1_1_3
+
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
+
+
 #define RF_NUM_PACKETS 18     // 18 * 30 total Channels can be broadcasted
 #define TRANSMIT_CHANNEL 100
 #define RENARD_SERIAL_BAUD	57600
 #define RECEIVER_UNIQUE_ID 0
 #define NRF_TYPE			RF1_1_3
 #define PIXEL_TYPE			NONE
-#define DATA_RATE RF24_1MBPS
+
 
 
 /***************************  END CONFIGURATION SECTION *************************************************/
@@ -42,7 +51,7 @@ int j=0;
 
 void setup()
 {
-	radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID );
+	radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID );
 	UCSR0C |= (1<<USBS0);
 	Serial.begin(RENARD_SERIAL_BAUD);
 

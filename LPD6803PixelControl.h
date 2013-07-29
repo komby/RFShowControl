@@ -20,7 +20,7 @@
 class LPD6803PixelControl : public LPD6803, public IPixelControl
 {
 public:
-	LPD6803PixelControl();
+	LPD6803PixelControl(uint8_t pClock, uint8_t pData);
 
 	void Paint(void);
 };

@@ -26,8 +26,22 @@
 
 
 //NRF24L01+ Items
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE			RF1_1_3
+
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
 
 
+// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
+// your RF1s in the field.  This will cause the RF1s to search for a
+// configuration broadcast for a short period after power-on before attempting to
+// read EEPROM for the last known working configuration.
+#define OVER_THE_AIR_CONFIG_ENABLE 0
+
+#define LISTEN_CHANNEL 100
 
 byte gotstr[32];
 
@@ -35,12 +49,10 @@ byte gotstr[32];
 
 
 /**************CONFIGURATION SECTION ***************************/
-// Set up nRF24L01 radio on SPI bus plus pins 9 & 10
-RFPixelControl radio(9,8);
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
 
 
-#define OVER_THE_AIR_CONFIG_ENABLE 0
-#define LISTEN_CHANNEL 100
 
 // Radio pipe addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
@@ -62,7 +74,7 @@ void setup() {
 	Serial.begin(57600);
 	Serial.write("Initializing DEBUG listener\n");
 
-	radio.Initalize( radio.RECEIVER, pipes, LISTEN_CHANNEL,RF24_1MBPS ,0);
+	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
   radio.printDetails(); 
 	Serial.write("Init and Paint LEDS for startup \n");
 
