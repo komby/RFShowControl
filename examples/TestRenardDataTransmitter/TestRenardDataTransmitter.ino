@@ -17,24 +17,30 @@
 #include "printf.h"
 
 /***************************  CONFIGURATION SECTION *************************************************/
-//use channel 100
 #define TRANSMIT_CHANNEL 100
 
 //What Speed do you want to use to transmit?
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//Setup  a RF pixel control 
-//RF1 v.01 board uses Radio 9,10
-RFPixelControl radio(8,7);
-//kombyone due transmitter board radio settings.
-//RFPixelControl radio(33,10);
-
-
 #define RENARD_SERIAL_BAUD	57600
-//How many pixels do you want to transmit data for
-#define NUM_CHANNELS		21
-/***************************  CONFIGURATION SECTION *************************************************/
+
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE			RF1_1_3
+
+#define RENARD_BAUD_RATE	57600
+
+#define START_CHANNEL 		0
+#define NUM_CHANNELS 		400
+
+
+//*****************************************************************************
+
+//Include this after all configuration variables are set
+#include <RFPixelControlConfig.h>
+
+
 
 #define RF_DELAY      2000
 
@@ -46,8 +52,6 @@ RFPixelControl radio(8,7);
 bool sync;
 bool status;
 
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 byte packetData[32];
 
@@ -73,7 +77,7 @@ void setup()
 	Serial.println("\n[RenardTransmitter test]\n");
     printf_begin();
 	  //radio.Initalize( radio.TRANSMITTER, pipes, 100 , RF24_1MBPS , 0);
-    radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, RF24_1MBPS, 50 );
+    radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0 );
 	delayMicroseconds(150);
     radio.printDetails();
 }
@@ -85,7 +89,6 @@ void loop ()
   for (int i = 0; i < NUM_CHANNELS; i += 30)
   {
 	  bytes_read = renardRead(packetData, (NUM_CHANNELS-i >= 30 ? 30 : (NUM_CHANNELS%30) ));
-//	  print_data((char *)packetData);
 	  //if we got less than expected,  fill the remainder with PADs for now 
 	  if (bytes_read < 30)
 	  {
@@ -94,17 +97,9 @@ void loop ()
 	      packetData[j]=PAD;
 	    }
 	  }
-
-	//With the next line, the data doesn't appear to make it to the receiver?!?
-//	packetData[30]=bytes_read;
 	radio.write_payload( &packetData[0], 32 );
 	delayMicroseconds(RF_DELAY);
 	status = radio.get_status();
-	//With the following while loop, we get stuck forever after the first transmission
-//	while (status & 0x01)
-//	{
-//		status = radio.get_status();
-//	}
   }
 }
 
