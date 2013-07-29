@@ -77,28 +77,10 @@
 #define lightCount 20  //Total # of lights on string (usually 50, 48, or 36)
 
 
-byte gotstr[32];
-uint16_t counter=0;
-uint8_t led_counter=0;
-uint16_t dmx_counter=0;
-int pkt_begin=0;
-int  pkt_max=0;
-int  z=0;
-bool readytoupdate=false;
-
-
-
 
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
-
-
-
-
-// Radio pipe addresses for the 2 nodes to communicate.
-const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
-
 
 
 //Arduino setup function.
