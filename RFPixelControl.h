@@ -147,7 +147,7 @@ class RFPixelControl : public RF24 {
 	uint8_t _numControllers;
 	uint32_t _controllerId;
 	byte packetData[RF_PACKET_LENGTH];
-	uint8_t  channelData[512];
+	uint8_t * channelData;
 	int _startChannel;
 	int _endChannel;
 	bool _otaConfigEnable;

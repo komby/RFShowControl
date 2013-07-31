@@ -86,7 +86,7 @@ void loop(void){
 	{
 		radio.read( &data, 32 );
 		
-		packetOffset =  data[30] *30;
+		packetOffset =  data[30];
 		printf("\n\r--%3d:",  data[30] );
 		for ( int i =0;i<30 && FULL_PRINT_DEBUG;i++)
 		{

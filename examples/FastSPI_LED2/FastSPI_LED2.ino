@@ -29,8 +29,8 @@
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE  RF1_1_3
 
-//What Kind of pixels? Valid Values: LPD8806,WS2801,SM16716,TM1809, TM1803, UCS1903, WS2811
-#define PIXEL_PROTOCOL		WS2801
+//What Kind of pixels? Valid Values: LPD_8806,WS_2801,SM_16716,TM_1809, TM_1803, UCS_1903, WS_2811
+#define PIXEL_PROTOCOL		WS_2801
 #define PIXEL_DATA_PIN 2
 #define PIXEL_CLOCK_PIN 4
 
@@ -46,8 +46,8 @@
 
 // If you're not using Over-The-Air configuration these variables are required:
 //If you are using OTA then your done,  ignore this stuff.
-#define HARDCODED_START_CHANNEL 0
-#define HARDCODED_NUM_PIXELS 3
+#define HARDCODED_START_CHANNEL 60
+#define HARDCODED_NUM_PIXELS 50
 #define LISTEN_CHANNEL 100	// the channel for the RF Radio
 
 
@@ -118,7 +118,7 @@ void setup()
 	#elif (PIXEL_PROTOCOL == WS_2811)
 	LEDS.addLeds(  new WS2811Controller800Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
 	
-	#else Must define PIXEL_PROTOCOL : (WS2801,LPD8806,WS2811,UCS1903,TM1803,SM16716)
+	#else Must define PIXEL_PROTOCOL : (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716)
 	#endif
 
 	

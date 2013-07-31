@@ -11,7 +11,6 @@
 #include <RF24.h>
 #include "printf.h"
 #include "E131Constants.h"
-#include <OTAConfig.h>
 /*
 * ArduinoEthernet Sheild Unicast E1.31 Transmitter
 *
@@ -24,67 +23,54 @@
 
 
 /***************************  CONFIGURATION SECTION *************************************************/
-#define NRF_TYPE MINIMALIST_SHIELD
-
-#include <RFPixelControlConfig.h>
 
 //How many pixels do you want to transmit data for
 //#define NUM_CHANNELS 512
 #define RF_DELAY      2000
-#define NUM_CHANNELS 220
+#define NUM_CHANNELS 270
 //use channel 100
 #define TRANSMIT_CHANNEL 100
 #define DATA_RATE RF24_250KBPS
-//Setup  a RF pixel control
-//RF1 v.01 board uses Radio 9,10
-//ARDUINO ETHERENET NEEDS PIN 10 Relocate CSN to pin8
-//RFPixelControl radio(9,8);
 
-//kombyone due transmitter board radio settings.
-//RFPixelControl radio(33,10);
-
+#define NRF_TYPE MINIMALIST_SHIELD
+#define RF_NUM_PACKETS 18
 /***************************  CONFIGURATION SECTION *************************************************/
+#include <RFPixelControlConfig.h>
 
 //change the mac (0xEF, 0xE0, 0xE1, ... 0xE9)
-byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+byte mac[] = {
+0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
 //Change this IP to one on your network
-IPAddress ip(192, 168, 2, 76);
+IPAddress ip(192, 168, 1, 150);
 
 
-//
-//// Radio pipe addresses for the 2 nodes to communicate.
-//const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
-#define RF_NUM_PACKETS 18
 
 
 //END Configuration
 //Where in the packet does the dmx start
 #define DMX_CHANNEL_DATA_START  126//DMX Packet Position 0xA8
+#define DMX_MAX_CHANNEL  512
 
 
-char packetBuffer[700]; //buffer to hold incoming packet,
+uint8_t packetBuffer[638]; //buffer to hold incoming packet,
 byte str[32];
 EthernetUDP Udp;
 
 void setup(){
-	delay(3);
-	uint16_t PortNr = 5568;
 
+	uint16_t PortNr = 5568;
 	Ethernet.begin(mac,ip);
-	delay(3);
 	Udp.begin(PortNr);
-	delay(3);
+
 	Serial.begin(57600);
 	Serial.println("\n[E1.31 Arduino Ethernet Transmitter ]\n");
 	printf_begin();
-	delay(3);
-	radio.Initialize( 1, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0);
-	//radio.Initalize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0);
+
+	radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0);
 	delayMicroseconds(1500);
 
 	radio.printDetails();
-	delay(3);
 }
 int maxprint=0;
 int len=0;
@@ -95,55 +81,92 @@ long checkduration = 0;
 boolean status;
 void loop () {
 	int packetSize = Udp.parsePacket();
+	if ( packetSize > 0 ){
+		Udp.read(packetBuffer,638);
+		printf("packetsize:%d\n",packetSize);
+		bool validateR = validateRoot(packetBuffer);
+		bool vdmp = validateDMP(packetBuffer);
+		bool vfr = validateFraming(packetBuffer);
 
-	
-	Udp.read(packetBuffer,700);
-	if (
-	packetBuffer[RLP_PREAMBLE_SIZE] == RLP_PREAMBLE_SIZE_VALID
-	&& packetBuffer[RLP_POST_AMBLE_SIZE] == RLP_POST_AMBLE_SIZE_VALID
-	// && packetBuffer[ACN_PACKET_IDENTIFIER] == need to verify ID
-	&& packetBuffer[IDX_VECTOR_PROTOCOL_H] == E1_31_VECTOR_VAL_H
-	&& packetBuffer[IDX_VECTOR_PROTOCOL_L] == E1_31_VECTOR_VAL_L
-	//
-	//&& packetBuffer[] ==
-	//&& packetBuffer[] ==
-	//&& packetBuffer[] ==
-	//&& packetBuffer[] ==
-	//&& packetBuffer[] ==
-	
-	
-	&& packetBuffer[E1_31_DMP_ADDRESS_TYPE_DATA_TYPE] == E1_31_DMP_ADDRESS_TYPE_DATA_TYPE_VALID
-	&& packetBuffer[E1_31_DMP_FIRST_PROP_ADDR] == E1_31_DMP_FIRST_PROP_ADDR_VALID
-	&& packetBuffer[E1_31_FRAMING_VECTOR] == E1_31_FRAMING_VECTOR_VALID )
-	{
-		
-		
-		int channelPos=0;
-		int i = 0;
-		int pktCnt=0;
-		int r;
-		for ( r=0; r< RF_NUM_PACKETS-1; r++){
-			memcpy ( &str[0], &packetBuffer[r*30 + DMX_CHANNEL_DATA_START], 30);
-			str[30]=r;
-			radio.write_payload( &str[0], 32 );
-			delayMicroseconds(RF_DELAY);
-			status = radio.get_status();
-			while (status & 0x01) {
-				status = radio.get_status();
-			}
-		}
-		//final packet if its a partial packet
-		int test = NUM_CHANNELS - ( r * 30 );
-		if (test >0){
-			memcpy ( &str[0], &packetBuffer[r*30], test);
-			str[30]=r;
-			radio.write_payload( &str[0], 32 );
-			delayMicroseconds(RF_DELAY);
-			status = radio.get_status();
-			while (status & 0x01) {
-				status = radio.get_status();
+		//  printf("validate root : %d,  validate DMP:  %d , validateFraming %d\n", validateR,vdmp,vfr);
+		if( validateR && vdmp && vfr)
+		{
+			
+			
+			int channelPos=0;
+			int i = 0;
+			int pktCnt=0;
+			int r;
+			uint16_t numChannelsInPacket = ( (packetBuffer[E1_31_DMP_PROP_VAL_CNT] <<8)  | packetBuffer[E1_31_DMP_PROP_VAL_CNT+1] ) -1 ;
+			uint8_t numPackets = numChannelsInPacket / 30;
+			//  printf("numPackets %d\n",numPackets);
+			if (numChannelsInPacket <=DMX_MAX_CHANNEL && numChannelsInPacket >0 && numPackets <= 18 )
+			{
+				//printf("numchannels:%d\n",numChannelsInPacket);
+				for ( r=0; r< numPackets; r++){
+					
+					memcpy ( &str[0], &packetBuffer[r*30 + E1_31_DMP_FIRST], 30);
+					str[30]=r;
+					radio.write_payload( &str[0], 32 );
+					delay(3);
+					// printf("SentPacket:%d \n\n",r);
+					//delayMicroseconds(RF_DELAY);
+					
+					
+					//printf("processingpacketafter:%d\n\n",millis());
+				}
+				//final packet if its a partial packet
+				int test = numChannelsInPacket - ( (r) * 30 );
+				
+				printf("numChaninpacket %d  -  %d = %d\n",numChannelsInPacket, (r)*30, test);
+				if (test >0){
+					memcpy ( &str[0], &packetBuffer[(r)*30 + E1_31_DMP_FIRST], test);
+					str[30]=r;
+					radio.write_payload( &str[0], 32 );
+					printf("sent the test case%d\n",test);
+					delay(3);
+					
+				}
 			}
 		}
 	}
+}
+
+bool validateDMP(uint8_t buf[]) {
+	if (buf[E1_31_DMP_VECTOR] != E1_31_DMP_VECTOR_VALID
+	|| buf[E1_31_DMP_ADDRESS_TYPE_DATA_TYPE] != E1_31_DMP_ADDRESS_TYPE_DATA_TYPE_VALID
+	|| ntos(buf + E1_31_DMP_FIRST_PROP_ADDR) != E1_31_DMP_FIRST_PROP_ADDR_VALID
+	|| ntos(buf + E1_31_DMP_ADDRESS_INCREMENT) != E1_31_DMP_ADDRESS_INCREMENT_VALID)
+	return false;
+	//         ntos(buf + E1_31_DMP_PROP_VAL_CNT) - 1;
+	return true;
+}
+
+bool validateFraming (uint8_t buf[])
+{
 	
+	if (ntoi(buf + E1_31_FRAMING_VECTOR) != E1_31_FRAMING_VECTOR_VALID)
+	return false;
+	return true;
+}
+
+bool validateRoot (uint8_t buf[])
+{
+	
+	if (ntos(buf) != RLP_PREAMBLE_SIZE_VALID
+	|| ntos(buf + RLP_POST_AMBLE_SIZE) != RLP_POST_AMBLE_SIZE_VALID
+	|| ntoi(buf + IDX_VECTOR_PROTOCOL) != 0x00000004)
+	return false;
+	return true;
+}
+
+static uint32_t ntoi(uint8_t *buf) {
+	return static_cast<uint32_t>(buf[0]) << 24
+	| static_cast<uint32_t>(buf[1]) << 16
+	| static_cast<uint32_t>(buf[2]) << 8
+	| buf[3];
+}
+
+static uint16_t ntos(uint8_t *buf) {
+	return static_cast<uint16_t>(buf[0]) << 8 | buf[1];
 }
