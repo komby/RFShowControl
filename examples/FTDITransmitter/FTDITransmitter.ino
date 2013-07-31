@@ -22,31 +22,30 @@
 *      The Commercial Use of this Software is Prohibited.
 *
 *
-*       TO Use this transmitter code you need to modify the HardwareSerial library from your main arduino install location
-*       for instructions on how to do so you can follow step "7.1.3. Hardwareserial.cpp"  from
-*       the PDF writeup for the RFColor2_4 - http://doityourselfchristmas.com/forums/attachment.php?attachmentid=18291&d=1361578971
+*       To Use this transmitter code you need to modify the HardwareSerial library from your main arduino install location
+*       for instructions on how to do so visit: http://learn.komby.com/wiki/20/hardware-serial-modification
 *
 */
-
-
 #include <RFPixelControl.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
+/***************************  BEGIN CONFIGURATION SECTION *************************************************/
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to listen to.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE			RF1_1_3
+
 //What Speed do you want to use to transmit?
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//Use channel 100
+//What RF Channel do you want to transmit on?  
+//Valid Values: 1-124
 #define TRANSMIT_CHANNEL 100
-
+/***************************  END CONFIGURATION SECTION *************************************************/
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>

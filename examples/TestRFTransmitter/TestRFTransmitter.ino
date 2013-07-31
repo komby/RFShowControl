@@ -25,14 +25,16 @@
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//Use channel 100
+//What RF Channel do you want to transmit on?  
+//Valid Values: 1-124
 #define TRANSMIT_CHANNEL 100
 
-#define NRF_TYPE MINIMALIST_SHIELD
-//#define NRF_TYPE RF1_1_3
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE  RF1_1_3
 
 
-/***************************  END CONFIGURATION SECTION BEGIN *************************************************/
+/***************************  END CONFIGURATION SECTION *************************************************/
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 

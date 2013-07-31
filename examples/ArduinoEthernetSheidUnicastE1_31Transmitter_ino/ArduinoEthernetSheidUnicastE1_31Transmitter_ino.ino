@@ -18,24 +18,30 @@
 * This code can be used to send data to the RF1 series controllers.
 *
 *  Created on: June 17, 2013
+*  Updated: July, 2013
 *      Author: Greg Scull
 */
 
 
 /***************************  CONFIGURATION SECTION *************************************************/
 
-//How many pixels do you want to transmit data for
-//#define NUM_CHANNELS 512
-#define RF_DELAY      2000
-#define NUM_CHANNELS 270
-//use channel 100
-#define TRANSMIT_CHANNEL 100
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE			RF1_1_3
+
+//What Speed do you want to use to transmit?
+//Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-#define NRF_TYPE MINIMALIST_SHIELD
-#define RF_NUM_PACKETS 18
+//What RF Channel do you want to transmit on?  
+//Valid Values: 1-124
+#define TRANSMIT_CHANNEL 100
+
 /***************************  CONFIGURATION SECTION *************************************************/
 #include <RFPixelControlConfig.h>
+#define RF_NUM_PACKETS 18
+#define RF_DELAY      2000
+
 
 //change the mac (0xEF, 0xE0, 0xE1, ... 0xE9)
 byte mac[] = {

@@ -1,15 +1,17 @@
 /*
  * Renard Transmitter
- *
+ * 
+ *  Author: Greg Scull
+ *  		7/2013
+ *   This transmitter uses 
  */
-
-
 #include <RFPixelControl.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+/*************************** CONFIGURATION SECTION *************************************************/
 
-// REQUIRED VARIABLES
+
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE			RF1_1_3
@@ -18,19 +20,25 @@
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-
-#define RF_NUM_PACKETS 18     // 18 * 30 total Channels can be broadcasted
+//What RF Channel do you want to transmit on?  
+//Valid Values: 1-124
 #define TRANSMIT_CHANNEL 100
+
+//What is the baud rate of the incoming serial data?
 #define RENARD_SERIAL_BAUD	57600
-#define RECEIVER_UNIQUE_ID 0
-#define NRF_TYPE			RF1_1_3
-#define PIXEL_TYPE			NONE
+
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+#define NRF_TYPE  RF1_1_3
+
 
 
 
 /***************************  END CONFIGURATION SECTION *************************************************/
 #include <RFPixelControlConfig.h>
-
+#define RF_NUM_PACKETS 18     // 18 * 30 total Channels can be broadcasted
+#define RECEIVER_UNIQUE_ID 0
+#define PIXEL_TYPE			NONE
 #define PAD 0x7D
 #define SYNC 0x7E
 #define ESCAPE 0x7F

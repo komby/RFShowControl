@@ -42,21 +42,24 @@
 #include <RF24.h>
 #include "printf.h"
 
-// REQUIRED VARIABLES
+
+/***************************  CONFIGURATION SECTION *************************************************/
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// If you are not using Over The air Configuration you do not need to change this setting.
+// Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE  RF1_1_3
-#define PIXEL_TYPE			WM_2999
-#define PIXEL_DATA_PIN			A0
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_1MBPS
-#define LISTEN_CHANNEL 100	// the channel for the RF Radio
 
-
+//What RF Channel do you want to listen on?  
+//Valid Values: 1-124
+#define LISTEN_CHANNEL 100	
 
 // Set OTA_CONFIG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
@@ -68,61 +71,55 @@
 #define HARDCODED_START_CHANNEL 0
 #define HARDCODED_NUM_PIXELS 20
 
+
+/*************************** END CONFIGURATION SECTION *************************************************/
 //Uncomment for serial
 #define DEBUG 0
-
-//NRF24L01+ Items
+#define PIXEL_TYPE			WM_2999
+#define PIXEL_DATA_PIN			A0
 
 //#define outPin 19  //Arduino pin # that Lights are Connected to.  This is actually Pin #28 on the Atmega 328 IC
 #define lightCount 20  //Total # of lights on string (usually 50, 48, or 36)
 
-
-
-
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 
-
 //Arduino setup function.
 void setup() {
- printf_begin();
- 
- 
+
+	printf_begin();
 	Serial.begin(57600);
 	Serial.write("Initializing reciever\n");
-Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
+
+	Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
 	pinMode(A0, OUTPUT);
 	digitalWrite(A0,LOW);
+
 	delay(2);
+
 	strip.SetPixelCount(20);
-	strip.Paint();
 
 	Serial.write("Initializing Radio\n");
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-	
+
 	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
-	{
-		
+	{		
 		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3,  RECEIVER_UNIQUE_ID);
 	}
 	
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-  radio.printDetails(); 
+	radio.printDetails(); 
 	Serial.write("Init and Paint LEDS for startup \n");
-	
 	//Both OTA and NON ota will need to set their data base pointers.
 	logicalControllerNumber = 0;
 	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
-	
-	
+	strip.Paint();
     radio.DisplayDiagnosticStartup(&strip) ;
 }
-      
 
 
-
-//RF Listening to DMX packets loop
+//RF Listening Loop
 void loop(void){
 
 	//When Radio.Listen returns true its time to update

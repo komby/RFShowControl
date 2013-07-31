@@ -20,22 +20,24 @@
 #include <OTAConfig.h>
 #include <GECEPixelControl.h>
 #include <GEColorEffects.h>
-//*****************************************************************************
+/***************************  BEGIN CONFIGURATION SECTION *************************************************/
 
-// REQUIRED VARIABLES
-//Make sure you choose a unique ID if you are using OTA config!
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// If you are not using Over The air Configuration you do not need to change this setting.
+// Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE			RF1_1_3
-#define PIXEL_TYPE			GECE
+
+//What Pin on your board is the data connected to
+// Pin 2 is used on the RF1 4 pin header.
 #define PIXEL_DATA_PIN			2
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_1MBPS
-#define LISTEN_CHANNEL 100	// the channel for the RF Radio
+#define DATA_RATE RF24_250KBPS
 
 
 // Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
@@ -46,12 +48,16 @@
 
 // If you're not using Over-The-Air configuration these variables are required:
 #define HARDCODED_START_CHANNEL 0
-#define HARDCODED_NUM_CHANNELS 150
+#define HARDCODED_NUM_CHANNELS 150 
+
+//What RF Channel do you want to listen on?  
+//Valid Values: 1-124
+#define LISTEN_CHANNEL 100	// the channel for the RF Radio
 
 
 
-
-//*****************************************************************************
+/***************************  END CONFIGURATION SECTION *************************************************/
+#define PIXEL_TYPE			GECE
 
 // OPTIONAL VARIABLES
 #define DEBUG // Uncomment this line to enable debugging

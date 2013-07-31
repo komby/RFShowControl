@@ -22,7 +22,9 @@
 
 
 /**************CONFIGURATION SECTION ***************************/
-// REQUIRED VARIABLES
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// If you are not using Over The air Configuration you do not need to change this setting.
+//Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
@@ -46,9 +48,12 @@
 
 // If you're not using Over-The-Air configuration these variables are required:
 //If you are using OTA then your done,  ignore this stuff.
-#define HARDCODED_START_CHANNEL 60
+#define HARDCODED_START_CHANNEL 1
 #define HARDCODED_NUM_PIXELS 50
-#define LISTEN_CHANNEL 100	// the channel for the RF Radio
+
+//What RF Channel do you want to listen on?  
+//Valid Values: 1-124
+#define LISTEN_CHANNEL 100	
 
 
 
@@ -131,7 +136,7 @@ void setup()
 
 void loop(void)
 {
-	//When Radio.Listen returns true its time to update the LEDs for all controlelrs,  A full update was made
+	//When Radio.Listen returns true its time to update the LEDs for all controllers,  A full update was made
 	if (radio.Listen() )
 	{
 		LEDS.show();

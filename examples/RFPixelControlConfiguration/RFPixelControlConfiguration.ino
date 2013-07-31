@@ -11,7 +11,7 @@
 #include <IPixelControl.h>
 
 
-/*\
+/*
 *  Created on: June 30 2013
 *      Author: Greg Scull
 */
@@ -28,8 +28,7 @@
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-/***************************  CONFIGURATION SECTION *************************************************/
-
+/***************************  END CONFIGURATION SECTION *************************************************/
 #include <RFPixelControlConfig.h>
 
 //change the mac (0xEF, 0xE0, 0xE1, ... 0xE9)

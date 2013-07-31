@@ -15,7 +15,7 @@ GECEPixelControl::GECEPixelControl(uint8_t pin) : GEColorEffects(50,pin)
 
 /**
  * Paint method to keep compatibility with the other Pixel types
- * Call the adafruit method show to update the string.
+ * 
  */
 void GECEPixelControl::Paint()
 {

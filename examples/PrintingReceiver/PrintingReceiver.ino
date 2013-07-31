@@ -1,30 +1,23 @@
 /*
 *
 *
-*  Created on: Mar  2013
+*  Created on: July  2013
 *      Author: Greg Scull, komby@komby.com
 *
 *   Print packet content and optionally packet data snooping on transmitter channels
 */
-
-
 #include <Arduino.h>
 #include <RFPixelControl.h>
-
 #include <IPixelControl.h>
 #include <WM2999.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
-
+/**************CONFIGURATION SECTION ***************************/
 
 //Uncomment for serial output of all data
 #define FULL_PRINT_DEBUG 0
-
-//Make sure you choose a unique ID if you are using OTA config!
-#define RECEIVER_UNIQUE_ID 33
-
 
 //NRF24L01+ Items
 //What board are you using to connect your nRF24L01+?
@@ -35,26 +28,23 @@
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
+//What RF Channel do you want to listen on?  
+//Valid Values: 1-124
+#define LISTEN_CHANNEL 100	
 
-// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
-// your RF1s in the field.  This will cause the RF1s to search for a
-// configuration broadcast for a short period after power-on before attempting to
-// read EEPROM for the last known working configuration.
+/**************END CONFIGURATION SECTION ***************************/
+
+
+//THESE OPTIONS WERE REMOVED FROM THE CONFIGURATION SECTION
+// YOU DO NOT NEED TO MODIFY THEM
 #define OVER_THE_AIR_CONFIG_ENABLE 0
+#define RECEIVER_UNIQUE_ID 0
+//END
 
-#define LISTEN_CHANNEL 100
-
-byte gotstr[32];
-
-
-
-
-/**************CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 
 byte data[32];
-
 
 void setup() {
 	printf_begin();
@@ -64,8 +54,8 @@ void setup() {
 	
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
-		
-		radio.AddLogicalController(0, 1, 464,  0);
+		//not used hardcoded for compatibility purposes
+		radio.AddLogicalController(0, 1, 10,  0);
 	}
 	Serial.begin(57600);
 	Serial.write("Initializing DEBUG listener\n");

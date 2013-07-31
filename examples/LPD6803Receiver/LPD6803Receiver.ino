@@ -40,7 +40,11 @@
  * As the receiver is listening to a Transmitter capable of transmitting 512 channels
  * We need to make sure that we are listening to the right channels in the universe
  */
-// REQUIRED VARIABLES
+ 
+ 
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// If you are not using Over The air Configuration you do not need to change this setting.
+//Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
@@ -67,10 +71,13 @@
  #define HARDCODED_START_CHANNEL 0
  #define HARDCODED_NUM_PIXELS 50  //This defines the # of LED Channels.
  #define HARDCODED_NUM_CHANNELS 150 //Number of DMX channels to read...usually dmx_led_channels/3
- #define LISTEN_CHANNEL 100 // the channel for the RF Radio
+
+//What RF Channel do you want to listen to?  
+//Valid Values: 1-124
+#define LISTEN_CHANNEL 100	
 
 
-
+/***************************  END CONFIGURATION SECTION *************************************************/
 
 
 //Include this after all configuration variables are set

@@ -19,21 +19,19 @@
 #include "printf.h"
 
 
-//*****************************************************************************
+/*************************** CONFIGURATION SECTION *************************************************/
 
-// REQUIRED VARIABLES
-//Make sure you choose a unique ID if you are using OTA config!
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// If you are not using Over The air Configuration you do not need to change this setting.
+// Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
-
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 #define NRF_TYPE			RF1_1_3
 
-#define PIXEL_TYPE			RENARD
+//What baud rate does your Renard board you are controlling need?
 #define RENARD_BAUD_RATE		57600
-
-
 
 // Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
@@ -41,22 +39,24 @@
 // read EEPROM for the last known working configuration.
 #define OVER_THE_AIR_CONFIG_ENABLE 0
 
-
 // If you're not using Over-The-Air configuration these variables are required:
-#define START_CHANNEL 		0
-#define NUM_CHANNELS 			400
-#define LISTEN_CHANNEL 			100	// the channel for the RF Radio
+#define START_CHANNEL 		1
+#define NUM_CHANNELS 		400
+
+
+//What RF Channel do you want to listen on?  
+//Valid Values: 1-124
+#define LISTEN_CHANNEL 100	
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_1MBPS
 
-//*****************************************************************************
-
+/***************************  END CONFIGURATION SECTION *************************************************/
 // OPTIONAL VARIABLES
-#define DEBUG // Uncomment this line to enable debugging
+//#define DEBUG // Uncomment this line to enable debugging
 
-
+#define PIXEL_TYPE			RENARD
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 
@@ -65,7 +65,7 @@ void setup()
 {
 	Serial.begin(RENARD_BAUD_RATE);
 	#ifdef DEBUG
-	printf_begin();
+		printf_begin();
 	#endif
 
 	Serial.println("Initializing Radio");
