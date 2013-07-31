@@ -108,7 +108,7 @@ void loop () {
 					memcpy ( &str[0], &packetBuffer[r*30 + E1_31_DMP_FIRST], 30);
 					str[30]=r;
 					radio.write_payload( &str[0], 32 );
-					delay(3);
+					delay(1);
 					// printf("SentPacket:%d \n\n",r);
 					//delayMicroseconds(RF_DELAY);
 					
@@ -124,7 +124,7 @@ void loop () {
 					str[30]=r;
 					radio.write_payload( &str[0], 32 );
 					printf("sent the test case%d\n",test);
-					delay(3);
+					//delay(3);
 					
 				}
 			}
