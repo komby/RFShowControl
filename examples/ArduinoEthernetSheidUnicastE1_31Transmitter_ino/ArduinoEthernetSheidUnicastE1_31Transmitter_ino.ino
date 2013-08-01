@@ -27,15 +27,26 @@
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
-#define NRF_TYPE			RF1_1_3
+#define NRF_TYPE			MINIMALIST_SHIELD
 
 //What Speed do you want to use to transmit?
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//What RF Channel do you want to transmit on?  
+//What RF Channel do you want to transmit on?
 //Valid Values: 1-124
 #define TRANSMIT_CHANNEL 100
+
+
+//Each ethernet device needs its own MAC address
+//You can get your own mac string for this at
+//http://www.miniwebtool.com/mac-address-generator/
+byte mac[] = {
+0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
+//Change this IP to one on your network
+IPAddress ip(192, 168, 1, 150);
+
 
 /***************************  CONFIGURATION SECTION *************************************************/
 #include <RFPixelControlConfig.h>
@@ -43,12 +54,6 @@
 #define RF_DELAY      2000
 
 
-//change the mac (0xEF, 0xE0, 0xE1, ... 0xE9)
-byte mac[] = {
-0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-
-//Change this IP to one on your network
-IPAddress ip(192, 168, 1, 150);
 
 
 
