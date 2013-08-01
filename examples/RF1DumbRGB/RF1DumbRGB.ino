@@ -45,7 +45,7 @@
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
 
 
 //Setup for RF1_12V DumbRGB Controller
