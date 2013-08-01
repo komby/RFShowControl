@@ -4,19 +4,17 @@
 
 #if (NRF_TYPE == MINIMALIST_SHIELD)
 RFPixelControl radio(9, 8);
-#else
-#if (NRF_TYPE == RF1_1_2) || \
+#elif (NRF_TYPE == RF1_1_2) || \
 	(NRF_TYPE == RF1_1_3) || \
 	(NRF_TYPE == RF1_0_2) || \
 	(NRF_TYPE == RF1_12V_0_1)
 RFPixelControl radio(8, 7);
-#else
-#if (NRF_TYPE == KOMBYONE_DUE)
+#elif (NRF_TYPE == KOMBYONE_DUE)
 RFPixelControl radio(33,10);
+#elif (NRF_TYPE == WM_2999_NRF)
+RFPixelControl radio(9,10);
 #else
 #error Must define an NRF type!
-#endif
-#endif
 #endif
 
 

@@ -85,7 +85,7 @@ RFPixelControl::~RFPixelControl() {
 	 }
 	else 
 	{
-		this->channelData = (uint8_t*)malloc(sizeof(uint8_t)*512);
+		this->channelData = (uint8_t*)calloc(512,sizeof(uint8_t));
 		if (this->_otaConfigEnable)
 		{
 			printf("OTACONFIG-Begin\n");

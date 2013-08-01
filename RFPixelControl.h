@@ -32,6 +32,8 @@
 #define MINIMALIST_SHIELD	3
 #define RF1_0_2				4
 #define RF1_12V_0_1			5
+#define WM_2999_NRF			6
+#define KOMBYONE_DUE        7
 
 //PIXEL TYPES
 #define GECE				1

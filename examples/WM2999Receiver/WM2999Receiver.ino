@@ -51,11 +51,12 @@
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
-#define NRF_TYPE  RF1_1_3
+#define NRF_TYPE  WM_2999_NRF
+//#define NRF_TYPE  RF1_1_3
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
 
 //What RF Channel do you want to listen on?  
 //Valid Values: 1-124
@@ -68,13 +69,13 @@
 #define OVER_THE_AIR_CONFIG_ENABLE 0
 
 // If you're not using Over-The-Air configuration these variables are required:
-#define HARDCODED_START_CHANNEL 0
+#define HARDCODED_START_CHANNEL 1
 #define HARDCODED_NUM_PIXELS 20
 
 
 /*************************** END CONFIGURATION SECTION *************************************************/
 //Uncomment for serial
-#define DEBUG 0
+#define DEBUG 1
 #define PIXEL_TYPE			WM_2999
 #define PIXEL_DATA_PIN			A0
 
@@ -87,17 +88,19 @@
 //Arduino setup function.
 void setup() {
 
-	printf_begin();
+	
 	Serial.begin(57600);
-	Serial.write("Initializing reciever\n");
-
+   
+	delay(2);
+	Serial.write("Initializing receiver\n");
+     printf_begin();
 	Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
 	pinMode(A0, OUTPUT);
 	digitalWrite(A0,LOW);
 
 	delay(2);
 
-	strip.SetPixelCount(20);
+	//strip.SetPixelCount(20);
 
 	Serial.write("Initializing Radio\n");
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
@@ -113,9 +116,21 @@ void setup() {
 	Serial.write("Init and Paint LEDS for startup \n");
 	//Both OTA and NON ota will need to set their data base pointers.
 	logicalControllerNumber = 0;
-	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
+      //  uint8_t* ptr = radio.GetControllerDataBase(logicalControllerNumber);
+        printf("%d num pix\n", radio.GetNumberOfChannels(logicalControllerNumber));
+	strip.WM2999PixelControl::Begin((uint8_t*)radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber)/3);
+for ( int i = 0; i<20;i++){
+strip.SetPixelColor(i, strip.Color(244,0,255));
+}
 	strip.Paint();
-    radio.DisplayDiagnosticStartup(&strip) ;
+delay (5000);
+for ( int i = 0; i<20;i++){
+      strip.SetPixelColor(i, strip.Color(0,255,0));
+}
+strip.Paint();
+delay (300);
+
+    //radio.DisplayDiagnosticStartup(&strip) ;
 }
 
 
