@@ -21,7 +21,7 @@
 
 /*************************** CONFIGURATION SECTION *************************************************/
 
-// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup.
 // If you are not using Over The air Configuration you do not need to change this setting.
 // Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
@@ -41,20 +41,20 @@
 
 // If you're not using Over-The-Air configuration these variables are required:
 #define START_CHANNEL 		1
-#define NUM_CHANNELS 		400
+#define NUM_CHANNELS 		64
 
 
-//What RF Channel do you want to listen on?  
+//What RF Channel do you want to listen on?
 //Valid Values: 1-124
-#define LISTEN_CHANNEL 100	
+#define LISTEN_CHANNEL 100
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_1MBPS
+#define DATA_RATE RF24_250KBPS
 
 /***************************  END CONFIGURATION SECTION *************************************************/
 // OPTIONAL VARIABLES
-//#define DEBUG // Uncomment this line to enable debugging
+#define DEBUG // Uncomment this line to enable debugging
 
 #define PIXEL_TYPE			RENARD
 //Include this after all configuration variables are set
@@ -65,7 +65,7 @@ void setup()
 {
 	Serial.begin(RENARD_BAUD_RATE);
 	#ifdef DEBUG
-		printf_begin();
+	printf_begin();
 	#endif
 
 	Serial.println("Initializing Radio");
@@ -73,13 +73,14 @@ void setup()
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 	
 	uint8_t logicalControllerNumber = 0;
-	#if (OVER_THE_AIR_CONFIG_ENABLE == 0)
+	#if (!OVER_THE_AIR_CONFIG_ENABLE )
 	
-	radio.AddLogicalController(logicalControllerNumber++, START_CHANNEL, NUM_CHANNELS, 0);
+	radio.AddLogicalController(logicalControllerNumber++, START_CHANNEL, NUM_CHANNELS, RENARD_BAUD_RATE);
 	#endif
 
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
+	radio.printDetails();
 
 	logicalControllerNumber = 0;
 	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber++));
