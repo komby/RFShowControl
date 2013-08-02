@@ -18,8 +18,7 @@
 #include <RF24.h>
 #include "printf.h"
 #include <OTAConfig.h>
-#include <GECEPixelControl.h>
-#include <GEColorEffects.h>
+
 /***************************  BEGIN CONFIGURATION SECTION *************************************************/
 
 // Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
@@ -47,7 +46,7 @@
 #define OVER_THE_AIR_CONFIG_ENABLE 0 
 
 // If you're not using Over-The-Air configuration these variables are required:
-#define HARDCODED_START_CHANNEL 0
+#define HARDCODED_START_CHANNEL 1
 #define HARDCODED_NUM_CHANNELS 150 
 
 //What RF Channel do you want to listen on?  
@@ -60,12 +59,13 @@
 #define PIXEL_TYPE			GECE
 
 // OPTIONAL VARIABLES
-#define DEBUG // Uncomment this line to enable debugging
+#define DEBUG 1 // Uncomment this line to enable debugging
 
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
-
+#include <GECEPixelControl.h>
+#include <GEColorEffects.h>
 
 
 //Arduino setup function.
@@ -119,7 +119,7 @@ void loop(void)
     //When Radio.Listen returns true its time to update the LEDs for all controlelrs,  A full update was made
     if (radio.Listen() )
     {
-		print_data((char *)radio.GetControllerDataBase(0));
+		//print_data((char *)radio.GetControllerDataBase(0));
 	    strip.Paint();
     }
 }
