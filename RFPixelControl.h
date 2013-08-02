@@ -34,7 +34,7 @@
 #define RF1_12V_0_1			5
 #define WM_2999_NRF			6
 #define KOMBYONE_DUE        7
-
+#define RFCOLOR2_4			8
 //PIXEL TYPES
 #define GECE				1
 #define WS_2801				2

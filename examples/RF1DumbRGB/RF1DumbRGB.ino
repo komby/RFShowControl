@@ -25,7 +25,7 @@
 #define RECEIVER_UNIQUE_ID 33
 
  //What board are you using to connect your nRF24L01+?
- //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
+ //Valid Values:  MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF, RFCOLOR2_4
  #define NRF_TYPE  RF1_1_3
 
 // Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program

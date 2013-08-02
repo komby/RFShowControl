@@ -11,7 +11,8 @@ RFPixelControl radio(9, 8);
 RFPixelControl radio(8, 7);
 #elif (NRF_TYPE == KOMBYONE_DUE)
 RFPixelControl radio(33,10);
-#elif (NRF_TYPE == WM_2999_NRF)
+#elif (NRF_TYPE == WM_2999_NRF) || \
+	(NRF_TYPE == RFCOLOR2_4)
 RFPixelControl radio(9,10);
 #else
 #error Must define an NRF type!
