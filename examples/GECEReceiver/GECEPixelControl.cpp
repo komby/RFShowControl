@@ -20,7 +20,7 @@ GECEPixelControl::GECEPixelControl(uint8_t pin) : GEColorEffects(50,pin)
 void GECEPixelControl::Paint()
 {
 	cli();
-    int numPixels = numLEDs/3
+    int numPixels = numLEDs/3;
 	for ( int i = 0; i < numPixels; i++ )
 	{
 		this->set_color(i,
