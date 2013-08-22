@@ -25,7 +25,7 @@ UCS1903,
 US2811,
 TM1803
 
-For more information visit the Releases page
+For more information visit the Releases page :https://github.com/komby/RFPixelControl/releases
 
 and 
 
