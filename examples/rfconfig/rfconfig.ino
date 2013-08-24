@@ -56,7 +56,6 @@
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
-radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
 // Ethernet controller MAC address...
 // must be unique...can generate with:
@@ -66,7 +65,7 @@ radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
 // CHANGE THIS TO MATCH YOUR HOST NETWORK
-static uint8_t ip[] = { 192, 168, 2, 99 };
+static uint8_t ip[] = { 192, 168, 1, 99 };
 // set up the radio.   change pins for particular board
 
 WebServer webserver(PREFIX, 80);
@@ -100,11 +99,10 @@ inline Print &operator <<(Print &obj, T arg)
 // Various blocks 'o html-o
 
 P(htmlHead) =
-    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
-    "<html xmlns=\"http://www.w3.org/1999/xhtml\"> "
+    "<!DOCTYPE html>"
+    "<html"
     "<head>"
-    "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
-    "<title>RF Configurator</title>"
+    "<title>RF Config</title>"
     "<style type=\"text/css\">"
     "body {font: 100%/1.4 Verdana, Arial, Helvetica, sans-serif;background-color: #4E5869;margin: 0;padding: 0;color: #000;}"
     "ul, ol, dl { padding: 0; margin: 0;}"
@@ -126,7 +124,7 @@ P(redirect) = "<h1>Success!</h1><form action=\"/logical\" method=\"post\">"
               "<div class = class=\"container\" id=\"buttons\">"
               "<input type=\"submit\"  name=\"doneinit\" value=\"Return\">"
               "<input type=\"submit\"  name=\"doneinit\" value=\"Resend\">"
-              "<input type=\"submit\"  name=\"doneinit\" value=\"Raw\">"
+            //  "<input type=\"submit\"  name=\"doneinit\" value=\"Raw\">"
               "</div> </form> ";
 P(dcontain) = "<div class=\"container\"> <div class=\"content\">";
 P(contain) = "<p class=\"container\">";
@@ -134,51 +132,85 @@ P(contain) = "<p class=\"container\">";
 P(writeInit) = "Writing Payload For init packet";
 P(writeLogical) = "Writing Payload For logical packet ";
 
-P(rawinput)=
-    "<h1>Raw input</h1>"
-    "<form id=\"rawinput\" name=\"rawinput\" method=\"post\" action=\"/rawpost\">"
-    "<table width=\"95%\" border=\"0\" cellpadding=\"2\">"
-    "<tr><td width=\"19%\">byte     0  - 15	:</td>"
-    "<td width=\"81%\">"
+//P(rawinput)=
+ //   "<h1>Raw input</h1>"
+   // "<form id=\"rawinput\" name=\"rawinput\" method=\"post\" action=\"/rawpost\">"
+   // "<table width=\"95%\" border=\"0\" cellpadding=\"2\">"
+   // "<tr><td width=\"19%\">byte     0  - 15	:</td>"
+   // "<td width=\"81%\">"
+ //"<input type=\"text\" name=\"0x00\" id=\"D00\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x01\" id=\"D01\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x02\" id=\"D02\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x03\" id=\"D03\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x04\" id=\"D04\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x05\" id=\"D05\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x06\" id=\"D06\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x07\" id=\"D07\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x08\" id=\"D08\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x09\" id=\"D09\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x10\" id=\"D10\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x11\" id=\"D11\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x12\" id=\"D12\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x13\" id=\"D13\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x14\" id=\"D14\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x15\" id=\"D15\"  size=\"2\" />"
+//
+ //"</td></tr><tr><td><br />byte 16- 31:</td><td>"
+//
+ //"<input type=\"text\" name=\"0x16\" id=\"D16\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x17\" id=\"D17\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x18\" id=\"D18\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x19\" id=\"D19\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x20\" id=\"D20\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x21\" id=\"D21\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x22\" id=\"D22\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x23\" id=\"D23\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x24\" id=\"D24\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x25\" id=\"D25\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x26\" id=\"D26\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x27\" id=\"D27\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x28\" id=\"D28\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x29\" id=\"D29\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x30\" id=\"D30\"  size=\"2\" />"
+ //"<input type=\"text\" name=\"0x31\" id=\"D31\"  size=\"2\" />"
+    //"<input type=\"text\" name=\"0x00\" id=\"D00\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x01\" id=\"D01\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x02\" id=\"D02\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x03\" id=\"D03\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x04\" id=\"D04\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x05\" id=\"D05\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x06\" id=\"D06\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x07\" id=\"D07\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x08\" id=\"D08\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x09\" id=\"D09\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x10\" id=\"D10\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x11\" id=\"D11\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x12\" id=\"D12\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x13\" id=\"D13\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x14\" id=\"D14\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x15\" id=\"D15\" maxlength=\"2\" size=\"2\" />"
+//
+    //"</td></tr><tr><td><br />byte 16- 31:</td><td>"
+//
+    //"<input type=\"text\" name=\"0x16\" id=\"D16\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x17\" id=\"D17\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x18\" id=\"D18\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x19\" id=\"D19\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x20\" id=\"D20\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x21\" id=\"D21\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x22\" id=\"D22\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x23\" id=\"D23\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x24\" id=\"D24\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x25\" id=\"D25\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x26\" id=\"D26\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x27\" id=\"D27\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x28\" id=\"D28\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x29\" id=\"D29\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x30\" id=\"D30\" maxlength=\"2\" size=\"2\" />"
+    //"<input type=\"text\" name=\"0x31\" id=\"D31\" maxlength=\"2\" size=\"2\" />"
 
-    "<input type=\"text\" name=\"0x00\" id=\"D00\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x01\" id=\"D01\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x02\" id=\"D02\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x03\" id=\"D03\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x04\" id=\"D04\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x05\" id=\"D05\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x06\" id=\"D06\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x07\" id=\"D07\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x08\" id=\"D08\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x09\" id=\"D09\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x10\" id=\"D10\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x11\" id=\"D11\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x12\" id=\"D12\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x13\" id=\"D13\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x14\" id=\"D14\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x15\" id=\"D15\" maxlength=\"2\" size=\"2\" />"
-
-    "</td></tr><tr><td><br />byte 16- 31:</td><td>"
-
-    "<input type=\"text\" name=\"0x16\" id=\"D16\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x17\" id=\"D17\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x18\" id=\"D18\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x19\" id=\"D19\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x20\" id=\"D20\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x21\" id=\"D21\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x22\" id=\"D22\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x23\" id=\"D23\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x24\" id=\"D24\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x25\" id=\"D25\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x26\" id=\"D26\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x27\" id=\"D27\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x28\" id=\"D28\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x29\" id=\"D29\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x30\" id=\"D30\" maxlength=\"2\" size=\"2\" />"
-    "<input type=\"text\" name=\"0x31\" id=\"D31\" maxlength=\"2\" size=\"2\" />"
-
-    "</td></tr></table><input type=\"submit\" value=\"Send the Raw Packet\"/></form><p>&nbsp;</p><p></p><p>"
-    "</p>";
+   // "</td></tr></table><input type=\"submit\" value=\"Send the Raw Packet\"/></form><p>&nbsp;</p><p></p><p>"
+    //"</p>";
 
 uint8_t cfg_pkt[32];
 
@@ -626,10 +658,10 @@ void logicalInit(WebServer &server, WebServer::ConnectionType type, char *url_ta
         {
             server.httpSeeOther("/");
         }
-        if (!(strcmp(value, "Raw")))
-        {
-            server.httpSeeOther("/rawinit");
-        }
+        //if (!(strcmp(value, "Raw")))
+        //{
+            //server.httpSeeOther("/rawinit");
+        //}
     }
     while (repeat);
 
@@ -650,6 +682,7 @@ void setup()
     printf("Webserver up\n");
 
 	radio.Initialize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, DATA_RATE, 1);
+radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
     delayMicroseconds(5000);
     radio.printDetails();
@@ -658,8 +691,8 @@ void setup()
     webserver.addCommand("initsuccess", &initsuccess);
     webserver.addCommand("logical", &logicalInit);
     webserver.addCommand("sendrf", &sendRFPacket);
-    webserver.addCommand("rawpost", &rawCmd);
-    webserver.addCommand("rawinit", &rawInit);
+   // webserver.addCommand("rawpost", &rawCmd);
+// webserver.addCommand("rawinit", &rawInit);
 }
 
 void loop()
