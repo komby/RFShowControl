@@ -1,4 +1,4 @@
-struct ControllerInitInfo
+struct  __attribute__ ((packed)) ControllerInitInfo
 {
     uint8_t packetType; // 0 for controller init; 1 for logical controller;
     uint32_t controllerID; // controller ID
@@ -8,7 +8,7 @@ struct ControllerInitInfo
     uint8_t extra[16];
 };
 
-struct LogicalInitInfo
+struct  __attribute__ ((packed)) LogicalInitInfo
 {
     uint8_t packetType; // LOGICALCONTROLLER_LED=2, LOGICALCONTROLLER_SERIAL=3, LOGICALCONTROLLER_CUSTOM=9;
     uint32_t controllerID; // controller ID

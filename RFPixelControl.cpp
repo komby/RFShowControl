@@ -168,6 +168,7 @@ RFPixelControl::~RFPixelControl() {
 				this->startListening();  //Start Listening!
 				
 		}
+		printf("after setup\n");
  this->PrintControllerConfig()	  ;
 		 return r;
 	}
@@ -178,6 +179,7 @@ RFPixelControl::~RFPixelControl() {
   /************************************************************************/
   void RFPixelControl::AddLogicalController(int pLControllerName, int pLcontrollerStartChannel, int pLControllerNumChannels, int pLControllerBaudRate)
   {
+	  printf("alc1%d\n", this->_numControllers);
 	  		ControllerInfo* t = this->_controllers;
 			  this->_controllers= new ControllerInfo[this->_numControllers+1];
 			  int i=0;
@@ -193,7 +195,9 @@ RFPixelControl::~RFPixelControl() {
 	  }
 	  
 	  this->_numControllers++;
-	   this->_controllers[i].logicalControllerNumber = pLControllerName;
+
+	  printf("Alc %d & %d \n", this->_numControllers, i );
+	   this->_controllers[i].logicalControllerNumber = i;
 	   this->_controllers[i].startChannel = pLcontrollerStartChannel;
 	   this->_controllers[i].numChannels = pLControllerNumChannels;
 	   this->_controllers[i].baudRate = pLControllerBaudRate;	
@@ -214,11 +218,11 @@ RFPixelControl::~RFPixelControl() {
  /************************************************************************/
  void RFPixelControl::PrintControllerConfig(ControllerInfo pControllerInfo)
  {
-	 ////printf("PE")
-	 printf("LogicalControllerNumber:%d\n", pControllerInfo.logicalControllerNumber );
-	 printf("CntrlStartChannel:%d\n", pControllerInfo.startChannel );
-	 printf("CntrlNumChannels:%d\n", pControllerInfo.numChannels);
-	 printf("CntrlBaudRate:%d\n", pControllerInfo.baudRate);
+	 //////printf("PE")
+	 //printf("LogicalControllerNumber:%d\n", pControllerInfo.logicalControllerNumber );
+	 //printf("CntrlStartChannel:%d\n", pControllerInfo.startChannel );
+	 //printf("CntrlNumChannels:%d\n", pControllerInfo.numChannels);
+	 //printf("CntrlBaudRate:%d\n", pControllerInfo.baudRate);
 
  }
  
@@ -227,15 +231,15 @@ RFPixelControl::~RFPixelControl() {
   /************************************************************************/
   void RFPixelControl::PrintControllerConfig(void)
   {
-	  printf("PhysicalController Configuration Info: \t\t%d\n", this->_controllerId);
-	  printf("Number of Logical Controllers : \t\t%d\n", this->_numControllers);
-	  printf("ListenChannel : \t\t\t%d\n", this->_channel);
-	  printf("DataStartChannel : \t\t\t%d\n", this->_startChannel );
-	  printf("DataEndChannel:  \t\t\t%d\n", this->_endChannel);
-	  printf("NumberOfChannels : \t\t\t%d\n", this->_endChannel - this->_startChannel); 
+	  printf("PhysicalController Info: \t\t%d\n", this->_controllerId);
+	  printf("ogical Controllers : \t\t%d\n", this->_numControllers);
+	  printf("Listen: \t\t\t%d\n", this->_channel);
+	  printf("DataStart : \t\t\t%d\n", this->_startChannel );
+	  printf("DataEnd:  \t\t\t%d\n", this->_endChannel);
+	  printf("NumberOf : \t\t\t%d\n", this->_endChannel - this->_startChannel); 
 	  for (int i=0;i< this->_numControllers;i++)
 	  {
-		printf("LogicalControllerNumber: \t\t%d\n", this->_controllers[i].logicalControllerNumber );
+		printf("LNumber(%d): \t\t%d\n", i,this->_controllers[i].logicalControllerNumber );
 		printf("CntrlStartChannel: \t\t\t%d\n", this->_controllers[i].startChannel );
 		printf("CntrlNumChannels: \t\t\t%d\n", this->_controllers[i].numChannels);
 		printf("CntrlBaudRateIfSerial:\t\t\t%d\n", this->_controllers[i].baudRate);
@@ -252,6 +256,7 @@ RFPixelControl::~RFPixelControl() {
 	 int numChannelsOffset = 0;
 	 for ( int i = 0; i < this->_numControllers; i++){
 		 if (this->_controllers[i].logicalControllerNumber == pLogicalControllerNumber){
+			 printf("GetControllerDataBase1\n");
 			 PrintControllerConfig();
 			 if (numChannelsOffset ==0) 
 			 {
@@ -268,6 +273,7 @@ RFPixelControl::~RFPixelControl() {
 			 numChannelsOffset += this->_controllers[i].numChannels;
 		 }
 	 }
+	 printf("GetControllerDataBase2\n");
 	PrintControllerConfig(); 
  }
  
@@ -304,39 +310,78 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 		//The First Configuration Packet contains the number of logical controllers for a given controller
 		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && this->packetData[IDX_CONTROLLER_ID]  == pReceiverId)
 		{
+			printf("gotinfoinit\n");
 			returnValue = true;
 			rfListenChannel = this->packetData[IDX_RF_LISTEN_CHANNEL];
-			rfListenRate = this->packetData[IDX_RF_LISTEN_RATE];
-			this->_numControllers = this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
+			uint32_t rfListenRater =this->packetData[IDX_RF_LISTEN_RATE];
+			printf("RFListenRate %d\n", rfListenRater );
+			rfListenRate = (int) rfListenRater;
+			this->_numControllers = 0;//this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
+			int numLogic =  this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
 			this->_channel = rfListenChannel;
-			this->_rf_data_rate = (rf24_datarate_e)rfListenRate;
+			
+			switch (rfListenRate)
+			{
+				case RF24_250KBPS:
+				//c_hdr->rfListenRate  = RF24_250KBPS;
+				this->_rf_data_rate = RF24_250KBPS;
+				break;
+				case RF24_1MBPS:
+				this->_rf_data_rate = RF24_1MBPS;
+				break;
+				//c_hdr->rfListenRate  = RF24_1MBPS;
+				case RF24_2MBPS:
+				this->_rf_data_rate = RF24_2MBPS;
+				break;
+				//c_hdr->rfListenRate  = RF24_2MBPS;
+			}
+			//this->_rf_data_rate = (rf24_datarate_e)rfListenRate;
 			
 			
 			//provision controller space for the configuration of logical controllers
-			this->_controllers = new ControllerInfo[numberOfLogicalControllers];
+			////this->_controllers = new ControllerInfo[numberOfLogicalControllers];
 			//(ControllerInfo*) malloc( this->_numControllers * sizeof (ControllerInfo) );
 			//ControllerInfo* ciTemp = this->_controllers;
 			int lControllerCount = 0;
 			
 			//get each logical controller
-			for(int i = 0; i < this->_numControllers;)
+			for(int i = 0; i < numLogic;)
 			{
-				for(bool found=false; !this->read( &this->packetData, 32 ) && !found;)
+				//while();
+				for(bool found=false; (!this->available() || this->read( &this->packetData, 32 )) && !found;)
 				{
-					delay(6);
+					
+					printf("received OTA logical");
+					//for (int i=0; i < 32; i++)
+					//{
+						//Serial.print (lcfg_pkt[0][i]);
+						//Serial.print (" ");
+					//}
+					//Serial.println();
+					for ( int i =0;i<32 ;i++)
+					{
+						printf(" 0x%02X", this->packetData[i]);
+						if ( (i-7) % 8 == 0 )
+						{
+							printf("\n\r--%3d:", i  );
+						}
+					}
+					//delay(6);
 					//make sure we are on a logical controller packet
 					//that we have the next logical controller ID
 					//and that its for this physical receiver
-					delay(1000);
+					//delay(1000);
 					if (this->packetData[IDX_CONFIG_PACKET_TYPE] != CONTROLLERINFOINIT && this->packetData[IDX_CONTROLLER_ID] == pReceiverId && this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER]==i)
 					{
 						
-						this->_controllers[i].startChannel = this->packetData[IDX_LOGICAL_CONTROLLER_START_CHANNEL];
-						this->_controllers[i].numChannels = this->packetData[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS];
-						this->_controllers[i].logicalControllerNumber = this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER];
+						printf("received OTA logical packet %d\n", i);
+						//this->_controllers[i].startChannel = this->packetData[IDX_LOGICAL_CONTROLLER_START_CHANNEL];
+						//this->_controllers[i].numChannels = this->packetData[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS];
+						//this->_controllers[i].logicalControllerNumber = this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER];
 						lControllerCount++;
 						found=true;
-						this->_controllers[i].baudRate = 0;
+						uint32_t baudrate = 0;
+						//this->_controllers[i].baudRate = 0;
 						//ciTemp->reserved = 0;
 						//ciTemp->customConfig = 0;
 						switch( this->packetData[IDX_CONFIG_PACKET_TYPE])
@@ -348,12 +393,13 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 							
 							break;
 							case LOGICALCONTROLLER_SERIAL:
-							this->_controllers[i].baudRate = this->packetData[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD];
+							baudrate = this->packetData[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD];
+							break;
 							//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
 							//memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
 							
 						}
-						
+						this->AddLogicalController(this->packetData[IDX_CONTROLLER_ID],this->packetData[IDX_LOGICAL_CONTROLLER_START_CHANNEL], this->packetData[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS], baudrate);
 						i++;
 					}
 				}

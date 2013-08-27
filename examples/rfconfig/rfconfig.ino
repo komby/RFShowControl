@@ -222,17 +222,17 @@ int iterations;
 int num_logcont;    //number of logical controllers
 
 
-void rawInit(WebServer &server, WebServer::ConnectionType type ,char *url_tail, bool tail_complete)
-{
-    server.httpSuccess();
-//send out header
-    server.printP(htmlHead);
-    server << "<body>";
-    server.printP(dcontain);
-    server.printP(rawinput);
-
-    server << "</div></div></body></html>";
-}
+//void rawInit(WebServer &server, WebServer::ConnectionType type ,char *url_tail, bool tail_complete)
+//{
+    //server.httpSuccess();
+////send out header
+    //server.printP(htmlHead);
+    //server << "<body>";
+    //server.printP(dcontain);
+    //server.printP(rawinput);
+//
+    //server << "</div></div></body></html>";
+//}
 void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tail, bool tail_complete)
 {
 
@@ -262,13 +262,13 @@ void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tai
         "<h1>RF Configurator</h1>"
         "<p class=\"container\">"
         //change Intro text below
-        "<i>Komby OTA Programming</i></p>"
+        "<i>RFPixelControl OTA Programming</i></p>"
         //
         "<p class=\"container\">&nbsp;</p>"
         "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"/init\">"
         "<p>Controller ID:  <input type=\"text\" name=\"controller\" id=\"controller-id\" maxlength=\"3\"/> </p>"
         "<p>Listen Rate:"
-        "<input type=\"radio\" name=\"radio\" id=\"250K\" value=\"0\" /> <label for=\"250K\">250 Khz</label>"
+        "<input type=\"radio\" name=\"radio\" id=\"250K\" value=\"0\" checked/> <label for=\"250K\">250 Khz</label>"
         "<input type=\"radio\" name=\"radio\" id=\"1M\" value=\"1\" /> <label for=\"1M\">1.0 Mhz</label>"
         "<input type=\"radio\" name=\"radio\" id=\"2M\" value=\"2\" /> <label for=\"2M\">2.0 Mhz</label>"
         "</p>"
@@ -351,10 +351,13 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                 case 0:
                     c_hdr->rfListenRate  = RF24_250KBPS;
                     //cfg_pkt[IDX_RF_LISTEN_RATE] = RF24_250KBPS;
+					break;
                 case 1:
                     c_hdr->rfListenRate  = RF24_1MBPS;
+					break;
                 case 2:
                     c_hdr->rfListenRate  = RF24_2MBPS;
+					break;
                 }
             }
             else if (!(strcmp(name, "member")))   // logical controller
@@ -644,8 +647,6 @@ void logicalInit(WebServer &server, WebServer::ConnectionType type, char *url_ta
     boolean repeat;
 
 
-    //server.httpSuccess();
-
     do
     {
         repeat = server.readPOSTparam(name, 16, value, 16);
@@ -658,10 +659,7 @@ void logicalInit(WebServer &server, WebServer::ConnectionType type, char *url_ta
         {
             server.httpSeeOther("/");
         }
-        //if (!(strcmp(value, "Raw")))
-        //{
-            //server.httpSeeOther("/rawinit");
-        //}
+   
     }
     while (repeat);
 
@@ -691,8 +689,7 @@ radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
     webserver.addCommand("initsuccess", &initsuccess);
     webserver.addCommand("logical", &logicalInit);
     webserver.addCommand("sendrf", &sendRFPacket);
-   // webserver.addCommand("rawpost", &rawCmd);
-// webserver.addCommand("rawinit", &rawInit);
+   
 }
 
 void loop()
