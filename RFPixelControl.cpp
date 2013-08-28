@@ -104,19 +104,37 @@ RFPixelControl::~RFPixelControl() {
 			
 				delay(2);
 				printDetails();
+				long elapsed = 0;
+				long maxTimeout = 30000;
 				//&& (millis() - configurationTime )<= RF_CONFIG_STARTUP_WINDOW
-				for(	unsigned long configurationTime = millis();!this->ConfigureReceiverAtStartup(pNodeId) ;)
+				for(	unsigned long configurationTime = millis();!this->ConfigureReceiverAtStartup(pNodeId) && elapsed < maxTimeout ;)
 				{
 					//delay 2 milliseconds between trying to get configuration data
 					delay(2);
+					elapsed = millis() - configurationTime;
 				}
 				if (this->_controllers ==NULL || this->_numControllers <= 0)
 				{
 					//We were not successfull in getting OTA Configuration,
 					printf("Unable to OTAConfig\n");
 					//First try and get configuration from EEPROM
-				
-				
+					int eepromVersion = -1;
+				    if (eeprom_read_int(EEPROM_VERSION_IDX, &eepromVersion))
+					{
+						printf("EEPROM VERSION IS %d\n",eepromVersion);
+						if( eeprom_read_bytes(EEPROM_CONTROLLER_CONFIG_IDX, this->packetData, EEPROM_PACKET_SIZE)) 
+						{
+							int logicalControllerCount = processConntrollerConfigPacket(this->packetData);
+							for ( int i=0; i< logicalControllerCount; i++)
+							{
+								eeprom_read_bytes(EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX+(i*EEPROM_PACKET_SIZE), this->packetData, EEPROM_PACKET_SIZE);
+								processLogicalConfigPacket(packetData);
+								
+							}
+						}
+					}
+					
+					
 					//CheckEEPROMSuccess
 				
 				
@@ -290,8 +308,62 @@ RFPixelControl::~RFPixelControl() {
 	 //add the count of channels to the _startChannel
 	 this->_endChannel = this->_startChannel + this->_endChannel;
  }
-
  
+ 
+int RFPixelControl::processConntrollerConfigPacket(uint8_t* pConfigPacket)
+{
+	
+	
+	//rfListenChannel = 
+
+	//printf("RFListenRate %d\n", rfListenRater );
+	int rfListenRate = (int) pConfigPacket[IDX_RF_LISTEN_RATE];;
+	this->_numControllers = 0;//we will let the logical controllers up this number as they get processed.
+	int numLogic =  pConfigPacket[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
+	this->_channel = pConfigPacket[IDX_RF_LISTEN_CHANNEL];;
+	
+	switch (rfListenRate)
+	{
+		case RF24_250KBPS:
+		this->_rf_data_rate = RF24_250KBPS;
+		break;
+		case RF24_1MBPS:
+		this->_rf_data_rate = RF24_1MBPS;
+		break;
+		case RF24_2MBPS:
+		this->_rf_data_rate = RF24_2MBPS;
+		break;
+	}
+	
+	return numLogic;
+}
+ 
+ 
+ void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
+ {
+	
+	printf("received OTA logical packet %d\n", pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUMBER]);
+
+	uint32_t baudrate = 0;
+	switch( pLogicalConfigPacket[IDX_CONFIG_PACKET_TYPE])
+	{
+		case LOGICALCONTROLLER_LED:
+		case LOGICALCONTROLLER_CUSTOM:
+		//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
+		//	memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
+		
+		break;
+		case LOGICALCONTROLLER_SERIAL:
+		baudrate = pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD];
+		break;
+		//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
+		//memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
+		
+	}
+	this->AddLogicalController(pLogicalConfigPacket[IDX_CONTROLLER_ID],pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_START_CHANNEL], pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS], baudrate);
+	
+ }
+
  /************************************************************************/
  /* OTA Configuration handler				
  /************************************************************************/
@@ -303,6 +375,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 	int rfListenChannel = 0;
 	int rfListenRate = 0;
 	int numberOfLogicalControllers = 0;
+
 	if (this->available())
 	{
 		// Fetch the payload, and see if this was the last one.
@@ -310,54 +383,40 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 		//The First Configuration Packet contains the number of logical controllers for a given controller
 		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && this->packetData[IDX_CONTROLLER_ID]  == pReceiverId)
 		{
-			printf("gotinfoinit\n");
-			returnValue = true;
-			rfListenChannel = this->packetData[IDX_RF_LISTEN_CHANNEL];
-			uint32_t rfListenRater =this->packetData[IDX_RF_LISTEN_RATE];
-			printf("RFListenRate %d\n", rfListenRater );
-			rfListenRate = (int) rfListenRater;
-			this->_numControllers = 0;//this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
-			int numLogic =  this->packetData[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
-			this->_channel = rfListenChannel;
-			
-			switch (rfListenRate)
-			{
-				case RF24_250KBPS:
-				//c_hdr->rfListenRate  = RF24_250KBPS;
-				this->_rf_data_rate = RF24_250KBPS;
-				break;
-				case RF24_1MBPS:
-				this->_rf_data_rate = RF24_1MBPS;
-				break;
-				//c_hdr->rfListenRate  = RF24_1MBPS;
-				case RF24_2MBPS:
-				this->_rf_data_rate = RF24_2MBPS;
-				break;
-				//c_hdr->rfListenRate  = RF24_2MBPS;
-			}
-			//this->_rf_data_rate = (rf24_datarate_e)rfListenRate;
-			
-			
-			//provision controller space for the configuration of logical controllers
-			////this->_controllers = new ControllerInfo[numberOfLogicalControllers];
-			//(ControllerInfo*) malloc( this->_numControllers * sizeof (ControllerInfo) );
-			//ControllerInfo* ciTemp = this->_controllers;
+				printf("received Config Packet for controller\n");
+				for ( int i =0;i<32 ;i++)
+				{
+					printf(" 0x%02X", this->packetData[i]);
+					if ( (i-7) % 8 == 0 )
+					{
+						printf("\n\r--%3d:", i  );
+					}
+				}
+			int numLogic = processConntrollerConfigPacket(this->packetData);
+			//processConntrollerConfigPacket();
+			//save the controller config packet into the eeprom.
+			eeprom_erase_all();
+			delay(1000);
+		    uint32_t version = 0;
+			version < EEPROM_VERSION;
+			eeprom_write_bytes(EEPROM_VERSION_IDX, (byte * ) &version, 4 );
+				delay(1000);
+			printf("Dumping eeprom contents...");
+			eeprom_serial_dump_table();
+			eeprom_write_bytes(EEPROM_CONTROLLER_CONFIG_IDX, (byte * )this->packetData, EEPROM_PACKET_SIZE );
+				delay(1000);
+			printf("Dumping eeprom contents...");
+			eeprom_serial_dump_table();
 			int lControllerCount = 0;
 			
 			//get each logical controller
 			for(int i = 0; i < numLogic;)
 			{
-				//while();
+				printf("innumlogicloop %d \n", i);
 				for(bool found=false; (!this->available() || this->read( &this->packetData, 32 )) && !found;)
 				{
 					
-					printf("received OTA logical");
-					//for (int i=0; i < 32; i++)
-					//{
-						//Serial.print (lcfg_pkt[0][i]);
-						//Serial.print (" ");
-					//}
-					//Serial.println();
+					printf("received OTA logical\n");
 					for ( int i =0;i<32 ;i++)
 					{
 						printf(" 0x%02X", this->packetData[i]);
@@ -374,36 +433,24 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 					if (this->packetData[IDX_CONFIG_PACKET_TYPE] != CONTROLLERINFOINIT && this->packetData[IDX_CONTROLLER_ID] == pReceiverId && this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER]==i)
 					{
 						
-						printf("received OTA logical packet %d\n", i);
-						//this->_controllers[i].startChannel = this->packetData[IDX_LOGICAL_CONTROLLER_START_CHANNEL];
-						//this->_controllers[i].numChannels = this->packetData[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS];
-						//this->_controllers[i].logicalControllerNumber = this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER];
-						lControllerCount++;
-						found=true;
-						uint32_t baudrate = 0;
-						//this->_controllers[i].baudRate = 0;
-						//ciTemp->reserved = 0;
-						//ciTemp->customConfig = 0;
-						switch( this->packetData[IDX_CONFIG_PACKET_TYPE])
-						{
-							case LOGICALCONTROLLER_LED:
-							case LOGICALCONTROLLER_CUSTOM:
-							//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
-							//	memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
-							
-							break;
-							case LOGICALCONTROLLER_SERIAL:
-							baudrate = this->packetData[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD];
-							break;
-							//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
-							//memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
-							
-						}
-						this->AddLogicalController(this->packetData[IDX_CONTROLLER_ID],this->packetData[IDX_LOGICAL_CONTROLLER_START_CHANNEL], this->packetData[IDX_LOGICAL_CONTROLLER_NUM_CHANNELS], baudrate);
+						
+						processLogicalConfigPacket(this->packetData);
+					
+							printf("configured Logical Packet\n");
+							found=true;
+							//if the logical packet was processed we can save it for later.
+							eeprom_write_bytes(EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX+i, (byte * )this->packetData, EEPROM_PACKET_SIZE);
+					
+						
+						//only increment the loop counter when we have the packet
 						i++;
+						
 					}
 				}
 			}
+			printf("Dumping eeprom contents...");
+			eeprom_serial_dump_table();
+			//delay(1000);
 		}
 	}
 	return returnValue;
@@ -616,3 +663,5 @@ int RFPixelControl::GetNumberOfChannels(int pLogicalController)
 {
 	return this->_controllers[pLogicalController].numChannels;	
 }
+
+

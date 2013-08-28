@@ -17,6 +17,11 @@
 #include <RF24.h>
 #include <IPixelControl.h>
 #include <OTAConfig.h>
+//#include <avr/eeprom.h>
+
+typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
+
+#include "EEPROMUtils.h"
 
 #define RF_CONFIG_STARTUP_WINDOW 10000
 #define RF_PACKET_LENGTH  32
@@ -42,8 +47,6 @@
 #define RENARD				4
 #define WM_2999				5
 #define LPD_6803			6
-
-typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 
 
 class RFPixelControl : public RF24 {
@@ -129,7 +132,9 @@ class RFPixelControl : public RF24 {
 	Returns true if OTAConfig is received.
 	*/
 	bool ConfigureReceiverAtStartup(uint32_t pReceiverId);
-	
+	int processConntrollerConfigPacket(uint8_t* pConfigPacket);
+	void processLogicalConfigPacket(uint8_t* pLogicalConfigPacket);
+
 	bool EnableOverTheAirConfiguration(uint8_t enabled);
 	
 	int GetNumberOfChannels(int pLogicalController);
@@ -159,3 +164,4 @@ class RFPixelControl : public RF24 {
 	};
 
 	#endif /* RFPIXELCONTROL_H_ */
+
