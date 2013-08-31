@@ -32,6 +32,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
+#include <EEPROM.h>
 /**
  * The LPD6803 receiver is only designed to control 1 string of lights at a time.
  * 

@@ -18,7 +18,7 @@
 #include <RF24.h>
 #include "printf.h"
 #include <OTAConfig.h>
-
+#include <EEPROM.h>
 /***************************  BEGIN CONFIGURATION SECTION *************************************************/
 
 // Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 

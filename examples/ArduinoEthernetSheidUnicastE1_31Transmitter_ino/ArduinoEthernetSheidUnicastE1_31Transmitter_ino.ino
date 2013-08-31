@@ -11,6 +11,7 @@
 #include <RF24.h>
 #include "printf.h"
 #include "E131Constants.h"
+#include <EEPROM.h>
 /*
 * ArduinoEthernet Sheild Unicast E1.31 Transmitter
 *

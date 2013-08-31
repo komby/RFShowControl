@@ -41,7 +41,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
-
+#include <EEPROM.h>
 
 /***************************  CONFIGURATION SECTION *************************************************/
 // Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 

@@ -15,7 +15,7 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-
+#include <EEPROM.h>
 //This uses a modified version of the DMXSerial library.
 //in order to work with the
 #include "ModifiedDMXSerial.h"

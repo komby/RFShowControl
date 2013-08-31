@@ -40,6 +40,7 @@ typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 #define WM_2999_NRF			6
 #define KOMBYONE_DUE        7
 #define RFCOLOR2_4			8
+#define KOMBEE				9
 //PIXEL TYPES
 #define GECE				1
 #define WS_2801				2

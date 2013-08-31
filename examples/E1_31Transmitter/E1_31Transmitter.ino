@@ -14,6 +14,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <tcpip.h>
+#include <EEPROM.h>
 /***************************  CONFIGURATION SECTION *************************************************/
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,

@@ -30,6 +30,7 @@
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+#include <EEPROM.h>
 /***************************  BEGIN CONFIGURATION SECTION *************************************************/
 #define DMX_NUM_CHANNELS 512  // This must be divisible by 3!  This defines the number of DMX channels we are going to listen to.
 #define RF_NUM_PACKETS 18     // This is DMX_NUM_CHANNELS divided by 30 rounded up.

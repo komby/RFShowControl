@@ -14,6 +14,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
+#include <EEPROM.h>
 /**************CONFIGURATION SECTION ***************************/
 
 //Uncomment for serial output of all data
