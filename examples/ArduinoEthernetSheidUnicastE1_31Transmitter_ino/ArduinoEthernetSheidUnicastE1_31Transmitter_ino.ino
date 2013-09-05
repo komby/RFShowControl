@@ -52,7 +52,7 @@ IPAddress ip(192, 168, 1, 150);
 /***************************  CONFIGURATION SECTION *************************************************/
 #include <RFPixelControlConfig.h>
 #define RF_NUM_PACKETS 18
-#define RF_DELAY      2000
+#define RF_DELAY      1500
 
 
 
@@ -95,49 +95,37 @@ void loop () {
 	int packetSize = Udp.parsePacket();
 	if ( packetSize > 0 ){
 		Udp.read(packetBuffer,638);
-		printf("packetsize:%d\n",packetSize);
+	
 		bool validateR = validateRoot(packetBuffer);
 		bool vdmp = validateDMP(packetBuffer);
 		bool vfr = validateFraming(packetBuffer);
 
-		//  printf("validate root : %d,  validate DMP:  %d , validateFraming %d\n", validateR,vdmp,vfr);
 		if( validateR && vdmp && vfr)
 		{
-			
-			
 			int channelPos=0;
 			int i = 0;
 			int pktCnt=0;
 			int r;
 			uint16_t numChannelsInPacket = ( (packetBuffer[E1_31_DMP_PROP_VAL_CNT] <<8)  | packetBuffer[E1_31_DMP_PROP_VAL_CNT+1] ) -1 ;
 			uint8_t numPackets = numChannelsInPacket / 30;
-			//  printf("numPackets %d\n",numPackets);
+
 			if (numChannelsInPacket <=DMX_MAX_CHANNEL && numChannelsInPacket >0 && numPackets <= 18 )
 			{
-				//printf("numchannels:%d\n",numChannelsInPacket);
 				for ( r=0; r< numPackets; r++){
 					
 					memcpy ( &str[0], &packetBuffer[r*30 + E1_31_DMP_FIRST], 30);
 					str[30]=r;
 					radio.write_payload( &str[0], 32 );
-					delay(1);
-					// printf("SentPacket:%d \n\n",r);
-					//delayMicroseconds(RF_DELAY);
+					delayMicroseconds(RF_DELAY);
 					
-					
-					//printf("processingpacketafter:%d\n\n",millis());
 				}
 				//final packet if its a partial packet
 				int test = numChannelsInPacket - ( (r) * 30 );
-				
-				printf("numChaninpacket %d  -  %d = %d\n",numChannelsInPacket, (r)*30, test);
+			
 				if (test >0){
 					memcpy ( &str[0], &packetBuffer[(r)*30 + E1_31_DMP_FIRST], test);
 					str[30]=r;
 					radio.write_payload( &str[0], 32 );
-					printf("sent the test case%d\n",test);
-					//delay(3);
-					
 				}
 			}
 		}
