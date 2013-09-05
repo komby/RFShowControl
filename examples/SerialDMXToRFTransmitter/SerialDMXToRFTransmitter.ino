@@ -1,5 +1,5 @@
 /*
-* RFDMXTransmitter
+* SerialDMXToRFTransmitter
 *
 *  Created on: Mar  2013
 *      Author: Greg Scull, komby@komby.com
