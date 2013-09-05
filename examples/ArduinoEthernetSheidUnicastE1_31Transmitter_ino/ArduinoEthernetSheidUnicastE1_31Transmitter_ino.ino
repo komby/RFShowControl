@@ -172,13 +172,3 @@ bool validateRoot (uint8_t buf[])
 	return true;
 }
 
-static uint32_t ntoi(uint8_t *buf) {
-	return static_cast<uint32_t>(buf[0]) << 24
-	| static_cast<uint32_t>(buf[1]) << 16
-	| static_cast<uint32_t>(buf[2]) << 8
-	| buf[3];
-}
-
-static uint16_t ntos(uint8_t *buf) {
-	return static_cast<uint16_t>(buf[0]) << 8 | buf[1];
-}

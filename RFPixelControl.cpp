@@ -249,11 +249,9 @@ void RFPixelControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 {
 	
 	printf("LNumber: \t\t%d\n",pControllerInfo.logicalControllerNumber );
-	
-	//( str, "&#37;u", num )
-	printf("CntrlStartChannel: \t\t\t %lu \n ",pControllerInfo.startChannel);
-	printf("CntrlNumChannels: \t\t\t %lu \n", pControllerInfo.numChannels);
-	printf("CntrlBaudRateIfSerial:\t\t\t %lu \n",pControllerInfo.baudRate);
+	printf("StartChannel: \t\t\t %lu \n ",pControllerInfo.startChannel);
+	printf("NumChannels: \t\t\t %lu \n", pControllerInfo.numChannels);
+	printf("BaudRateIfSerial:\t\t\t %lu \n",pControllerInfo.baudRate);
 
 }
 
@@ -298,7 +296,7 @@ uint8_t* RFPixelControl::GetControllerDataBase( uint8_t pLogicalControllerNumber
 		numChannelsOffset += this->_controllers[i].numChannels;
 		}
 	}
-	printf("GetControllerDataBase2\n");
+	
 	PrintControllerConfig();
 }
 
@@ -345,7 +343,7 @@ int RFPixelControl::processConntrollerConfigPacket(uint8_t* pConfigPacket)
 void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
 {
 
-	printf("received OTA logical packet %d\n", pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUMBER]);
+	printf("OTA lp %d\n", pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUMBER]);
 
 	uint32_t baudrate = 0;
 	switch( pLogicalConfigPacket[IDX_CONFIG_PACKET_TYPE])
@@ -356,10 +354,7 @@ void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
 
 		break;
 		case LOGICALCONTROLLER_SERIAL:
-			//baudrate = (uint32_t)pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD] << 24|
-						//(uint32_t)pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD+1] << 16|
-						//(uint32_t)pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD+2] << 8|
-						//(uint32_t)pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD+3];
+			
 			baudrate = convert8BitTo32Bit(&pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD]);
 			printf("BaudRate is set to %lu\n", baudrate);
 			break;
@@ -378,13 +373,7 @@ void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
 		(uint32_t)highByteAddrPtr[3];	
 	}
 	
-///************************************************************************/
-///*                                                                      */
-///************************************************************************/
-	//int32_t RFPixelControl::littleToBigEndianLong( uint8_t* lowByteAddrPtr ) 
-	//{
-		//return (uint32_t)lowByteAddrPtr[0]<<24| (uint32_t)lowByteAddrPtr[1]<<8|(uint32_t)lowByteAddrPtr[2]>>8|(uint32_t)lowByteAddrPtr[3]>>24;
-	//}
+
 /************************************************************************/
 /* OTA Configuration handler
 /************************************************************************/
@@ -396,26 +385,19 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 	int rfListenChannel = 0;
 	int rfListenRate = 0;
 	int numberOfLogicalControllers = 0;
-//printf("bta\n");
+
 	if (this->available())
 	{
 		
-		printf("after thisavailable\n");
+	
 		// Fetch the payload, and see if this was the last one.
 		this->read( &this->packetData, 32 );
-		printf("received Config Packet for controller\n");
-		for ( int i =0;i<32 ;i++)
-		{
-			printf(" 0x%02X", this->packetData[i]);
-			if ( (i-7) % 8 == 0 )
-			{
-				printf("\n\r--%3d:", i  );
-			}
-		}
+		
 	//	printf("got packet ... what its?");
 		//The First Configuration Packet contains the number of logical controllers for a given controller
 		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && ( convert8BitTo32Bit(this->packetData+IDX_CONTROLLER_ID)  == pReceiverId))
 		{
+#ifdef DEBUG_PRINT
 			printf("received Config Packet for controller\n");
 			for ( int i =0;i<32 ;i++)
 			{
@@ -425,21 +407,15 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 					printf("\n\r--%3d:", i  );
 				}
 			}
+#endif
 			int numLogic = processConntrollerConfigPacket(this->packetData);
 					//processConntrollerConfigPacket();
 			//save the controller config packet into the eeprom.
 			eeprom_erase_all();
 			delay(1000);
 			uint32_t version = EEPROM_VERSION;
-			//version << EEPROM_VERSION;
 			eeprom_write_bytes(EEPROM_VERSION_IDX, (byte * ) &version, 4 );
-			//delay(1000);
-			//printf("Dumping eeprom contents...");
-		//	eeprom_serial_dump_table();
 			eeprom_write_bytes(EEPROM_CONTROLLER_CONFIG_IDX, (byte * )this->packetData, EEPROM_PACKET_SIZE );
-			//delay(1000);
-			//printf("Dumping eeprom contents...");
-		//	eeprom_serial_dump_table();
 			int lControllerCount = 0;
 
 			//get each logical controller
@@ -451,6 +427,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 				for(bool found=false; this->read( &this->packetData, 32 ) && !found;)
 				{
 
+#ifdef DEBUG_PRINT
 					printf("received OTA logical\n");
 					for ( int i =0;i<32 ;i++)
 					{
@@ -460,6 +437,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
     							printf("\n\r--%3d:", i  );
 							}
 					}
+#endif
 	//delay(6);
 	//make sure we are on a logical controller packet
 	//that we have the next logical controller ID
@@ -470,8 +448,9 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 
 
 						processLogicalConfigPacket(this->packetData);
-
+#ifdef DEBUG_PRINT
 						printf("configured Logical Packet\n");
+#endif
 						found=true;
 						//if the logical packet was processed we can save it for later.
 						eeprom_write_bytes(EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX+i, (byte * )this->packetData, EEPROM_PACKET_SIZE);
@@ -487,7 +466,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 					}
 			}
 		}	
-		printf("Dumping eeprom contents...");
+		printf("eeprom:");
 		eeprom_serial_dump_table();
 		//delay(1000);
 		}
@@ -519,148 +498,148 @@ delay(10000);
 
 bool RFPixelControl::Listen(void)
 {
-// See if there is any data in the RF buffer
-if ( this->available() ){
-for (bool done = false;!done;){
-// Fetch the payload, and see if this was the last one.
-done = this->read( &this->packetData, 32 );
-//when process packet returns true we got the last channel we are listening to and its time to output....
-if (ProcessPacket( this->channelData, this->packetData))
-{
-//return true to the sketch and let it handle updates
-return true;
-}
-}
-}
-return false;
-}
-
-/**
-*  processPacket - handles copying the needed channels from the radio data into the Renard data.
-*        This method takes a different approach for getting the data.  Originally I was looping through
-*        all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
-*        I haven't done performance timing so who knows?  It passed my tests :)
-*
-*  return - true if the last channel was found and its time for an update, otherwise false.
-*/
-bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
-{
-int startChannel = this->_startChannel -1;
-int finalChannel = this->_endChannel- 1;
-
-//  Way too many variables here need to refactor...
-bool retVal = false;
-int packetSequence = p[PACKET_SEQ_IDX];
-int packetStartChann = packetSequence * CHANNELS_PER_PACKET;
-int packetEndChannel = packetStartChann + CHANNELS_PER_PACKET;
-
-int calcStartChannel = -1;
-int calcStartDestIdx = -1;
-int calcStartSourceIdx = -1;
-
-
-int calcEndChannel = -1;
-int calcEndDestIdx = -1;
-int calcEndSourceIdx = -1;
-
-//first assume we will be copying the whole packet.
-int channelCopyStartIdx = 0;
-int channelCopyEndIdx = CHANNELS_PER_PACKET - 1;
-int numberOfValidChannelsInPacket = channelCopyEndIdx;
-
-//First we need to know what is the first valid channel in this packet
-if (startChannel >= packetStartChann)
-{
-//It could be in the packet is it?
-if (startChannel <= packetEndChannel)
-{
-//set calculated start to the start channel
-calcStartChannel = startChannel;
-//set the idx of the dest array to the start channel
-calcStartDestIdx = 0 ;
-//offset the idx for source by the channel count factor
-calcStartSourceIdx = startChannel - packetStartChann;
-//start is after the packet start and before or equal to the end channel.
-
-}
-else
-{
-//start channel was after the range of channels in this packet.  skip this packet.
-return retVal;
-}
-}
-else
-{
-calcStartChannel =  packetStartChann;
-calcStartDestIdx = packetStartChann - startChannel;
-calcStartSourceIdx = 0;
-
-//we started before this packet
-//end channel interrogation will handle if we need
-//anything from this packet.
-}
-//now interrogate the end channel
-//check if the end is in this packet
-if (packetEndChannel <= finalChannel)
-{
-//since final is greater than the end of the packet, check start
-//if start is set we need all channels from this packet.
-if (calcStartChannel >= 0)
-{
-calcEndChannel = packetEndChannel;
-calcEndDestIdx = packetEndChannel - (startChannel);
-calcEndSourceIdx = packetEndChannel - packetStartChann;
+	// See if there is any data in the RF buffer
+	if ( this->available() ){
+		for (bool done = false;!done;){
+			// Fetch the payload, and see if this was the last one.
+			done = this->read( &this->packetData, 32 );
+			//when process packet returns true we got the last channel we are listening to and its time to output....
+			if (ProcessPacket( this->channelData, this->packetData))
+			{
+			//return true to the sketch and let it handle updates
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
-}
-else
-{
-//final channel is before the end of this packet  (packetEndChannel >= finalChann )
-if (finalChannel >= packetStartChann)
-{
-//Because final is less than the packet end
-//and >= start we know that the final channel is in this packet
-calcEndChannel =  this->_endChannel ;
-calcEndDestIdx = finalChannel - startChannel ;
-calcEndSourceIdx = finalChannel - packetStartChann;
+	/**
+	*  processPacket - handles copying the needed channels from the radio data into the Renard data.
+	*        This method takes a different approach for getting the data.  Originally I was looping through
+	*        all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
+	*        I haven't done performance timing so who knows?  It passed my tests :)
+	*
+	*  return - true if the last channel was found and its time for an update, otherwise false.
+	*/
+	bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
+	{
+		int startChannel = this->_startChannel -1;
+		int finalChannel = this->_endChannel- 1;
 
-//because this is the last packet we care about,  return true
-retVal=true;
+		//  Way too many variables here need to refactor...
+		bool retVal = false;
+		int packetSequence = p[PACKET_SEQ_IDX];
+		int packetStartChann = packetSequence * CHANNELS_PER_PACKET;
+		int packetEndChannel = packetStartChann + CHANNELS_PER_PACKET;
 
-}
-else
-{
-//Final happened before this packet//continue.
-return retVal;
-}
-}
+		int calcStartChannel = -1;
+		int calcStartDestIdx = -1;
+		int calcStartSourceIdx = -1;
 
-//now we have calculated positions
-if (calcStartChannel >= 0 && calcEndChannel >= 0)
-{
-//how many channels are we getting from this packet?
-int numChannelsInPacket = calcEndChannel - calcStartChannel;
 
-//Use memcpy to copy the bytes from the radio packet into the data array.
-memcpy(&dest[calcStartDestIdx], &p[calcStartSourceIdx], numChannelsInPacket);
+		int calcEndChannel = -1;
+		int calcEndDestIdx = -1;
+		int calcEndSourceIdx = -1;
 
-}
-return retVal;
+		//first assume we will be copying the whole packet.
+		int channelCopyStartIdx = 0;
+		int channelCopyEndIdx = CHANNELS_PER_PACKET - 1;
+		int numberOfValidChannelsInPacket = channelCopyEndIdx;
+							
+		//First we need to know what is the first valid channel in this packet
+		if (startChannel >= packetStartChann)
+		{
+		//It could be in the packet is it?
+		if (startChannel <= packetEndChannel)
+		{
+		//set calculated start to the start channel
+		calcStartChannel = startChannel;
+		//set the idx of the dest array to the start channel
+		calcStartDestIdx = 0 ;
+		//offset the idx for source by the channel count factor
+		calcStartSourceIdx = startChannel - packetStartChann;
+		//start is after the packet start and before or equal to the end channel.
+
+		}
+		else
+		{
+		//start channel was after the range of channels in this packet.  skip this packet.
+		return retVal;
+		}
+		}
+		else
+		{
+		calcStartChannel =  packetStartChann;
+		calcStartDestIdx = packetStartChann - startChannel;
+		calcStartSourceIdx = 0;
+
+		//we started before this packet
+		//end channel interrogation will handle if we need
+		//anything from this packet.
+		}
+		//now interrogate the end channel
+		//check if the end is in this packet
+		if (packetEndChannel <= finalChannel)
+		{
+		//since final is greater than the end of the packet, check start
+		//if start is set we need all channels from this packet.
+		if (calcStartChannel >= 0)
+		{
+		calcEndChannel = packetEndChannel;
+		calcEndDestIdx = packetEndChannel - (startChannel);
+		calcEndSourceIdx = packetEndChannel - packetStartChann;
+		}
+
+		}
+		else
+		{
+		//final channel is before the end of this packet  (packetEndChannel >= finalChann )
+		if (finalChannel >= packetStartChann)
+		{
+		//Because final is less than the packet end
+		//and >= start we know that the final channel is in this packet
+		calcEndChannel =  this->_endChannel ;
+		calcEndDestIdx = finalChannel - startChannel ;
+		calcEndSourceIdx = finalChannel - packetStartChann;
+
+		//because this is the last packet we care about,  return true
+		retVal=true;
+
+	}
+		else
+		{
+		//Final happened before this packet//continue.
+			return retVal;
+		}
+	}
+
+	//now we have calculated positions
+	if (calcStartChannel >= 0 && calcEndChannel >= 0)
+	{
+		//how many channels are we getting from this packet?
+		int numChannelsInPacket = calcEndChannel - calcStartChannel;
+
+		//Use memcpy to copy the bytes from the radio packet into the data array.
+		memcpy(&dest[calcStartDestIdx], &p[calcStartSourceIdx], numChannelsInPacket);
+
+	}
+	return retVal;
 }
 
 
 
 bool RFPixelControl::EnableOverTheAirConfiguration(uint8_t enabled)
 {
-if(enabled>0)
-this->_otaConfigEnable = true;
-else
-this->_otaConfigEnable = false;
+	if(enabled>0)
+		this->_otaConfigEnable = true;
+	else
+		this->_otaConfigEnable = false;
 }
 
 int RFPixelControl::GetNumberOfChannels(int pLogicalController)
 {
-return this->_controllers[pLogicalController].numChannels;
+	return this->_controllers[pLogicalController].numChannels;
 }
 
 
