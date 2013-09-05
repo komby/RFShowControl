@@ -80,7 +80,7 @@
 
 /***************************  END CONFIGURATION SECTION *************************************************/
 
-
+#define RECEIVER_NODE 1
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 

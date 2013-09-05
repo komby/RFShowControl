@@ -57,7 +57,7 @@
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
-
+#define RECEIVER_NODE 1
 bool readytoupdate=false;
 
 byte * buffer;

@@ -12,6 +12,7 @@
 
 
 #include <Arduino.h>
+#include <EEPROM.h>
 #include <RFPixelControl.h>
 #include <IPixelControl.h>
 #include "FastSPI_LED2.h"
@@ -19,8 +20,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
-#include <EEPROM.h>
-
+//
 /**************CONFIGURATION SECTION ***************************/
 // Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
 // If you are not using Over The air Configuration you do not need to change this setting.
@@ -57,7 +57,6 @@
 
 
 
-
 /**************END CONFIGURATION SECTION ***************************/
 #define PIXEL_TYPE			FAST_SPI
 //You dont really need to change these.
@@ -65,6 +64,7 @@
 #define LED_BRIGHTNESS 128 //50%
 
 //Include this after all configuration variables are set
+
 #include <RFPixelControlConfig.h>
 
 byte gotstr[32];

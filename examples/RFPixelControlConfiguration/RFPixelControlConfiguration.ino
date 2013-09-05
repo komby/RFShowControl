@@ -5,7 +5,6 @@
 #include <nRF24L01.h>
 #include "printf.h"
 #include <OTAConfig.h>
-#include <EEPROM.h>
 #include <Arduino.h>
 
 #include <IPixelControl.h>

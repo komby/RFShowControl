@@ -20,12 +20,11 @@
  * digital pins,  re-reads them,  and re-displays the form.
  *
  */
-//#define  DEBUG
-
+#define  DEBUG
 
 #include <nRF24L01.h>
 #include <RF24.h>
-#include <RFPixelControl.h>
+#include <RF24Wrapper.h>
 #include "printf.h"
 #include <OTAConfig.h>
 #include <Arduino.h>
@@ -33,10 +32,10 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include "WebServer.h"
-#include <IPixelControl.h>
-
 #include "packets.h"
-#define OVER_THE_AIR_CONFIG_ENABLE 0 
+#include <EEPROM.h>
+
+
 //
 // below is the configuration info most likely to change
 //
@@ -54,14 +53,11 @@
 #define NRF_TYPE MINIMALIST_SHIELD
 //#define NRF_TYPE RF1_1_3
 
-//Include this after all configuration variables are set
-#include <RFPixelControlConfig.h>
-
 // Ethernet controller MAC address...
 // must be unique...can generate with:
 // http://www.miniwebtool.com/mac-address-generator/
 //
-
+RF24Wrapper radio(9, 8);
 
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
 // CHANGE THIS TO MATCH YOUR HOST NETWORK
@@ -81,9 +77,9 @@ WebServer webserver(PREFIX, 80);
 #define RF_DELAY 2000
 #define RF_NODE_CONFIGURATION_CHANNEL 125
 
-
-//Include this after all configuration variables are set
-#include <RFPixelControlConfig.h>
+const uint64_t pipes[2] = {
+	0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
+};
 // static HTML info (global) below
 
 // no-cost stream operator as described at
@@ -340,7 +336,7 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
             if (!(strcmp(name, "controller")))   // controller id
             {
 
-                c_hdr->controllerID = (uint8_t)strtoul(value, NULL, 0);
+                c_hdr->controllerID = htonl(strtoul(value, NULL, 0));
                 //cfg_pkt[IDX_CONTROLLER_ID]  = (uint8_t)strtoul(value, NULL, 0);
             }
             else if (!(strcmp(name, "radio")))   // radio speed
@@ -368,8 +364,8 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                 struct LogicalInitInfo *tmphdr  = (struct LogicalInitInfo*) lcfg_pkt;
                 for (int q=0; q <num_logcont; q++)
                 {
-
-                    tmphdr->controllerID=cfg_pkt[IDX_CONTROLLER_ID];
+				     
+                    tmphdr->controllerID=c_hdr->controllerID;
                     tmphdr->logicalControllerNumber=(uint8_t)q;
                     tmphdr++;
                 }
@@ -394,10 +390,10 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                 // extract the array number
                 lcont = (int)(name[5] & 0x0f);
 
-#ifdef DEBUG
+//#ifdef DEBUG
                 Serial.print ("lcont value: ");
                 Serial.println(lcont, DEC);
-#endif
+//#endif
 
                 // set the overlayed structure to point at the logical controller buffer we are placing the element in;
                 struct LogicalInitInfo *l_hdr = (struct LogicalInitInfo*) lcfg_pkt;
@@ -418,7 +414,8 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                     }
                     else if (!(strcmp(value, "Renard")))
                     {
-                        l_hdr->packetType=LOGICALCONTROLLER_SERIAL;
+                     
+					    l_hdr->packetType=LOGICALCONTROLLER_SERIAL;
                         l_hdr->outputFormat=RENARD_OUTPUT;
                     }
                     else if (!(strcmp(value, "LED")))
@@ -428,15 +425,15 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                     break;
 
                 case 's':
-                    l_hdr->startChannel=(uint32_t)strtoul(value, NULL, 0);
+                    l_hdr->startChannel=htonl((uint32_t)strtoul(value, NULL, 0));
                     break;
 
                 case 'n':
-                    l_hdr->numChannels=(uint32_t)strtoul(value, NULL, 0);
+                    l_hdr->numChannels=htonl((uint32_t)strtoul(value, NULL, 0));
                     break;
 
                 case 'z':
-                    l_hdr->baudRate=(uint32_t)strtoul(value, NULL, 0);
+                    l_hdr->baudRate=htonl((uint32_t)strtoul(value, NULL, 0));
                     break;
 
                 }
@@ -619,7 +616,7 @@ void rawCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, b
                 cfg_pkt[holdme] = (uint8_t)strtoul(value, NULL, 16);
 
 
-#ifdef DEBUG
+//#ifdef DEBUG
                 for (int q = 0; q<16; q++) Serial.print(name[q]);
                 Serial.print(" holdme is ");
                 Serial.print(holdme, DEC);
@@ -631,7 +628,7 @@ void rawCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, b
                 Serial.print(" is ");
                 Serial.print(cfg_pkt[holdme], HEX);
                 Serial.println();
-#endif
+//#endif
             }
         }
         while (repeat);
@@ -678,9 +675,9 @@ void setup()
     delay(1000);
     webserver.begin();
     printf("Webserver up\n");
-
-	radio.Initialize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, DATA_RATE, 1);
-radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+    
+	radio.Initialize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, DATA_RATE);
+//radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
     delayMicroseconds(5000);
     radio.printDetails();

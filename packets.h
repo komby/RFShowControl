@@ -6,7 +6,7 @@ struct ControllerInitInfo
     uint32_t rfListenRate;
     uint16_t numLogicalControllers;
     uint8_t extra[16];
-};
+}__attribute__ ((__packed__));
 
 struct LogicalInitInfo
 {
@@ -19,4 +19,4 @@ struct LogicalInitInfo
     uint32_t baudRate;  //OPTIONAL, used with LOGICALCONTROLLER_SERIAL &  LOGICALCONTROLLER_CUSTOM if outputting on a dmx or serial device
     uint8_t  reserved[3]; //3 bytes future use
     uint8_t  customconfig[10];//10 bytes of optional configuration data.
-};
+}__attribute__ ((__packed__));

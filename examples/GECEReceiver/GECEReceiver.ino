@@ -57,7 +57,7 @@
 
 /***************************  END CONFIGURATION SECTION *************************************************/
 #define PIXEL_TYPE			GECE
-
+#define RECEIVER_NODE 1
 // OPTIONAL VARIABLES
 #define DEBUG 1 // Uncomment this line to enable debugging
 

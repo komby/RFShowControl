@@ -24,23 +24,25 @@ RFPixelControl radio(9,10);
 
 
 
-
 #if (PIXEL_TYPE == GECE)
 #include "GECEPixelControl.h"
 #include <GEColorEffects.h>
 GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN);
+
 #endif
 
 
 #if (PIXEL_TYPE == RENARD)
 #include "RenardControl.h"
 RenardControl strip = RenardControl(RENARD_BAUD_RATE);
+
 #endif
 
 #if (PIXEL_TYPE == WM_2999)
 #include <WM2999.h>
 #include "WM2999PixelControl.h"
 WM2999PixelControl strip =  WM2999PixelControl(PIXEL_DATA_PIN);
+
 #endif
 
 #if (PIXEL_TYPE == LPD_6803)

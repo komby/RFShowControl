@@ -28,7 +28,7 @@
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
-//Valid Values:  MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF, RFCOLOR2_4
+//Valid Values:  MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF, RFCOLOR2_4,KOMBEE
 #define NRF_TYPE			RF1_1_3
 
 //What baud rate does your Renard board you are controlling need?
@@ -56,7 +56,7 @@
 /***************************  END CONFIGURATION SECTION *************************************************/
 // OPTIONAL VARIABLES
 #define DEBUG // Uncomment this line to enable debugging
-
+#define RECEIVER_NODE 1
 #define PIXEL_TYPE			RENARD
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>

@@ -12,16 +12,11 @@
 #ifndef RFPIXELCONTROL_H_
 #define RFPIXELCONTROL_H_
 
-#include <SPI.h>
-#include <nRF24L01.h>
-#include <RF24.h>
+#include <RF24Wrapper.h>
 #include <IPixelControl.h>
 #include <OTAConfig.h>
-//#include <avr/eeprom.h>
+#include <EEPROMUtils.h>
 
-typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
-
-#include "EEPROMUtils.h"
 
 #define RF_CONFIG_STARTUP_WINDOW 10000
 #define RF_PACKET_LENGTH  32
@@ -50,7 +45,7 @@ typedef enum { role_transmitter = 1, role_receiver = 0} role_e;
 #define LPD_6803			6
 
 
-class RFPixelControl : public RF24 {
+class RFPixelControl : public RF24Wrapper {
 	public:
 	//RFPixelAdapter();
 	virtual ~RFPixelControl();
@@ -61,7 +56,7 @@ class RFPixelControl : public RF24 {
 
 	/**
 	* Constructor
-	
+
 	*
 	* Creates a new instance of this driver.  Before using, you create an instance
 	* and send in the unique pins that this chip is connected to.
@@ -82,49 +77,24 @@ class RFPixelControl : public RF24 {
 
 	void SetStartAndEndChannels();
 
-	
-	/**
-	* Check what channel the radio is listening on
-	*/
-	uint8_t GetChannel(void);
-	
-	/**
-	* overriding method from base class
-	*
-	* Based on code suggestion from Joe
-	* overrides the base  SPI.setClockDivider(SPI_CLOCK_DIV4);
-	* to the needed  SPI.setClockDivider(SPI_CLOCK_DIV2);
-	*
-	* @param mode HIGH to take this unit off the SPI bus, LOW to put it on
-	*/
-	void  csn(int mode);
-	/**
-	* Write the transmit payload
-	*
-	* The size of data written is the fixed payload size, see getPayloadSize()
-	*
-	* @param buf Where to get the data
-	* @param len Number of bytes to be sent
-	* @return Current value of status register
-	*/
-	uint8_t write_payload(const void* buf, uint8_t len);
-	
+
+
+
 	void DisplayDiagnosticStartup(IPixelControl * string);
-	uint8_t get_status(void);
-	
+
 	/************************************************************************
 	* Listen will be listening for all the data needed for an update
 	* When it returns true its time to update all controllers
 	************************************************************************/
 	bool Listen(void);
-	
+
 	int SaveConfigurationToEEPROM();
-	
-	
+
+
 	int ReadConfigurationFromEEPROM();
-	
+
 	void PrintControllerConfig(ControllerInfo pControllerInfo);
-	
+
 	bool GetControllerDataUpdate( void );
 	bool ProcessPacket(byte*  dest, byte* src);
 	uint8_t* GetControllerDataBase( uint8_t pLogicalControllerNumber );
@@ -136,33 +106,31 @@ class RFPixelControl : public RF24 {
 	int processConntrollerConfigPacket(uint8_t* pConfigPacket);
 	void processLogicalConfigPacket(uint8_t* pLogicalConfigPacket);
 
+	int32_t littleToBigEndianLong( uint8_t* lowByteAddrPtr ) ;
+    int32_t convert8BitTo32Bit(uint8_t *  highByteAddrPtr);
+
 	bool EnableOverTheAirConfiguration(uint8_t enabled);
-	
+
 	int GetNumberOfChannels(int pLogicalController);
-	void AddLogicalController(int pLControllerName, int pLcontrollerStartChannel, int pLControllerNumChannels, int pLControllerBaudRate);
-	
+	void AddLogicalController(uint8_t pLControllerName, uint32_t pLcontrollerStartChannel, uint32_t pLControllerNumChannels, uint32_t pLControllerBaudRate);
+
 	void PrintControllerConfig(void);
 
 	private:
-	uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/
-	int _channel;  //channel to transmit on
-	rf24_datarate_e _rf_data_rate; //Data Rate for the RF.
-	
-	bool dataRateSuccess;
-	bool payloadSizeSetSuccessful;
-	bool channelSetSuccessfully;
+
+
 	ControllerInfo * _controllers;
 	uint8_t _numControllers;
 	uint32_t _controllerId;
 	byte packetData[RF_PACKET_LENGTH];
 	uint8_t * channelData;
-	int _startChannel;
-	int _endChannel;
+	uint32_t _startChannel;
+	uint32_t _endChannel;
 	bool _otaConfigEnable;
-	
-	
+
+
 
 	};
 
 	#endif /* RFPIXELCONTROL_H_ */
-
+	

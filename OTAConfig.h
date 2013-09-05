@@ -12,7 +12,7 @@
 
 #ifndef __OTA_CONFIG_H
 #define __OTA_CONFIG_H
-#define OTA_CONFIG_WINDOW 50000
+#define OTA_CONFIG_WINDOW 10000
 #define RF_NODE_CONFIGURATION_CHANNEL 125	
 #define EEPROM_VERSION 1 
 #define EEPROM_PACKET_SIZE 32
@@ -92,6 +92,6 @@ struct ControllerInfo {
 	uint8_t reserved[RESERVED_BYTES_LEN] ;
 	uint8_t customConfig[CUSTOM_CONFIG_INFO_LEN];
 	
-	};
+	}__attribute__ ((__packed__));
 	
 #endif;
