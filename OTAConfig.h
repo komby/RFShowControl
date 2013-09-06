@@ -1,30 +1,18 @@
-//#include <EEPROM.h>
-//#include <controller.h>
-//#include <FastSPI_LED2.h>
-//#include <controller.h>
-//#include <fastpin.h>
-//#include <fastspi.h>
-//#include <clockless.h>
-//#include <lib8tion.h>
-//#include <hsv2rgb.h>
-//#include <chipsets.h>
-//#include <dmx.h>
-
 #ifndef __OTA_CONFIG_H
 #define __OTA_CONFIG_H
-#define OTA_CONFIG_WINDOW 10000
+
+#define OTA_CONFIG_WINDOW 5000
 #define RF_NODE_CONFIGURATION_CHANNEL 125	
 #define EEPROM_VERSION 1 
 #define EEPROM_PACKET_SIZE 32
 #define EEPROM_VERSION_IDX 0
 #define EEPROM_CONTROLLER_CONFIG_IDX 4
 #define EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX EEPROM_CONTROLLER_CONFIG_IDX + EEPROM_PACKET_SIZE
-enum ControlPacketType {CONTROLLERINFOINIT=1, LOGICALCONTROLLER_LED=2, LOGICALCONTROLLER_SERIAL=3, LOGICALCONTROLLER_CUSTOM=9};
-enum ControllerOutputProtocol { RENARD_OUTPUT=1, DMX_OUTPUT=2};
-
-//to define the 10 byte array storing the custom controller configuration information.
 #define CUSTOM_CONFIG_INFO_LEN 10
 #define RESERVED_BYTES_LEN 3
+
+enum ControlPacketType {CONTROLLERINFOINIT=1, LOGICALCONTROLLER_LED=2, LOGICALCONTROLLER_SERIAL=3, LOGICALCONTROLLER_CUSTOM=9};
+enum ControllerOutputProtocol { RENARD_OUTPUT=1, DMX_OUTPUT=2};
 
 //////////////////////////////////////////////////////////////////////////
 //This is the structure of the initial packet set to a configurable node
@@ -77,11 +65,6 @@ enum ControllerOutputProtocol { RENARD_OUTPUT=1, DMX_OUTPUT=2};
 
 #define IDX_CUSTOM_CONTROLLER_CONFIG_SPACE 22
 
-//DUMB RGB LOGICAL CONTROLLER ALTERNATE PACKET FORMAT
-
-//#define IDX_LOGICAL_CONTROLLER_RGB_RED_PIN  18
-//#define IDX_LOGICAL_CONTROLLER_RGB_GREEN_PIN  19
-//#define IDX_LOGICAL_CONTROLLER_RGB_BLUE_PIN  20
 
 
 struct ControllerInfo {

@@ -29,7 +29,7 @@
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values:  MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF, RFCOLOR2_4,KOMBEE
-#define NRF_TYPE			RF1_1_3
+#define NRF_TYPE			KOMBEE
 
 //What baud rate does your Renard board you are controlling need?
 #define RENARD_BAUD_RATE		57600
@@ -58,19 +58,27 @@
 #define DEBUG // Uncomment this line to enable debugging
 #define RECEIVER_NODE 1
 #define PIXEL_TYPE			RENARD
+#if (NRF_TYPE==KOMBEE)
+#define HEARTBEAT_PIN  A1
+#define HEARTBEAT_PIN_1  3
+#endif
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 
-
+int beat  =0;
 void setup()
 {
 	Serial.begin(RENARD_BAUD_RATE);
 	#ifdef DEBUG
 	printf_begin();
 	#endif
-
+	
 	Serial.println("Initializing Radio");
-
+	#if (NRF_TYPE==KOMBEE)
+	  pinMode(HEARTBEAT_PIN, OUTPUT);     
+	  pinMode(HEARTBEAT_PIN_1, OUTPUT);   
+	#endif
+	    
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 	
 	uint8_t logicalControllerNumber = 0;
@@ -113,5 +121,12 @@ void loop(void)
 	if (radio.Listen() )
 	{
 		strip.Paint();
+		#if (NRF_TYPE==KOMBEE)
+		beat=!beat;
+		digitalWrite(HEARTBEAT_PIN, beat);
+		digitalWrite(HEARTBEAT_PIN_1, beat);
+		#endif
+
+
 	}
 }

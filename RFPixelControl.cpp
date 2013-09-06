@@ -83,7 +83,7 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 		this->flush_tx();  //Clear the TX FIFO Buffers
 		this->powerUp();  //Fire up the radio
 		this->ce(HIGH);  //Turn on transmitter!
-		return true;
+		return this->channelSetSuccessfully;
 	}
 
 	else	
@@ -115,15 +115,13 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 			while (!configged && elapsed < maxTimeout )
 			{
 				configged = this->ConfigureReceiverAtStartup(pNodeId);
-				//delay 2 milliseconds between trying to get configuration data
-				//delay(2);
 				elapsed = millis() - configurationTime;
 				if (!(elapsed % 1000))
 				printf("#");
 			}
 			if (this->_controllers ==NULL || this->_numControllers <= 0)
 			{
-				//We were not successfull in getting OTA Configuration,
+				//We were not successful in getting OTA Configuration,
 				printf("\nUnable to OTAConfig\n");
 				//First try and get configuration from EEPROM
 				int eepromVersion = -1;
@@ -146,28 +144,19 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 					else
 					{
 						printf("EEPROM Version Mismatch U need to fix this or else santa is going to give you coal....\n");
-						//	return false
+						return false;
 					}
 				}
 				
-				
 			}
 			
-				//OTA Successful,  Save to EEPROM,  Reset Listen channel and rate;
-				printf("OTAConfig Success\n");
-				
-				this->stopListening();
-				this->setChannel(this->_channel);
-				//this->setDataRate(this->_rf_data_rate);
-				//this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
-				//this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
-				//this->startListening();  //Start Listening!
-				//this->printDetails();
-				//SetStartAndEndChannels();
-				
-			
+			//OTA Successful,  Save to EEPROM,  Reset Listen channel and rate;
+			printf("OTAConfig Success\n");
+			this->stopListening();
+			this->setChannel(this->_channel);
+			this->setDataRate(this->_rf_data_rate);
 		}
-		
+	
 		this->setChannel(this->_channel); //Change from the default channel...
 		channelSetSuccessfully = false;
 		if ( this->GetChannel() == pChannel)
@@ -178,29 +167,21 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 		this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
 		this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
 		this->startListening();  //Start Listening!
-		r=true;
-	
-}
+		return this->channelSetSuccessfully;
+	}
 
 	
-		this->setChannel(this->_channel); //Change from the default channel...
-		//channelSetSuccessfully = false;
+	this->setChannel(this->_channel); //Change from the default channel...
+	//channelSetSuccessfully = false;
 		
-		this->_rf_data_rate = pDataRate;
-		
-		this->channelSetSuccessfully = true;
-		
-		//Setup Receiver to listen for configuration packets on the Configuration Channel
-		this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
-		this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
-		this->startListening();  //Start Listening!
-		
-		
-	
-	printf("after setup\n");
-	this->PrintControllerConfig()	  ;
-	return r;
-	
+	this->_rf_data_rate = pDataRate;
+	this->channelSetSuccessfully = true;	
+	//Setup Receiver to listen for configuration packets on the Configuration Channel
+	this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
+	this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
+	this->startListening();  //Start Listening!
+	this->PrintControllerConfig();
+	return r;	
 }
 
 /************************************************************************/
@@ -224,8 +205,6 @@ void RFPixelControl::AddLogicalController(uint8_t pLControllerName, uint32_t pLc
 	}
 	
 	this->_numControllers++;
-
-	//printf("Alc %d & %d \n", this->_numControllers, i );
 	this->_controllers[i].logicalControllerNumber = i;
 	this->_controllers[i].startChannel = pLcontrollerStartChannel;
 	this->_controllers[i].numChannels = pLControllerNumChannels;

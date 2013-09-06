@@ -74,16 +74,19 @@
 
 /*************************** END CONFIGURATION SECTION *************************************************/
 //Uncomment for serial
-#define DEBUG 1
+//#define DEBUG 1
 #define PIXEL_TYPE			WM_2999
 #define PIXEL_DATA_PIN			A0
+
+#define HEARTBEAT_PIN  A2
+#define RF_LINK_PIN  A1
 
 //#define outPin 19  //Arduino pin # that Lights are Connected to.  This is actually Pin #28 on the Atmega 328 IC
 #define lightCount 20  //Total # of lights on string (usually 50, 48, or 36)
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
-
+int beat  =0;
 //Arduino setup function.
 void setup() {
 
@@ -93,13 +96,16 @@ void setup() {
 	delay(2);
 	Serial.write("Initializing receiver\n");
      printf_begin();
-	Serial.write(A0);	//The WM2999 Light string data line is connected to this pin.
-	pinMode(A0, OUTPUT);
-	digitalWrite(A0,LOW);
+	Serial.write(PIXEL_DATA_PIN);	//The WM2999 Light string data line is connected to this pin.
+	pinMode(PIXEL_DATA_PIN, OUTPUT);
+	digitalWrite(PIXEL_DATA_PIN,LOW);
 
 	delay(2);
 
-	//strip.SetPixelCount(20);
+	
+	pinMode(HEARTBEAT_PIN, OUTPUT);     
+	pinMode(RF_LINK_PIN, OUTPUT);   
+	
 
 	Serial.write("Initializing Radio\n");
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
@@ -109,9 +115,10 @@ void setup() {
 	{		
 		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3,  RECEIVER_UNIQUE_ID);
 	}
-	
-	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
+	int link = radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
 	radio.printDetails(); 
+	digitalWrite(RF_LINK_PIN, link);
+	
 	Serial.write("Init and Paint LEDS for startup \n");
 	//Both OTA and NON ota will need to set their data base pointers.
 	logicalControllerNumber = 0;
@@ -129,7 +136,7 @@ for ( int i = 0; i<20;i++){
 strip.Paint();
 delay (300);
 
-    //radio.DisplayDiagnosticStartup(&strip) ;
+    
 }
 
 
@@ -140,6 +147,9 @@ void loop(void){
 	if (radio.Listen() )
 	{
 		strip.Paint();
+		beat=!beat;
+		digitalWrite(HEARTBEAT_PIN, beat);
+		
 	}
 }
 

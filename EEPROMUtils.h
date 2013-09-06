@@ -45,7 +45,7 @@ inline void eeprom_serial_dump_column() {
 	for (i = EEPROM_MIN_ADDR; i <= EEPROM_MAX_ADDR; i++) {
 		b = EEPROM.read(i);
 		sprintf(buf, "%03X: %02X", i, b);
-		Serial.println(buf);
+		//Serial.println(buf);
 	}
 }
 
@@ -79,7 +79,7 @@ inline void eeprom_serial_dump_table(int bytesPerRow = 16) {
 		// start row by printing the byte address
 		if (j == 0) {
 			sprintf(buf, "%03X: ", i);
-			Serial.print(buf);
+			//Serial.print(buf);
 		}
 
 		// read current byte from eeprom
@@ -96,11 +96,11 @@ inline void eeprom_serial_dump_table(int bytesPerRow = 16) {
 		// to start a new line
 		if (j == bytesPerRow) {
 			j = 0;
-			Serial.println(buf);
+			//Serial.println(buf);
 		}
 		// else just print the hex value with print()
 		else {
-			Serial.print(buf);
+			//Serial.print(buf);
 		}
 	}
 }

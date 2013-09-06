@@ -77,9 +77,6 @@ class RFPixelControl : public RF24Wrapper {
 
 	void SetStartAndEndChannels();
 
-
-
-
 	void DisplayDiagnosticStartup(IPixelControl * string);
 
 	/************************************************************************
@@ -90,28 +87,33 @@ class RFPixelControl : public RF24Wrapper {
 
 	int SaveConfigurationToEEPROM();
 
-
 	int ReadConfigurationFromEEPROM();
 
 	void PrintControllerConfig(ControllerInfo pControllerInfo);
 
 	bool GetControllerDataUpdate( void );
+	
 	bool ProcessPacket(byte*  dest, byte* src);
+	
 	uint8_t* GetControllerDataBase( uint8_t pLogicalControllerNumber );
 	/**
 	ConfigureReceiverAtStartup
 	Returns true if OTAConfig is received.
 	*/
 	bool ConfigureReceiverAtStartup(uint32_t pReceiverId);
+	
 	int processConntrollerConfigPacket(uint8_t* pConfigPacket);
+	
 	void processLogicalConfigPacket(uint8_t* pLogicalConfigPacket);
 
 	int32_t littleToBigEndianLong( uint8_t* lowByteAddrPtr ) ;
-    int32_t convert8BitTo32Bit(uint8_t *  highByteAddrPtr);
+    
+	int32_t convert8BitTo32Bit(uint8_t *  highByteAddrPtr);
 
 	bool EnableOverTheAirConfiguration(uint8_t enabled);
 
 	int GetNumberOfChannels(int pLogicalController);
+	
 	void AddLogicalController(uint8_t pLControllerName, uint32_t pLcontrollerStartChannel, uint32_t pLControllerNumChannels, uint32_t pLControllerBaudRate);
 
 	void PrintControllerConfig(void);
@@ -119,18 +121,18 @@ class RFPixelControl : public RF24Wrapper {
 	private:
 
 
-	ControllerInfo * _controllers;
-	uint8_t _numControllers;
-	uint32_t _controllerId;
-	byte packetData[RF_PACKET_LENGTH];
-	uint8_t * channelData;
-	uint32_t _startChannel;
-	uint32_t _endChannel;
-	bool _otaConfigEnable;
-
+		ControllerInfo * _controllers;
+		uint8_t _numControllers;
+		uint32_t _controllerId;
+		byte packetData[RF_PACKET_LENGTH];
+		uint8_t * channelData;
+		uint32_t _startChannel;
+		uint32_t _endChannel;
+		bool _otaConfigEnable;
+    
 
 
 	};
 
-	#endif /* RFPIXELCONTROL_H_ */
+#endif /* RFPIXELCONTROL_H_ */
 	
