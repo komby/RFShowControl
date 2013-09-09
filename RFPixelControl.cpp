@@ -493,102 +493,101 @@ bool RFPixelControl::Listen(void)
 	return false;
 }
 
-	/**
-	*  processPacket - handles copying the needed channels from the radio data into the Renard data.
-	*        This method takes a different approach for getting the data.  Originally I was looping through
-	*        all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
-	*        I haven't done performance timing so who knows?  It passed my tests :)
-	*
-	*  return - true if the last channel was found and its time for an update, otherwise false.
-	*/
-	bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
+/**
+*  processPacket - handles copying the needed channels from the radio data into the Renard data.
+*        This method takes a different approach for getting the data.  Originally I was looping through
+*        all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
+*        I haven't done performance timing so who knows?  It passed my tests :)
+*
+*  return - true if the last channel was found and its time for an update, otherwise false.
+*/
+bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
+{
+	int startChannel = this->_startChannel -1;
+	int finalChannel = this->_endChannel- 1;
+
+	//  Way too many variables here need to refactor...
+	bool retVal = false;
+	int packetSequence = p[PACKET_SEQ_IDX];
+	int packetStartChann = packetSequence * CHANNELS_PER_PACKET;
+	int packetEndChannel = packetStartChann + CHANNELS_PER_PACKET;
+
+	int calcStartChannel = -1;
+	int calcStartDestIdx = -1;
+	int calcStartSourceIdx = -1;
+
+
+	int calcEndChannel = -1;
+	int calcEndDestIdx = -1;
+	int calcEndSourceIdx = -1;
+
+	//first assume we will be copying the whole packet.
+	int channelCopyStartIdx = 0;
+	int channelCopyEndIdx = CHANNELS_PER_PACKET - 1;
+	int numberOfValidChannelsInPacket = channelCopyEndIdx;
+						
+	//First we need to know what is the first valid channel in this packet
+	if (startChannel >= packetStartChann)
 	{
-		int startChannel = this->_startChannel -1;
-		int finalChannel = this->_endChannel- 1;
-
-		//  Way too many variables here need to refactor...
-		bool retVal = false;
-		int packetSequence = p[PACKET_SEQ_IDX];
-		int packetStartChann = packetSequence * CHANNELS_PER_PACKET;
-		int packetEndChannel = packetStartChann + CHANNELS_PER_PACKET;
-
-		int calcStartChannel = -1;
-		int calcStartDestIdx = -1;
-		int calcStartSourceIdx = -1;
-
-
-		int calcEndChannel = -1;
-		int calcEndDestIdx = -1;
-		int calcEndSourceIdx = -1;
-
-		//first assume we will be copying the whole packet.
-		int channelCopyStartIdx = 0;
-		int channelCopyEndIdx = CHANNELS_PER_PACKET - 1;
-		int numberOfValidChannelsInPacket = channelCopyEndIdx;
-							
-		//First we need to know what is the first valid channel in this packet
-		if (startChannel >= packetStartChann)
-		{
 		//It could be in the packet is it?
 		if (startChannel <= packetEndChannel)
 		{
-		//set calculated start to the start channel
-		calcStartChannel = startChannel;
-		//set the idx of the dest array to the start channel
-		calcStartDestIdx = 0 ;
-		//offset the idx for source by the channel count factor
-		calcStartSourceIdx = startChannel - packetStartChann;
-		//start is after the packet start and before or equal to the end channel.
-
+			//set calculated start to the start channel
+			calcStartChannel = startChannel;
+			//set the idx of the dest array to the start channel
+			calcStartDestIdx = 0 ;
+			//offset the idx for source by the channel count factor
+			calcStartSourceIdx = startChannel - packetStartChann;
+			//start is after the packet start and before or equal to the end channel.
+	
 		}
 		else
 		{
-		//start channel was after the range of channels in this packet.  skip this packet.
-		return retVal;
+			//start channel was after the range of channels in this packet.  skip this packet.
+			return retVal;
 		}
-		}
-		else
-		{
+	}
+	else
+	{
 		calcStartChannel =  packetStartChann;
 		calcStartDestIdx = packetStartChann - startChannel;
 		calcStartSourceIdx = 0;
-
 		//we started before this packet
 		//end channel interrogation will handle if we need
 		//anything from this packet.
-		}
-		//now interrogate the end channel
-		//check if the end is in this packet
-		if (packetEndChannel <= finalChannel)
-		{
+	}
+	//now interrogate the end channel
+	//check if the end is in this packet
+	if (packetEndChannel <= finalChannel)
+	{
 		//since final is greater than the end of the packet, check start
 		//if start is set we need all channels from this packet.
 		if (calcStartChannel >= 0)
 		{
-		calcEndChannel = packetEndChannel;
-		calcEndDestIdx = packetEndChannel - (startChannel);
-		calcEndSourceIdx = packetEndChannel - packetStartChann;
+			calcEndChannel = packetEndChannel;
+			calcEndDestIdx = packetEndChannel - (startChannel);
+			calcEndSourceIdx = packetEndChannel - packetStartChann;
 		}
 
-		}
-		else
-		{
+	}
+	else
+	{
 		//final channel is before the end of this packet  (packetEndChannel >= finalChann )
 		if (finalChannel >= packetStartChann)
 		{
-		//Because final is less than the packet end
-		//and >= start we know that the final channel is in this packet
-		calcEndChannel =  this->_endChannel ;
-		calcEndDestIdx = finalChannel - startChannel ;
-		calcEndSourceIdx = finalChannel - packetStartChann;
+			//Because final is less than the packet end
+			//and >= start we know that the final channel is in this packet
+			calcEndChannel =  this->_endChannel ;
+			calcEndDestIdx = finalChannel - startChannel ;
+			calcEndSourceIdx = finalChannel - packetStartChann;
+	
+			//because this is the last packet we care about,  return true
+			retVal=true;
 
-		//because this is the last packet we care about,  return true
-		retVal=true;
-
-	}
+		}
 		else
 		{
-		//Final happened before this packet//continue.
+			//Final happened before this packet//continue.
 			return retVal;
 		}
 	}
