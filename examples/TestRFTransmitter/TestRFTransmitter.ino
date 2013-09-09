@@ -67,6 +67,7 @@ void loop ()
 
 
 // Show update method handles the transmission of the RF packets.  Its using the RF DMX technique used by Joe Johnson for the RFColor2_4 library
+
 void showUpdate()
 {
 	byte status = 0;
@@ -74,7 +75,7 @@ void showUpdate()
 	for(int ii=0, kk=0,jj=0;ii< numberOfChannels && kk<32 ;ii++)
 	{
 		str[kk++] = buffer[ii];//set the byte color
-		if (kk == 30)
+		if (kk == 30 || ii == (numberOfChannels -1) )
 		{
 			str[kk] = jj++;
 			kk=0;
@@ -89,7 +90,6 @@ void showUpdate()
 		}
 	}
 }
-
 /*
 Helper functions from ADAFRUIT ws8201 library
 The MIT License (MIT)
