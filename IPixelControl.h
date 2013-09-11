@@ -11,6 +11,16 @@
 #include <Arduino.h>
 
 
+// Define RGB orderings
+enum ColorOrder {
+	RGB_ORDER=0012,
+	RBG_ORDER=0021,
+	GRB_ORDER=0102,
+	GBR_ORDER=0120,
+	BRG_ORDER=0201,
+	BGR_ORDER=0210
+};
+
 //base class for pixels
 class IPixelControl {
 public:
@@ -58,7 +68,7 @@ public:
 	 * @param n - Pixel number to set
 	 * @param c - Color to set the nth pixel to
 	 */
-	void SetPixelColor(uint16_t n, uint32_t c);
+	void SetPixelColor(uint16_t n, uint32_t c, uint8_t colorOrder = RGB_ORDER);
 	/*
 	 * Sets pixel n to values r, g, b
 	 *
@@ -67,7 +77,7 @@ public:
 	 * @param g - green 0-255 value
 	 * @param b - blue 0-255 value
 	 */
-	void SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
+	void SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t colorOrder = RGB_ORDER);
 
 	/*
 	 * Create a 24 bit color value from R,G,B

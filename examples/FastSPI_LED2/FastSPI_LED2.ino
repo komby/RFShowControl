@@ -32,9 +32,13 @@
 #define NRF_TYPE  RF1_1_3
 
 //What Kind of pixels? Valid Values: LPD_8806,WS_2801,SM_16716,TM_1809, TM_1803, UCS_1903, WS_2811
-#define PIXEL_PROTOCOL		WS_2801
+#define PIXEL_PROTOCOL		WS_2811
 #define PIXEL_DATA_PIN 2
 #define PIXEL_CLOCK_PIN 4
+
+//What order does your pixel string expect the data to be?  
+//Valid Values: RGB, RBG,GRB,GBR,BRG,BGR
+#define PIXEL_COLOR_ORDER RGB
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
@@ -100,28 +104,29 @@ void setup()
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	LEDS.setBrightness(LED_BRIGHTNESS);
-	
+	printf("PixelColorOrder: %d\n", PIXEL_COLOR_ORDER);
 	logicalControllerNumber = 0;
 	
 	leds =(CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-	
-	
+	 int countOfPixels = radio.GetNumberOfChannels(0)/3;
 
+	printf("Number of channels configured %d\n", countOfPixels);
+       
 
 	#if (PIXEL_PROTOCOL == LPD_8806)
-	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
 	#elif (PIXEL_PROTOCOL == WS_2801)
-	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
 	#elif  (PIXEL_PROTOCOL == SM_16716)
-	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, RGB>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
 	#elif  (PIXEL_PROTOCOL == TM_1809)
-	LEDS.addLeds(  new TM1809Controller800Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(  new TM1809Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
 	#elif  (PIXEL_PROTOCOL == TM_1803)
-	LEDS.addLeds(  new TM1803Controller400Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(  new TM1803Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
 	#elif  (PIXEL_PROTOCOL == UCS_1903)
-	LEDS.addLeds(  new UCS1903Controller400Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(  new UCS1903Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds,countOfPixels, 0);
 	#elif (PIXEL_PROTOCOL == WS_2811)
-	LEDS.addLeds(  new WS2811Controller800Khz<PIXEL_DATA_PIN>(), leds, HARDCODED_NUM_PIXELS, 0);
+	LEDS.addLeds(  new WS2811Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
 	
 	#else Must define PIXEL_PROTOCOL : (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716)
 	#endif
@@ -129,7 +134,7 @@ void setup()
 	
 	//Initalize the data for LEDs
 	//todo eventually this will be a bug
-	memset(leds, 0,  HARDCODED_NUM_PIXELS * sizeof(struct CRGB));
+	memset(leds, 0,  countOfPixels * sizeof(struct CRGB));
 	delay (200);
 	radio.PrintControllerConfig();
 }
