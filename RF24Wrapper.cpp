@@ -41,7 +41,7 @@ uint8_t RF24Wrapper::GetChannel(void){
 bool RF24Wrapper::Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate)
 {
     bool r = false;
-    
+
     this->_channel =pChannel;
     this->dataRateSuccess = false;
     this->payloadSizeSetSuccessful = false;
@@ -50,15 +50,15 @@ bool RF24Wrapper::Initialize( int  pRole, const uint64_t * pPipes, int pChannel,
     this->setRetries(0,0);  //set # of retries & delay between retries
     this->dataRateSuccess=this->setDataRate( pDataRate );  //set RF data rate
     this->setPayloadSize(32);   //set RF packet size
-    
+
     if ( this->getPayloadSize() == 32 )
     {
         this->payloadSizeSetSuccessful = true;
     }
-    
+
     this->setAutoAck(0);  //Turn off Auto Ack!!!!
     this->setChannel(pChannel); //Change from the default channel...
-    
+
     this->setCRCLength(RF24_CRC_16 );  //Setup CRC
 
     if ( pRole == TRANSMITTER)
@@ -73,7 +73,7 @@ bool RF24Wrapper::Initialize( int  pRole, const uint64_t * pPipes, int pChannel,
         this->openReadingPipe(1,pPipes[1]);  //Open pipe for Reading...But we aren't reading anything....
         //this->setPALevel(RF24_PA_HIGH);  //Set the power level to high!
         this->setPALevel(RF24_PA_MAX);  //Set the power level to high!
-        
+
         this->write_register(CONFIG, ( this->read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );  //set up radio for writing!
         this->flush_tx();  //Clear the TX FIFO Buffers
         this->powerUp();  //Fire up the radio
@@ -84,26 +84,42 @@ bool RF24Wrapper::Initialize( int  pRole, const uint64_t * pPipes, int pChannel,
     else
     {
         //receiver setup
-        
+
         this->setChannel(this->_channel); //Change from the default channel...
         channelSetSuccessfully = false;
         if ( this->GetChannel() == pChannel)
         this->channelSetSuccessfully = true;
-        
-        
+
+		this->pipes=pPipes;
         //setup as a receiver
         this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
         this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
         this->startListening();  //Start Listening!
         r=true;
-        
+
     }
 
     return r;
-    
-} 
 
+}
 
+bool RF24Wrapper::ChangeTransmitChannel(int pChannel)
+{
+	this->ce(LOW);  //Turn on transmitter!
+	//this->powerDown();
+	this->setChannel(pChannel); //Change from the default channel...
+
+	//this->openWritingPipe(this->pipes[0]);  //Open pipe for Writing
+	//this->openReadingPipe(1,this->pipes[1]);  //Open pipe for Reading...But we aren't reading anything....
+	//this->setPALevel(RF24_PA_HIGH);  //Set the power level to high!
+	//this->setPALevel(RF24_PA_MAX);  //Set the power level to high!
+
+	//this->write_register(CONFIG, ( this->read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );  //set up radio for writing!
+	//this->flush_tx();  //Clear the TX FIFO Buffers
+	//this->powerUp();  //Fire up the radio
+	this->ce(HIGH);  //Turn on transmitter!
+	return true;
+}
 /**
 * Override base class method
 * This method was created so that we dont

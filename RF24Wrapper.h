@@ -22,7 +22,7 @@ class RF24Wrapper : public RF24 {
 
 	/**
 	* Constructor
-	
+
 	*
 	* Creates a new instance of this driver.  Before using, you create an instance
 	* and send in the unique pins that this chip is connected to.
@@ -34,12 +34,13 @@ class RF24Wrapper : public RF24 {
 	RF24Wrapper(uint8_t _cepin, uint8_t _cspin) ;
 
 
-	
+
 	/**
 	* Check what channel the radio is listening on
 	*/
 	uint8_t GetChannel(void);
-	
+
+	bool ChangeTransmitChannel(int transmitChannel);
 	/**
 	* overriding method from base class
 	*
@@ -60,22 +61,22 @@ class RF24Wrapper : public RF24 {
 	* @return Current value of status register
 	*/
 	uint8_t write_payload(const void* buf, uint8_t len);
-	
+
 
 	uint8_t get_status(void);
-	
-	
+
+
 	bool Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate);
 
 	protected:
 	uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/
 	int _channel;  //channel to transmit on
 	rf24_datarate_e _rf_data_rate; //Data Rate for the RF.
-	
+
 	bool dataRateSuccess;
 	bool payloadSizeSetSuccessful;
 	bool channelSetSuccessfully;
-
+    const uint64_t * pipes;
 
 	};
 
