@@ -44,7 +44,7 @@
 #include <EEPROM.h>
 
 /***************************  CONFIGURATION SECTION *************************************************/
-// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
+// Define a Unique receiver ID.  This id should be unique for each receiver in your setup.
 // If you are not using Over The air Configuration you do not need to change this setting.
 // Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
@@ -57,9 +57,9 @@
 //Valid Values   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//What RF Channel do you want to listen on?  
+//What RF Channel do you want to listen on?
 //Valid Values: 1-124
-#define LISTEN_CHANNEL 100	
+#define LISTEN_CHANNEL 100
 
 // Set OTA_CONFIG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
@@ -81,64 +81,76 @@
 #define HEARTBEAT_PIN  A2
 #define RF_LINK_PIN  A1
 
+
+//force update if no data received every 200 ms
+#define TIMEOUT_FORCE_REFRESH 200
+
 //#define outPin 19  //Arduino pin # that Lights are Connected to.  This is actually Pin #28 on the Atmega 328 IC
 #define lightCount 20  //Total # of lights on string (usually 50, 48, or 36)
 
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
 int beat  =0;
+unsigned long time = millis();
 //Arduino setup function.
 void setup() {
 
-	
+
 	Serial.begin(57600);
-   
+
 	delay(2);
 	Serial.write("Initializing receiver\n");
-     printf_begin();
+        printf_begin();
 	Serial.write(PIXEL_DATA_PIN);	//The WM2999 Light string data line is connected to this pin.
 	pinMode(PIXEL_DATA_PIN, OUTPUT);
 	digitalWrite(PIXEL_DATA_PIN,LOW);
 
-	delay(2);
+	delay(200);
 
-	
-	pinMode(HEARTBEAT_PIN, OUTPUT);     
-	pinMode(RF_LINK_PIN, OUTPUT);   
-	
+
+	pinMode(HEARTBEAT_PIN, OUTPUT);
+	pinMode(RF_LINK_PIN, OUTPUT);
+
 
 	Serial.write("Initializing Radio\n");
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
 	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
-	{		
+	{
 		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3,  RECEIVER_UNIQUE_ID);
 	}
 	int link = radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-	radio.printDetails(); 
+	radio.printDetails();
 	digitalWrite(RF_LINK_PIN, link);
-	
+
 	Serial.write("Init and Paint LEDS for startup \n");
 	//Both OTA and NON ota will need to set their data base pointers.
 	logicalControllerNumber = 0;
       //  uint8_t* ptr = radio.GetControllerDataBase(logicalControllerNumber);
         printf("%d num pix\n", radio.GetNumberOfChannels(logicalControllerNumber));
 	strip.WM2999PixelControl::Begin((uint8_t*)radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber)/3);
-for ( int i = 0; i<20;i++){
-strip.SetPixelColor(i, strip.Color(244,0,255));
-}
-	strip.Paint();
-delay (5000);
-for ( int i = 0; i<20;i++){
+
+
+	for ( int i = 0; i<20;i++){
       strip.SetPixelColor(i, strip.Color(0,255,0));
-}
-strip.Paint();
-delay (300);
+	}
+	strip.Paint();
+	delay (200);
+        strip.Paint();
+	delay (200);
+        strip.Paint();
+	delay (200);
+        strip.Paint();
+	delay (200);
+	for ( int i = 0; i<20;i++){
+		strip.SetPixelColor(i, strip.Color(0,0,0));
 
-    
-}
+	}
+	strip.Paint();
+	time = millis();
 
+}
 
 //RF Listening Loop
 void loop(void){
@@ -147,8 +159,15 @@ void loop(void){
 	if (radio.Listen() )
 	{
 		strip.Paint();
+		time = millis();
 		beat=!beat;
 		digitalWrite(HEARTBEAT_PIN, beat);
-		
+
+	}
+	else if (millis()-time >= TIMEOUT_FORCE_REFRESH)
+	{
+		strip.Paint();
+		time = millis();
+
 	}
 }

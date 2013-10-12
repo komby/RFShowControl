@@ -20,6 +20,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include "printf.h"
+#include <MemoryFree.h>
 //
 /**************CONFIGURATION SECTION ***************************/
 // Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
@@ -104,13 +105,15 @@ void setup()
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
 	radio.printDetails();
 	LEDS.setBrightness(LED_BRIGHTNESS);
-	printf("PixelColorOrder: %d\n", PIXEL_COLOR_ORDER);
+	Serial.print(F("PixelColorOrder: "));
+	printf("%d\n", PIXEL_COLOR_ORDER);
 	logicalControllerNumber = 0;
 	
 	leds =(CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
 	 int countOfPixels = radio.GetNumberOfChannels(0)/3;
 
-	printf("Number of channels configured %d\n", countOfPixels);
+	Serial.print(F("Number of channels configured "));
+	printf("%d\n", countOfPixels);
        
 
 	#if (PIXEL_PROTOCOL == LPD_8806)
@@ -137,6 +140,10 @@ void setup()
 	memset(leds, 0,  countOfPixels * sizeof(struct CRGB));
 	delay (200);
 	radio.PrintControllerConfig();
+	
+	
+		Serial.print(F("freeMemory()="));
+		Serial.println(freeMemory());
 }
 
 void loop(void)
