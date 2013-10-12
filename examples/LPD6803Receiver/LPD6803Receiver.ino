@@ -97,7 +97,7 @@ int  pkt_max=0;
 int  z=0;
 bool readytoupdate=false;
 
-
+uint8_t* data;
 
 //Arduino setup function.
 void setup() {
@@ -119,16 +119,23 @@ void setup() {
  //radio.PrintControllerConfig();
  
  logicalControllerNumber = 0;
-
- strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
+  data = radio.GetControllerDataBase(logicalControllerNumber);
+ strip.Begin(data, radio.GetNumberOfChannels(logicalControllerNumber));
 
   Serial.write("Init and Paint LEDS for startup \n");
   delay (2);
-  
   for(int i=0;i<strip.GetPixelCount(); i++)
-    strip.SetPixelColor(i, strip.Color(0,0,0));
+  strip.SetPixelColor(i, 0,0,0);
   strip.Paint();
-  delay(2);
+  delay(2000);
+  for(int i=0;i<strip.GetPixelCount(); i++)
+  strip.SetPixelColor(i,255,255,255);
+  strip.Paint();
+  delay(2000);
+  for(int i=0;i<strip.GetPixelCount(); i++)
+  strip.SetPixelColor(i, 0,0,0);
+  strip.Paint();
+  delay(2000);
 }
 
 
@@ -137,6 +144,10 @@ void setup() {
 void loop(void){
   if (radio.Listen() )
   {
+	  for(int i=0;i<strip.GetPixelCount(); i++)
+	  {
+		strip.SetPixelColor(i, data[i], data[i+1], data[i+2]);
+	  }
 	  strip.Paint();
   }
 }

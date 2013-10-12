@@ -12,16 +12,18 @@
 
 #ifndef ADAFRUITILIB6803
 #define ADAFRUITILIB6803
-#include <LPD6803.h>
+#include "LPD6803.h"
 #include <TimerOne.h>
 #include <IPixelControl.h>
 #include <RFPixelControl.h>
 
-class LPD6803PixelControl : public LPD6803, public IPixelControl
+class LPD6803PixelControl :  public IPixelControl, public LPD6803
 {
 public:
 	LPD6803PixelControl(uint8_t pClock, uint8_t pData);
-
+	
+	void SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
+	
 	void Paint(void);
 };
 
