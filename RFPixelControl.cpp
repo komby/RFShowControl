@@ -88,10 +88,10 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 
 	else	
 	{
-		this->channelData = (uint8_t*)calloc(512,sizeof(uint8_t));
+		this->channelData = (uint8_t*)calloc(1024,sizeof(uint8_t));
 		if (this->_otaConfigEnable)
 		{
-			printf("OTACONFIG-Begin\n");
+			printf_P(PSTR("OTACONFIG-Begin\n"));
 			//We are setting up a receiver,  Before we can come online we need configuration information
 			//Check to see if we have a configuration node online.
 			this->setChannel(RF_NODE_CONFIGURATION_CHANNEL); //Change from the default channel...
@@ -102,12 +102,12 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 			this->startListening();  //Start Listening!
 			
 			delay(2);
-			printf("print config channel details\n");
+			
 			printDetails();
 			long elapsed = 0;
 			long maxTimeout = OTA_CONFIG_WINDOW;
 			//&& (millis() - configurationTime )<= RF_CONFIG_STARTUP_WINDOW
-			printf("attempting OTA Config \n\t#");
+			printf_P(PSTR("attempting OTA Config \n\t#"));
 
 //			for(	unsigned long configurationTime = millis();!this->ConfigureReceiverAtStartup(pNodeId) && elapsed < maxTimeout ;)
 			unsigned long configurationTime = millis();
@@ -122,12 +122,12 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 			if (this->_controllers ==NULL || this->_numControllers <= 0)
 			{
 				//We were not successful in getting OTA Configuration,
-				printf("\nUnable to OTAConfig\n");
+				printf_P(PSTR("\nUnable to OTAConfig\n"));
 				//First try and get configuration from EEPROM
 				int eepromVersion = -1;
 				if (eeprom_read_int(EEPROM_VERSION_IDX, &eepromVersion))
 				{
-					printf("EEPROM VERSION IS %d\n",eepromVersion);
+					printf_P(PSTR("EEPROM VERSION IS %d\n"),eepromVersion);
 					if (eepromVersion == EEPROM_VERSION)
 					{
 						if( eeprom_read_bytes(EEPROM_CONTROLLER_CONFIG_IDX, this->packetData, EEPROM_PACKET_SIZE))
@@ -143,7 +143,7 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 					}
 					else
 					{
-						printf("EEPROM Version Mismatch U need to fix this or else santa is going to give you coal....\n");
+						printf_P(PSTR("EEPROM Version Mismatch U need to fix this or else santa is going to give you coal....\n"));
 						return false;
 					}
 				}
@@ -151,7 +151,7 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 			}
 			
 			//OTA Successful,  Save to EEPROM,  Reset Listen channel and rate;
-			printf("OTAConfig Success\n");
+			printf_P(PSTR("OTAConfig Success\n"));
 			this->stopListening();
 			this->setChannel(this->_channel);
 			this->setDataRate(this->_rf_data_rate);
@@ -227,10 +227,10 @@ void RFPixelControl::AddLogicalController(uint8_t pLControllerName, uint32_t pLc
 void RFPixelControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 {
 	
-	printf("LNumber: \t\t%d\n",pControllerInfo.logicalControllerNumber );
-	printf("StartChannel: \t\t\t %lu \n ",pControllerInfo.startChannel);
-	printf("NumChannels: \t\t\t %lu \n", pControllerInfo.numChannels);
-	printf("BaudRateIfSerial:\t\t\t %lu \n",pControllerInfo.baudRate);
+	printf_P(PSTR("LNumber:\t%d\n"),pControllerInfo.logicalControllerNumber );
+	printf_P(PSTR("StartCh:\t%lu\n"),pControllerInfo.startChannel);
+	printf_P(PSTR("NumCh:\t%lu\n"), pControllerInfo.numChannels);
+	printf_P(PSTR("Baud:\t%lu\n"),pControllerInfo.baudRate);
 
 }
 
@@ -239,12 +239,12 @@ void RFPixelControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 /************************************************************************/
 void RFPixelControl::PrintControllerConfig(void)
 {
-	printf("PhysicalController Info: \t\t%d\n", this->_controllerId);
-	printf("Logical Controllers : \t\t%d\n", this->_numControllers);
-	printf("Listen: \t\t\t%d\n", this->_channel);
-	printf("DataStart : \t\t\t % lu \n", this->_startChannel );
-	printf("DataEnd:  \t\t\t% lu \n", this->_endChannel);
-	printf("NumberOf : \t\t\t%d\n", this->_endChannel - this->_startChannel);
+	printf("Cntl Info:\t%d\n", this->_controllerId);
+	printf("LCntrl:\t%d\n", this->_numControllers);
+	printf("Listen:\t%d\n", this->_channel);
+	printf("Start:\t%lu\n", this->_startChannel );
+	printf("End:\t% lu\n", this->_endChannel);
+	printf("Num:\t%d\n", this->_endChannel - this->_startChannel);
 	for (int i=0;i< this->_numControllers;i++)
 	{
 		PrintControllerConfig(this->_controllers[i]);
@@ -260,7 +260,7 @@ uint8_t* RFPixelControl::GetControllerDataBase( uint8_t pLogicalControllerNumber
 	int numChannelsOffset = 0;
 	for ( int i = 0; i < this->_numControllers; i++){
 		if (this->_controllers[i].logicalControllerNumber == pLogicalControllerNumber){
-			printf("GetControllerDataBase1\n");
+			printf_P(PSTR("GetControllerDataBase1\n"));
 			PrintControllerConfig();
 			if (numChannelsOffset ==0)
 			{
@@ -321,8 +321,8 @@ int RFPixelControl::processConntrollerConfigPacket(uint8_t* pConfigPacket)
 
 void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
 {
-
-	printf("OTA lp %d\n", pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUMBER]);
+    printf_P(PSTR("OTA Logical Packet "));
+	printf("%d\n", pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUMBER]);
 
 	uint32_t baudrate = 0;
 	switch( pLogicalConfigPacket[IDX_CONFIG_PACKET_TYPE])
@@ -335,7 +335,8 @@ void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
 		case LOGICALCONTROLLER_SERIAL:
 			
 			baudrate = convert8BitTo32Bit(&pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD]);
-			printf("BaudRate is set to %lu\n", baudrate);
+			printf_P(PSTR("BaudRate is set to "));
+			printf("%lu\n", baudrate);
 			break;
 			//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
 			//memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
@@ -377,7 +378,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && ( convert8BitTo32Bit(this->packetData+IDX_CONTROLLER_ID)  == pReceiverId))
 		{
 #ifdef DEBUG_PRINT
-			printf("received Config Packet for controller\n");
+			printf_P(PSTR("received Config Packet for controller\n"));
 			for ( int i =0;i<32 ;i++)
 			{
 				printf(" 0x%02X", this->packetData[i]);
@@ -407,7 +408,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 				{
 
 #ifdef DEBUG_PRINT
-					printf("received OTA logical\n");
+					printf_P(PSTR("received OTA logical\n"));
 					for ( int i =0;i<32 ;i++)
 					{
 							printf(" 0x%02X", this->packetData[i]);
@@ -428,7 +429,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 
 						processLogicalConfigPacket(this->packetData);
 #ifdef DEBUG_PRINT
-						printf("configured Logical Packet\n");
+						printf_P(PSTR("configured Logical Packet\n"));
 #endif
 						found=true;
 						//if the logical packet was processed we can save it for later.
@@ -445,7 +446,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 					}
 			}
 		}	
-		printf("eeprom:");
+		printf_P(PSTR("eeprom:"));
 		eeprom_serial_dump_table();
 		//delay(1000);
 		}
