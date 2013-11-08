@@ -37,7 +37,7 @@
 
 #define NUM_CHANNELS 3  
 #define START_CHANNEL 1 //Where in the universe do we start
-#define FINAL_CHANNEL 3 //DO Refactory out, addition would be easy....
+
 
 
 //What RF Channel do you want to listen on?  
@@ -50,7 +50,7 @@
 
 
 //Setup for RF1_12V DumbRGB Controller
-#define REDPIN 10
+#define REDPIN 3
 #define GREENPIN 5
 #define BLUEPIN 9
  
