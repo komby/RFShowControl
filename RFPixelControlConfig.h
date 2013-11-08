@@ -3,23 +3,28 @@
 
 
 #if (NRF_TYPE == MINIMALIST_SHIELD)
-RFPixelControl radio(9, 8);
+#define 	__CE  9
+#define		__CSN 8
 #elif (NRF_TYPE == RF1_1_2) || \
 	(NRF_TYPE == RF1_1_3) || \
 	(NRF_TYPE == RF1_0_2) || \
 	(NRF_TYPE == RF1_12V_0_1) ||\
-	(NRF_TYPE == KOMBEE) 
-RFPixelControl radio(8, 7);
-#elif (NRF_TYPE == KOMBYONE_DUE)
-RFPixelControl radio(33,10);
+	(NRF_TYPE == KOMBEE)
+#define 	__CE  8
+#define		__CSN 7
 #elif (NRF_TYPE == WM_2999_NRF) || \
 	(NRF_TYPE == RFCOLOR2_4)
-RFPixelControl radio(9,10);
+#define 	__CE  9
+#define		__CSN 10
 #else
 #error Must define an NRF type!
 #endif
 
-
+#if (RF_WRAPPER==1)
+RF24Wrapper radio(__CE, __CSN);
+#else
+RFPixelControl radio(__CE, __CSN);
+#endif
 
 
 

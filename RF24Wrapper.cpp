@@ -38,7 +38,7 @@ uint8_t RF24Wrapper::GetChannel(void){
 * @param pPipes - the addressses to listen on
 *
 */
-bool RF24Wrapper::Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate)
+bool RF24Wrapper::Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int logical)
 {
     bool r = false;
 

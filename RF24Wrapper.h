@@ -66,7 +66,7 @@ class RF24Wrapper : public RF24 {
 	uint8_t get_status(void);
 
 
-	bool Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate);
+	bool Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int logical = 0);
 
 	protected:
 	uint8_t csn_pin; /**< SPI Chip select redefined because private in base ---  its hacky*/

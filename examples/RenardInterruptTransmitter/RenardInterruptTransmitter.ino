@@ -30,6 +30,7 @@
 
 
 /***************************  END CONFIGURATION SECTION *************************************************/
+#define RF_WRAPPER 1
 #include <RFPixelControlConfig.h>
 #define RF_NUM_PACKETS 18     // 18 * 30 total Channels can be broadcasted
 #define RECEIVER_UNIQUE_ID 0
