@@ -8,7 +8,7 @@
 
 #include <GECEPixelControl.h>
 
-GECEPixelControl::GECEPixelControl(uint8_t pin) : GEColorEffects(50,pin)
+GECEPixelControl::GECEPixelControl(uint8_t pin) : GEColorEffects(pin,HARDCODED_NUM_CHANNELS/3)
 {
 }
 
