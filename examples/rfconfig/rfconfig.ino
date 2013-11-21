@@ -50,7 +50,9 @@
 //Use channel 100
 #define TRANSMIT_CHANNEL 125
 
+//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 #define NRF_TYPE MINIMALIST_SHIELD
+
 //#define NRF_TYPE RF1_1_3
 
 // Ethernet controller MAC address...
