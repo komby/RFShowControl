@@ -30,6 +30,7 @@
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: RFCOLOR2_4, MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF
+//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 #define NRF_TYPE  RF1_1_3
 
 //What Kind of pixels? Valid Values: LPD_8806,WS_2801,SM_16716,TM_1809, TM_1803, UCS_1903, WS_2811
