@@ -44,21 +44,22 @@
 
 
 //What Speed do you want to use to transmit?
-//Valid Values:   RF24_250KBPS, RF24_1MBPS
+//Valid Values:  Configuration defaults to using 250kbps only.
 #define DATA_RATE RF24_250KBPS
 
-//Use channel 100
+//Use channel 125 as we are using this for Configuration.
 #define TRANSMIT_CHANNEL 125
 
+//What board are you using to connect your nRF24L01+?
+//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
 //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 #define NRF_TYPE MINIMALIST_SHIELD
-
-//#define NRF_TYPE RF1_1_3
 
 // Ethernet controller MAC address...
 // must be unique...can generate with:
 // http://www.miniwebtool.com/mac-address-generator/
 //
+//TODO Refactor into NRF_TYPE Call
 RF24Wrapper radio(9, 8);
 
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
