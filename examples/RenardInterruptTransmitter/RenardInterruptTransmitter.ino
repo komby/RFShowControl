@@ -15,6 +15,7 @@
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,KOMBEE
+//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 #define NRF_TYPE			RF1_1_3
 
 //What Speed do you want to use to transmit?
