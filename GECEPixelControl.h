@@ -15,10 +15,12 @@
 #include <IPixelControl.h>
 #include <RFPixelControl.h>
 
+
+
 class GECEPixelControl: public GEColorEffects, public IPixelControl
 {
 public:
-	GECEPixelControl(uint8_t pin);
+	GECEPixelControl(uint8_t pin, int pixelCount);
 	
 	void Paint(void);
 };

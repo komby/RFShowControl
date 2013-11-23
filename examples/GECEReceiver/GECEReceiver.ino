@@ -54,6 +54,8 @@
 //Valid Values: 1-124
 #define LISTEN_CHANNEL 100	// the channel for the RF Radio
 
+//this is a delay in the update loop to update the pixels less frequently.
+#define PIXEL_PRINT_DELAY 4
 
 
 /***************************  END CONFIGURATION SECTION *************************************************/
@@ -121,6 +123,7 @@ void loop(void)
     if (radio.Listen() )
     {
 		//print_data((char *)radio.GetControllerDataBase(0));
+		delay(PIXEL_PRINT_DELAY);
 	    strip.Paint();
     }
 }

@@ -32,7 +32,7 @@ RFPixelControl radio(__CE, __CSN);
 #if (PIXEL_TYPE == GECE)
 #include "GECEPixelControl.h"
 #include <GEColorEffects.h>
-GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN);
+GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_CHANNELS/3);
 
 #endif
 
