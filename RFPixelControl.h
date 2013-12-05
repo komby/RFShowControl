@@ -43,6 +43,7 @@
 #define RENARD				4
 #define WM_2999				5
 #define LPD_6803			6
+#define GWTS_EARS			7
 
 
 class RFPixelControl : public RF24Wrapper {

@@ -29,6 +29,14 @@ RFPixelControl radio(__CE, __CSN);
 
 
 
+#if (PIXEL_TYPE == GWTS_EARS)
+#include "GWTSControl.h"
+#include <GwtS.h>
+GWTSControl strip = GWTSControl();
+
+#endif
+
+
 #if (PIXEL_TYPE == GECE)
 #include "GECEPixelControl.h"
 #include <GEColorEffects.h>
