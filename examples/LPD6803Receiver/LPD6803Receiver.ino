@@ -70,9 +70,8 @@
 
 
 // If you are not using Over the air configuration you will need to specify the following options
- #define HARDCODED_START_CHANNEL 0
- #define HARDCODED_NUM_PIXELS 50  //This defines the # of LED Channels.
- #define HARDCODED_NUM_CHANNELS 150 //Number of DMX channels to read...usually dmx_led_channels/3
+ #define HARDCODED_START_CHANNEL 1
+ #define HARDCODED_NUM_PIXELS 11  //This defines the # of LED Channels. ( bug that makes you set this one more than you need  
 
 //What RF Channel do you want to listen to?  
 //Valid Values: 1-124
@@ -112,30 +111,46 @@ void setup() {
  uint8_t logicalControllerNumber = 0;
  #if (OVER_THE_AIR_CONFIG_ENABLE == 0)
  
- radio.AddLogicalController(logicalControllerNumber++, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS, 0);
+ radio.AddLogicalController(logicalControllerNumber++, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS*3, 0);
  #endif
 
  radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
  radio.printDetails();
  //radio.PrintControllerConfig();
- 
+
  logicalControllerNumber = 0;
   data = radio.GetControllerDataBase(logicalControllerNumber);
  strip.Begin(data, radio.GetNumberOfChannels(logicalControllerNumber));
-
+strip.setCPUmax(100);
   Serial.write("Init and Paint LEDS for startup \n");
   delay (2);
   for(int i=0;i<strip.GetPixelCount(); i++)
   strip.SetPixelColor(i, 0,0,0);
   strip.Paint();
   delay(2000);
-  for(int i=0;i<strip.GetPixelCount(); i++)
+  for(int i=0;i<=strip.GetPixelCount(); i++)
   strip.SetPixelColor(i,255,255,255);
   strip.Paint();
   delay(2000);
-  for(int i=0;i<strip.GetPixelCount(); i++)
+  for(int i=0;i<=strip.GetPixelCount(); i++)
   strip.SetPixelColor(i, 0,0,0);
+  strip.Paint();  
+  delay(2000);
+  for(int i=0;i<=strip.GetPixelCount(); i++)
+  strip.SetPixelColor(i, 255,0,0);
   strip.Paint();
+  delay(2000);
+    for(int i=0;i<=strip.GetPixelCount(); i++)
+  strip.SetPixelColor(i, 0,255,0);
+  strip.Paint();
+  delay(2000);
+ for(int i=0;i<=strip.GetPixelCount(); i++)
+  strip.SetPixelColor(i, 0,0,255);
+  strip.Paint();
+  delay(2000);
+  for(int i=0;i<=strip.GetPixelCount(); i++)
+  strip.SetPixelColor(i, 0,0,0);
+  strip.Paint();  
   delay(2000);
 }
 
@@ -145,11 +160,19 @@ void setup() {
 void loop(void){
   if (radio.Listen() )
   {
-	  for(int i=0;i<strip.GetPixelCount(); i++)
-	  {
-		strip.SetPixelColor(i, data[i], data[i+1], data[i+2]);
+          noInterrupts();
+	  for(int i=1;i<strip.GetPixelCount(); i++)
+	  {  
+              // critical, time-sensitive code here
+               // other code here
+                 int offset = i*3;
+		 strip.SetPixelColor(i, data[(offset)], data[(offset)+1], data[offset+2]);
+               //  strip.Paint();
 	  }
+          
+          interrupts();
 	  strip.Paint();
+         // delay(1);
   }
 }
 

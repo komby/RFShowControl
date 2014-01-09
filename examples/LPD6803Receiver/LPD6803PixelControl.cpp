@@ -21,10 +21,10 @@ LPD6803PixelControl::LPD6803PixelControl(uint8_t pClock, uint8_t pData) : LPD680
 void LPD6803PixelControl::Paint()
 {
 	this->show();
-	delay(2);  //Hold for 2 milliseconds to latch color. This may be 1MS longer than needed?? 
+	//delay(2);  //Hold for 2 milliseconds to latch color. This may be 1MS longer than needed?? 
 }
 
 void LPD6803PixelControl::SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b)
 {
-	this->setPixelColor(n, r, g, b);
+	this->setPixelColor(n, b, g, r);
 }
