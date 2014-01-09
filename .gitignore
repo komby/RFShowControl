@@ -1,3 +1,5 @@
 *.cppproj
 Visual Micro
 Debug
+cscope.out
+tags
