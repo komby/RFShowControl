@@ -2,7 +2,7 @@
 * FastSPI_LED2Receiver  RFPixel Control Receiver Sketch for handling the FAST_SPI2 Release candidate.
 *
 *  Created on: Mar  2013
-*  Updated 7/6/2013
+*  Updated 3/18/2014 - Added FastLED v2 release
 *      Author: Greg Scull, komby@komby.com
 *
 *      Users of this software agree to hold harmless the creators and contributors
@@ -15,7 +15,7 @@
 #include <EEPROM.h>
 #include <RFPixelControl.h>
 #include <IPixelControl.h>
-#include "FastSPI_LED2.h"
+#include "FastLED.h"
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
@@ -29,9 +29,9 @@
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
-//Valid Values: RFCOLOR2_4, MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF
+//Valid Values: RFCOLOR2_4, MINIMALIST_SHIELD, RF1, WM_2999_NRF
 //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE  RF1_1_3
+#define NRF_TYPE  RF1  
 
 //What Kind of pixels? Valid Values: LPD_8806,WS_2801,SM_16716,TM_1809, TM_1803, UCS_1903, WS_2811
 #define PIXEL_PROTOCOL		WS_2811

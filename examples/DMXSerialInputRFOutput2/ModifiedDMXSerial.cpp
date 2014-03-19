@@ -72,6 +72,7 @@
 // 100000 bit/sec is good: gives 100 usec break and 16 usec MAB
 // 1990 spec says transmitter must send >= 92 usec break and >= 12 usec MAB
 // receiver must accept 88 us break and 8 us MAB
+//#define BREAKSPEED   100000
 #define BREAKSPEED     100000
 #define DMXSPEED       250000
 #define BREAKFORMAT    SERIAL_8E1

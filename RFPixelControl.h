@@ -29,6 +29,8 @@
 //NRF PINOUTS
 #define RF1_1_2				1
 #define RF1_1_3				2
+#define RF1  				2
+#define RF1_12V  			2
 #define MINIMALIST_SHIELD	3
 #define RF1_0_2				4
 #define RF1_12V_0_1			5
@@ -36,6 +38,7 @@
 #define KOMBYONE_DUE        7
 #define RFCOLOR2_4			8
 #define KOMBEE				9
+
 //PIXEL TYPES
 #define GECE				1
 #define WS_2801				2

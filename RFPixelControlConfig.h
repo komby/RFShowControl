@@ -6,6 +6,7 @@
 #define 	__CE  9
 #define		__CSN 8
 #elif (NRF_TYPE == RF1_1_2) || \
+	(NRF_TYPE == RF1) || \
 	(NRF_TYPE == RF1_1_3) || \
 	(NRF_TYPE == RF1_0_2) || \
 	(NRF_TYPE == RF1_12V_0_1) ||\

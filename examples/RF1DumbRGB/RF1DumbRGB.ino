@@ -26,9 +26,9 @@
 #define RECEIVER_UNIQUE_ID 33
 
  //What board are you using to connect your nRF24L01+?
- //Valid Values:  MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF, RFCOLOR2_4
+ //Valid Values:  MINIMALIST_SHIELD, RF1,KOMBEE, 
  //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
- #define NRF_TYPE  RF1_1_3
+ #define NRF_TYPE  RF1
 
 // Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a

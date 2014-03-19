@@ -27,9 +27,9 @@
 #define RECEIVER_UNIQUE_ID 33
 
 //What board are you using to connect your nRF24L01+?
-//Valid Values: RFCOLOR2_4, MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBEE, WM_2999_NRF
+//Valid Values: RFCOLOR2_4, MINIMALIST_SHIELD, KOMBEE, WM_2999_NRF
 //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE  RF1_1_3
+#define NRF_TYPE  RF1
 
 //What Speed is your transmitter using?
 //Valid Values   RF24_250KBPS, RF24_1MBPS
