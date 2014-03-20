@@ -18,21 +18,21 @@
 /**************CONFIGURATION SECTION ***************************/
 
 //Uncomment for serial output of all data
-#define FULL_PRINT_DEBUG 0
+//#define FULL_PRINT_DEBUG 1
 
 //NRF24L01+ Items
 //What board are you using to connect your nRF24L01+?
 //Valid Values:  RF1, MINIMALIST_SHIELD, RFCOLOR2_4, KOMBEE
 //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE			RF1
+#define NRF_TYPE			MINIMALIST_SHIELD
 
 //What Speed do you want to use to transmit?
 //Valid Values:   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//What RF Channel do you want to listen on?  
+//What RF Channel do you want to listen on?
 //Valid Values: 1-124
-#define LISTEN_CHANNEL 100	
+#define LISTEN_CHANNEL 100
 
 /**************END CONFIGURATION SECTION ***************************/
 #define RECEIVER_NODE 1
@@ -59,7 +59,7 @@ void setup() {
 		//not used hardcoded for compatibility purposes
 		radio.AddLogicalController(0, 1, 10,  0);
 	}
-	Serial.begin(57600);
+	Serial.begin(115200);
 	Serial.write("Initializing DEBUG listener\n");
 
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
@@ -79,14 +79,17 @@ void loop(void){
 		radio.read( &data, 32 );
 		
 		packetOffset =  data[30];
-		printf("\n\r--%3d:",  data[30] );
+		printf("--%3d - %3d:*****************************\r\n",  data[30] * 30,  (data[30] * 30) + 30 );
+		printf("\n\r--%3d:",  data[30] * 30 );
 		for ( int i =0;i<30 && FULL_PRINT_DEBUG;i++)
 		{
-			printf(" 0x%02X", data[i]);
+			
 			if ( (i-7) % 8 == 0 )
 			{
-				printf("\n\r--%3d:", i  + packetOffset);
+				printf("\t\t\n\r--%3d:", i  + (packetOffset * 30));
 			}
+			printf(" 0x%02X", data[i]);
+			
 		}
 		
 	}
