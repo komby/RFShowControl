@@ -3,3 +3,6 @@ Visual Micro
 Debug
 cscope.out
 tags
+examples/*/Arduino-Makefile/
+examples/*/Makefile
+examples/*/build-cli/
