@@ -1,14 +1,13 @@
 /*
- * FastSPI_LED2Receiver  RFPixel Control Receiver Sketch for handling the FAST_SPI2 Release candidate.
+ * DMXSerial RFPixel Control Receiver Sketch for handling the RF to DMX
  *
  *		Input: nRF
- *		Output: Multiple Pixel Types (configurable below)
+ *		Output: DMX
  *
- * Created on: Mar 2013
- * Updated 3/18/2014 - Added FastLED v2 release
+ * Created on: August 2013
  * Author: Greg Scull, komby@komby.com
  *
- * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ * Updated: May 20, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
  * License:
  *		Users of this software agree to hold harmless the creators and
@@ -23,13 +22,12 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <FastSPI_LED2.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
 
 #include "IPixelControl.h"
-#include "printf.h"
+#include "ModifiedDMXSerial.h"
 #include "RFPixelControl.h"
 
 
@@ -193,18 +191,19 @@
 //		http://learn.komby.com/Configuration:Hardcoded_Start_Channel
 #define HARDCODED_START_CHANNEL		1
 
-// HARDCODED_NUM_PIXELS Description:
-//		This is the number of pixels this device will be reading the data from the
-//		stream and controlling.  This is NOT the number of channels you need.  The
-//		actual number of channels is this value times 3, one each for Red, Green,
-//		and blue.
+// HARDCODED_NUM_DMX_CHANNELS Description:
+//		This is the number of DMX channels you're listening for from the nRF data
+//		and outputting on this controller.  If your controller isn't utilizing a
+//		full universe worth of data, it's still safe to output 512 channels, the
+//		controller you have attached will simply ignore the channels after the
+//		ones it supports.
 //
 // Valid Values:
-//		1-340
+//		1-512
 //
 // More Information:
-//		http://learn.komby.com/Configuration:Hardcoded_Num_Pixels
-#define HARDCODED_NUM_PIXELS		20
+//		http://learn.komby.com/Configuration:Hardcoded_Num_Dmx_Channels
+#define HARDCODED_NUM_DMX_CHANNELS	512
 /*********************** END OF CONFIGURATION SECTION ************************/
 
 
@@ -234,96 +233,43 @@
 /********************* END OF OTA CONFIGURATION SECTION **********************/
 
 
-
-/******************** START OF ADVANCED SETTINGS SECTION *********************/
-//#define DEBUG						1
-#define PIXEL_TYPE					FAST_SPI
-
-//How Bright should our LEDs start at
-#define LED_BRIGHTNESS				128 //50%
-/********************* END OF ADVANCED SETTINGS SECTION **********************/
-
-
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
-CRGB *leds;
 
-//Arduino setup function.
+uint8_t *channels;
+
 void setup(void)
 {
-#ifdef DEBUG
-	Serial.begin(57600);
-	printf_begin();
-#endif
+	//NOTE You CANNOT use any Serial.Write with this sketch
 
-	LEDS.setBrightness(LED_BRIGHTNESS);
-	// sanity check delay - allows reprogramming if accidently blowing power w/leds
-	delay(2000);
+	//Set the output pin for the RS485 adapter to transmit
+	pinMode(A0, OUTPUT);
+	digitalWrite(A0, HIGH);
 
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
 	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
-		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, 0);
+		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_DMX_CHANNELS, 0);
 	}
 
-	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE, RECEIVER_UNIQUE_ID);
-
-#ifdef DEBUG
-	radio.printDetails();
-	Serial.print(F("PixelColorOrder: "));
-	printf("%d\n", PIXEL_COLOR_ORDER);
-#endif
-
-	LEDS.setBrightness(LED_BRIGHTNESS);
+	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
 	logicalControllerNumber = 0;
-	leds = (CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-	int countOfPixels = radio.GetNumberOfChannels(0)/3;
+	channels = radio.GetControllerDataBase(logicalControllerNumber);
+	int numChannels = radio.GetNumberOfChannels(logicalControllerNumber);
+	ModifiedDMXSerial.maxChannel(numChannels);
 
-#ifdef DEBUG
-	Serial.print(F("Number of channels configured "));
-	printf("%d\n", countOfPixels);
-#endif
+	ModifiedDMXSerial.init(DMXController, channels);
 
-	#if (PIXEL_PROTOCOL == LPD_8806)
-	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2801)
-	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == SM_16716)
-	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1809)
-	LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1803)
-	LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == UCS_1903)
-	LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2811)
-	LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-
-	#else
-		#error Must define PIXEL_PROTOCOL: (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716)
-	#endif
-
-	//Initalize the data for LEDs
-	//todo eventually this will be a bug
-	memset(leds, 0, countOfPixels * sizeof(struct CRGB));
-	delay (200);
-
-#ifdef DEBUG
-	radio.PrintControllerConfig();
-	Serial.print(F("freeMemory()="));
-	Serial.println(freeMemory());
-#endif
 }
 
 void loop(void)
 {
-	//When Radio.Listen returns true its time to update the LEDs for all controllers, a full update was made
+	//we dont need to do anything here as the library is handling all the data and transmission of info.
 	if (radio.Listen())
 	{
-		LEDS.show();
 	}
 }

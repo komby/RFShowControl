@@ -3,41 +3,42 @@
 *
 * Generates a continuous sequence of RF data as a transmitter for debugging purposes.
 *
-*  Created on: Mar 25, 2013
-*  Author: Greg Scull
+* Created on: Mar 25, 2013
+* Author: Greg Scull
 */
 
-#include <RFPixelControl.h>
-#include <SPI.h>
+#include <EEPROM.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+#include <SPI.h>
+
+#include "RFPixelControl.h"
 #include "printf.h"
-#include <EEPROM.h>
-/***************************  CONFIGURATION SECTION BEGIN *************************************************/
+/*************************** CONFIGURATION SECTION BEGIN *************************************************/
 
 //How many pixels do you want to transmit data for (NOTE: Pixels, not channels)
 #define NUM_PIXELS 170
 
 //Delay between RF transmissions (in microseconds)
-#define RF_DELAY      2000
+#define RF_DELAY					2000
 
 //What Speed do you want to use to transmit?
-//Valid Values:   RF24_250KBPS, RF24_1MBPS
+//Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
-//What RF Channel do you want to transmit on?  
+//What RF Channel do you want to transmit on?
 //Valid Values: 1-124
 #define TRANSMIT_CHANNEL 100
 
 //What board are you using to connect your nRF24L01+?
 //Valid Values: RF1, MINIMALIST_SHIELD, KOMBEE
 //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE  RF1
+#define NRF_TYPE					RF1
 
 
-/***************************  END CONFIGURATION SECTION *************************************************/
+/*************************** END CONFIGURATION SECTION *************************************************/
 //Include this after all configuration variables are set
-#include <RFPixelControlConfig.h>
+#include "RFPixelControlConfig.h"
 
 //Initialize the RF packet buffer
 byte str[32];
@@ -45,42 +46,42 @@ byte str[32];
 const int numberOfChannels = NUM_PIXELS * 3;
 
 byte buffer[numberOfChannels];
+void rainbow(int num);
+uint32_t Wheel(byte WheelPos);
 
-void setup()
+void setup(void)
 {
 	Serial.begin(57600);
 	Serial.println("\n[TEST RF Transmitter]\n");
 	printf_begin();
 	delay(5);
-	radio.Initialize( 1, pipes, TRANSMIT_CHANNEL , DATA_RATE , 0);
-	
+	radio.Initialize(1, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0);
+
 	delay(5);
 	radio.printDetails();
 	delay(5);
 }
 
 
-void loop ()
+void loop(void)
 {
-	
-	rainbow( NUM_PIXELS);
+	rainbow(NUM_PIXELS);
 }
 
 
 // Show update method handles the transmission of the RF packets.  Its using the RF DMX technique used by Joe Johnson for the RFColor2_4 library
-
-void showUpdate()
+void showUpdate(void)
 {
 	byte status = 0;
 
 	for(int ii=0, kk=0,jj=0;ii< numberOfChannels && kk<32 ;ii++)
 	{
 		str[kk++] = buffer[ii];//set the byte color
-		if (kk == 30 || ii == (numberOfChannels -1) )
+		if (kk == 30 || ii == (numberOfChannels -1))
 		{
 			str[kk] = jj++;
 			kk=0;
-			radio.write_payload( &str[0], 32 );
+			radio.write_payload(&str[0], 32);
 			delayMicroseconds(RF_DELAY);
 			status = radio.get_status();
 
@@ -117,19 +118,19 @@ THE SOFTWARE.
 
 Modified by Greg scull to handle RF transmission.
 */
-void rainbow( int num)
+void rainbow(int num)
 {
 	int i, j;
 
-	for (j=0; j < 256; j++)     // 3 cycles of all 256 colors in the wheel
+	for (j=0; j < 256; j++) // 3 cycles of all 256 colors in the wheel
 	{
 		for (i=0; i < num; i++)
 		{
-			uint32_t c  = Wheel( ((i * 256 / num) + j) % 256);
+			uint32_t c = Wheel(((i * 256 / num) + j) % 256);
 			uint8_t *p = &buffer[i * 3];
-			*p++ = c;         // Blue
-			*p++ = c >>  8; // Green
-			*p++ = c >> 16; // Red
+			*p++ = c;		// Blue
+			*p++ = c >> 8;	// Green
+			*p++ = c >> 16;	// Red
 		}
 		showUpdate();
 	}

@@ -1,11 +1,8 @@
 /*
- * FastSPI_LED2Receiver  RFPixel Control Receiver Sketch for handling the FAST_SPI2 Release candidate.
- *
- *		Input: nRF
- *		Output: Multiple Pixel Types (configurable below)
- *
+ * RF1DumbRGB - RFPixelControl Receiver code for the DumbRGB expansion board.
+ * 
  * Created on: Mar 2013
- * Updated 3/18/2014 - Added FastLED v2 release
+ * Updated 6/2/2013
  * Author: Greg Scull, komby@komby.com
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
@@ -23,7 +20,6 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <FastSPI_LED2.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
@@ -76,61 +72,6 @@
 //		http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 //
 #define NRF_TYPE					RF1
-
-// PIXEL_PROTOCOL Description:
-//		What type of pixels are you trying to control?
-//
-// Valid Values:
-//		LPD_8806
-//		WS_2801
-//		SM_16716
-//		TM_1809
-//		TM_1803
-//		UCS_1903
-//		WS_2811
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Protocol
-#define PIXEL_PROTOCOL				WS_2811
-
-// PIXEL_DATA_PIN Description:
-//		Arduino (or clone) output pin that will go to the data line of
-//		your pixel strand.  The default, and bottom data pin for the
-//		RF1 devices is 2.
-//
-// Valid Values:
-//		Any arduino output pin, typically ~1-16
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Data_Pin
-#define PIXEL_DATA_PIN				2
-
-// PIXEL_CLOCK_PIN Description:
-//		Arduino (or clone) output pin that drives the clock line of
-//		your pixel strand.  The default, and bottom clock pin for the
-//		RF1 devices is 4.
-//
-// Valid Values:
-//		Any arduino output pin, typically ~1-16
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Clock_Pin
-#define PIXEL_CLOCK_PIN				4
-
-// PIXEL_COLOR_ORDER Description:
-//		This is the order your pixel string expects the data to be sent.
-//
-// Valid Values:
-//		RGB
-//		RBG
-//		GRB
-//		GBR
-//		BRG
-//		BGR
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Color_Order
-#define PIXEL_COLOR_ORDER			RGB
 
 // OVER_THE_AIR_CONFIG_ENABLE Description:
 //		If you're using Over-The-Air configuration, set this value to 1 and skip
@@ -192,19 +133,6 @@
 // More Information:
 //		http://learn.komby.com/Configuration:Hardcoded_Start_Channel
 #define HARDCODED_START_CHANNEL		1
-
-// HARDCODED_NUM_PIXELS Description:
-//		This is the number of pixels this device will be reading the data from the
-//		stream and controlling.  This is NOT the number of channels you need.  The
-//		actual number of channels is this value times 3, one each for Red, Green,
-//		and blue.
-//
-// Valid Values:
-//		1-340
-//
-// More Information:
-//		http://learn.komby.com/Configuration:Hardcoded_Num_Pixels
-#define HARDCODED_NUM_PIXELS		20
 /*********************** END OF CONFIGURATION SECTION ************************/
 
 
@@ -237,19 +165,23 @@
 
 /******************** START OF ADVANCED SETTINGS SECTION *********************/
 //#define DEBUG						1
-#define PIXEL_TYPE					FAST_SPI
 
-//How Bright should our LEDs start at
-#define LED_BRIGHTNESS				128 //50%
+#define NUM_CHANNELS 3
+#define START_CHANNEL 1 //Where in the universe do we start
+
+//Setup for RF1_12V DumbRGB Controller
+#define REDPIN 3
+#define GREENPIN 5
+#define BLUEPIN 9
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
-CRGB *leds;
+byte *buffer;
+void dumbRGBShow(int r, int g, int b, int d);
 
-//Arduino setup function.
 void setup(void)
 {
 #ifdef DEBUG
@@ -257,73 +189,50 @@ void setup(void)
 	printf_begin();
 #endif
 
-	LEDS.setBrightness(LED_BRIGHTNESS);
-	// sanity check delay - allows reprogramming if accidently blowing power w/leds
-	delay(2000);
+	pinMode(REDPIN, OUTPUT);
+	pinMode(GREENPIN, OUTPUT);
+	pinMode(BLUEPIN, OUTPUT);
+
+	buffer[0]=255;
 
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-
 	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
-		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, 0);
+		 radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, NUM_CHANNELS, 0);
 	}
+	
+ 	delay(2);
 
-	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE, RECEIVER_UNIQUE_ID);
-
+	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 #ifdef DEBUG
-	radio.printDetails();
-	Serial.print(F("PixelColorOrder: "));
-	printf("%d\n", PIXEL_COLOR_ORDER);
+	radio.printDetails(); 
 #endif
 
-	LEDS.setBrightness(LED_BRIGHTNESS);
+	buffer= radio.GetControllerDataBase(0);
+	delay(200);
 
-	logicalControllerNumber = 0;
-	leds = (CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-	int countOfPixels = radio.GetNumberOfChannels(0)/3;
-
-#ifdef DEBUG
-	Serial.print(F("Number of channels configured "));
-	printf("%d\n", countOfPixels);
-#endif
-
-	#if (PIXEL_PROTOCOL == LPD_8806)
-	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2801)
-	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == SM_16716)
-	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1809)
-	LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1803)
-	LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == UCS_1903)
-	LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2811)
-	LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-
-	#else
-		#error Must define PIXEL_PROTOCOL: (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716)
-	#endif
-
-	//Initalize the data for LEDs
-	//todo eventually this will be a bug
-	memset(leds, 0, countOfPixels * sizeof(struct CRGB));
-	delay (200);
-
-#ifdef DEBUG
-	radio.PrintControllerConfig();
-	Serial.print(F("freeMemory()="));
-	Serial.println(freeMemory());
-#endif
+	dumbRGBShow(255, 0, 0, 25);
+	delay(200);
+	dumbRGBShow(0, 255, 0, 25);
+	delay(200);
+	dumbRGBShow(0, 0, 255, 25);
+	delay(200);
+	dumbRGBShow(0, 0, 0, 25);
 }
 
 void loop(void)
 {
-	//When Radio.Listen returns true its time to update the LEDs for all controllers, a full update was made
 	if (radio.Listen())
 	{
-		LEDS.show();
+		dumbRGBShow(buffer[0], buffer[1], buffer[2], 1);
 	}
+}
+ 
+void dumbRGBShow(int r, int g, int b, int d)
+{
+	analogWrite(REDPIN, r);
+	analogWrite(GREENPIN, g);
+	analogWrite(BLUEPIN, b);
+	delay(d);
 }

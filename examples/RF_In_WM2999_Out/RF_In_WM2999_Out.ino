@@ -1,14 +1,32 @@
 /*
- * FastSPI_LED2Receiver  RFPixel Control Receiver Sketch for handling the FAST_SPI2 Release candidate.
+ * This sketch is intended to take data from the RF network using a
+ * Komby transmitter and control WM2999 pixels.
  *
  *		Input: nRF
- *		Output: Multiple Pixel Types (configurable below)
+ *		Output: WM2999
  *
- * Created on: Mar 2013
- * Updated 3/18/2014 - Added FastLED v2 release
+ * Created: Mar 2013
  * Author: Greg Scull, komby@komby.com
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ *
+ * This code is a derivative of the original work done by
+ * Joe Johnson RFColor_24 Receiver Program
+ *
+ * The Code which Joe wrote inspired this software, the related hardware and
+ * it was also used as a starting point for this class.
+ *
+ * As with the RFColor_24 The commercial Use of this software is Prohibited.
+ * Use this software and (especially) the hardware at your own risk.
+ *
+ * !!!! WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING !!!!
+ *		The WM2999 controller is a HIGH VOLTAGE DEVICE
+ *
+ * DO NOT, I REPEAT... DO NOT TOUCH, LICK, or otherwise MOLEST THE WM2999
+ * Controller OR the Original Holiday time color changing lights controller
+ * while it is plugged in a power outlet.  Without proper isolation hardware
+ * you MUST not connect the controller to your computer while it is plugged in.
+ *
  *
  * License:
  *		Users of this software agree to hold harmless the creators and
@@ -23,14 +41,15 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <FastSPI_LED2.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
+#include <WM2999.h>
 
 #include "IPixelControl.h"
 #include "printf.h"
 #include "RFPixelControl.h"
+#include "WM2999PixelControl.h"
 
 
 
@@ -75,62 +94,7 @@
 // More Information:
 //		http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 //
-#define NRF_TYPE					RF1
-
-// PIXEL_PROTOCOL Description:
-//		What type of pixels are you trying to control?
-//
-// Valid Values:
-//		LPD_8806
-//		WS_2801
-//		SM_16716
-//		TM_1809
-//		TM_1803
-//		UCS_1903
-//		WS_2811
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Protocol
-#define PIXEL_PROTOCOL				WS_2811
-
-// PIXEL_DATA_PIN Description:
-//		Arduino (or clone) output pin that will go to the data line of
-//		your pixel strand.  The default, and bottom data pin for the
-//		RF1 devices is 2.
-//
-// Valid Values:
-//		Any arduino output pin, typically ~1-16
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Data_Pin
-#define PIXEL_DATA_PIN				2
-
-// PIXEL_CLOCK_PIN Description:
-//		Arduino (or clone) output pin that drives the clock line of
-//		your pixel strand.  The default, and bottom clock pin for the
-//		RF1 devices is 4.
-//
-// Valid Values:
-//		Any arduino output pin, typically ~1-16
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Clock_Pin
-#define PIXEL_CLOCK_PIN				4
-
-// PIXEL_COLOR_ORDER Description:
-//		This is the order your pixel string expects the data to be sent.
-//
-// Valid Values:
-//		RGB
-//		RBG
-//		GRB
-//		GBR
-//		BRG
-//		BGR
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Pixel_Color_Order
-#define PIXEL_COLOR_ORDER			RGB
+#define NRF_TYPE					WM_2999_NRF
 
 // OVER_THE_AIR_CONFIG_ENABLE Description:
 //		If you're using Over-The-Air configuration, set this value to 1 and skip
@@ -147,7 +111,7 @@
 //		1 - use OTA
 //
 // More Information:
-//		http://learn.komby.com/Configuration:OTA
+//		http://learn.komby.com/wiki/Configuration:OTA
 //
 #define OVER_THE_AIR_CONFIG_ENABLE	0
 /********************** END OF REQUIRED CONFIGURATION ************************/
@@ -161,7 +125,7 @@
 //		"OTA Configuration" of the user-customizable options.
 //
 // For more information on Non-OTA vs. OTA visit:
-//		http://learn.komby.com/NON-OTA_vs_OTA
+//		http://learn.komby.com/wiki/NON-OTA_vs_OTA
 
 // LISTEN_CHANNEL Description:
 //		RF Channel do you want to listen on? This needs to match the channel you've
@@ -176,7 +140,7 @@
 //		1-124
 //
 // More Information:
-//		http://learn.komby.com/Configuration:Listen_Channel
+//		http://learn.komby.com/wiki/Configuration:Listen_Channel
 //
 #define LISTEN_CHANNEL				100
 
@@ -190,7 +154,7 @@
 //		1-1020
 //
 // More Information:
-//		http://learn.komby.com/Configuration:Hardcoded_Start_Channel
+//		http://learn.komby.com/wiki/Configuration:Hardcoded_Start_Channel
 #define HARDCODED_START_CHANNEL		1
 
 // HARDCODED_NUM_PIXELS Description:
@@ -203,7 +167,7 @@
 //		1-340
 //
 // More Information:
-//		http://learn.komby.com/Configuration:Hardcoded_Num_Pixels
+//		http://learn.komby.com/wiki/Configuration:Hardcoded_Num_Pixels
 #define HARDCODED_NUM_PIXELS		20
 /*********************** END OF CONFIGURATION SECTION ************************/
 
@@ -216,7 +180,7 @@
 //		section, you are done configuring options.
 //
 // For more information on Non-OTA vs. OTA visit:
-//		http://learn.komby.com/NON-OTA_vs_OTA
+//		http://learn.komby.com/wiki/NON-OTA_vs_OTA
 
 // RECEIVER_UNIQUE_ID Description:
 //		This id should be unique for each receiver in your setup.  This value
@@ -229,7 +193,7 @@
 //		1-255
 //
 // More Information:
-//		http://learn.komby.com/Configuration:Receiver_Unique_Id
+//		http://learn.komby.com/wiki/Configuration:Receiver_Unique_Id
 #define RECEIVER_UNIQUE_ID			33
 /********************* END OF OTA CONFIGURATION SECTION **********************/
 
@@ -237,93 +201,100 @@
 
 /******************** START OF ADVANCED SETTINGS SECTION *********************/
 //#define DEBUG						1
-#define PIXEL_TYPE					FAST_SPI
+#define PIXEL_TYPE					WM_2999
+#define PIXEL_DATA_PIN				A0
 
-//How Bright should our LEDs start at
-#define LED_BRIGHTNESS				128 //50%
+#define HEARTBEAT_PIN				A2
+#define RF_LINK_PIN					A1
+
+// Force an update if no data received every TIMEOUT_FORCE_REFRESH ms
+#define TIMEOUT_FORCE_REFRESH		200
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
-CRGB *leds;
+int beat = 0;
+unsigned long time = millis();
 
 //Arduino setup function.
 void setup(void)
 {
 #ifdef DEBUG
 	Serial.begin(57600);
+	delay(2);
+	Serial.write("Initializing receiver\n");
 	printf_begin();
+	Serial.write(PIXEL_DATA_PIN);	//The WM2999 Light string data line is connected to this pin.
 #endif
 
-	LEDS.setBrightness(LED_BRIGHTNESS);
-	// sanity check delay - allows reprogramming if accidently blowing power w/leds
-	delay(2000);
+	pinMode(PIXEL_DATA_PIN, OUTPUT);
+	digitalWrite(PIXEL_DATA_PIN,LOW);
 
+	delay(200);
+
+	pinMode(HEARTBEAT_PIN, OUTPUT);
+	pinMode(RF_LINK_PIN, OUTPUT);
+
+#ifdef DEBUG
+	Serial.write("Initializing Radio\n");
+#endif
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
 	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
-		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, 0);
+		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, RECEIVER_UNIQUE_ID);
 	}
-
-	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE, RECEIVER_UNIQUE_ID);
+	int link = radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
+	digitalWrite(RF_LINK_PIN, link);
 
 #ifdef DEBUG
 	radio.printDetails();
-	Serial.print(F("PixelColorOrder: "));
-	printf("%d\n", PIXEL_COLOR_ORDER);
+	Serial.write("Init and Paint LEDS for startup \n");
+	printf("%d num pix\n", radio.GetNumberOfChannels(logicalControllerNumber));
 #endif
 
-	LEDS.setBrightness(LED_BRIGHTNESS);
-
+	//Both OTA and NON ota will need to set their data base pointers.
 	logicalControllerNumber = 0;
-	leds = (CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-	int countOfPixels = radio.GetNumberOfChannels(0)/3;
+	strip.WM2999PixelControl::Begin((uint8_t*)radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber)/3);
 
-#ifdef DEBUG
-	Serial.print(F("Number of channels configured "));
-	printf("%d\n", countOfPixels);
-#endif
+	for (int i = 0; i<20; i++)
+	{
+		strip.SetPixelColor(i, strip.Color(0, 255, 0));
+	}
+	strip.Paint();
+	delay(200);
+	strip.Paint();
+	delay(200);
+	strip.Paint();
+	delay(200);
+	strip.Paint();
+	delay(200);
 
-	#if (PIXEL_PROTOCOL == LPD_8806)
-	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2801)
-	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == SM_16716)
-	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1809)
-	LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1803)
-	LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == UCS_1903)
-	LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2811)
-	LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-
-	#else
-		#error Must define PIXEL_PROTOCOL: (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716)
-	#endif
-
-	//Initalize the data for LEDs
-	//todo eventually this will be a bug
-	memset(leds, 0, countOfPixels * sizeof(struct CRGB));
-	delay (200);
-
-#ifdef DEBUG
-	radio.PrintControllerConfig();
-	Serial.print(F("freeMemory()="));
-	Serial.println(freeMemory());
-#endif
+	for (int i = 0; i<20; i++)
+	{
+		strip.SetPixelColor(i, strip.Color(0, 0, 0));
+	}
+	strip.Paint();
+	time = millis();
 }
 
+//RF Listening Loop
 void loop(void)
 {
-	//When Radio.Listen returns true its time to update the LEDs for all controllers, a full update was made
+	//When Radio.Listen returns true its time to update
 	if (radio.Listen())
 	{
-		LEDS.show();
+		strip.Paint();
+		time = millis();
+		beat = !beat;
+		digitalWrite(HEARTBEAT_PIN, beat);
+	}
+	else if (millis()-time >= TIMEOUT_FORCE_REFRESH)
+	{
+		strip.Paint();
+		time = millis();
 	}
 }

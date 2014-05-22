@@ -1,89 +1,113 @@
-/* Web_Demo.pde -- sample code for Webduino server library */
-
 /*
- * To use this demo,  enter one of the following USLs into your browser.
- * Replace "host" with the IP address assigned to the Arduino.
+ * Web-based OTA Configuration
  *
- * http://host/
- * http://host/json
+ *		Input: Web Interface (http)
+ *		Output: OTA Configuration Packets
  *
- * This URL brings up a display of the values READ on digital pins 0-9
- * and analog pins 0-5.  This is done with a call to defaultCmd.
+ * Author: Greg Scull/Mat Mrosko
  *
+ * Updated: May 21, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
- * http://host/form
+ * License:
+ *		Users of this software agree to hold harmless the creators and
+ *		contributors of this software.  By using this software you agree that
+ *		you are doing so at your own risk, you could kill yourself or someone
+ *		else by using this software and/or modifying the factory controller.
+ *		By using this software you are assuming all legal responsibility for
+ *		the use of the software and any hardware it is used on.
  *
- * This URL also brings up a display of the values READ on digital pins 0-9
- * and analog pins 0-5.  But it's done as a form,  by the "formCmd" function,
- * and the digital pins are shown as radio buttons you can change.
- * When you click the "Submit" button,  it does a POST that sets the
- * digital pins,  re-reads them,  and re-displays the form.
- *
+ *		The Commercial Use of this Software is Prohibited.
  */
-#define  DEBUG
 
+#include <Arduino.h>
+#include <EEPROM.h>
+#include <Ethernet.h>
 #include <nRF24L01.h>
 #include <RF24.h>
-#include <RF24Wrapper.h>
-#include "printf.h"
-#include <OTAConfig.h>
-#include <Arduino.h>
-#include <util.h>
 #include <SPI.h>
-#include <Ethernet.h>
-#include "WebServer.h"
+#include <util.h>
+
+#include "OTAConfig.h"
 #include "packets.h"
-#include <EEPROM.h>
+#include "printf.h"
+#include "RF24Wrapper.h"
+#include "WebServer.h"
 
 
+
+/********************* START OF REQUIRED CONFIGURATION ***********************/
+// This configuration section is required whether you're using OTA or not.
 //
-// below is the configuration info most likely to change
+// If you're using OTA, these values need to be what you configured your
+// OTA configuration node to send packets on.
 //
-#define PACKET_SEND_DELAY 1000   // delay between packets.  Increase if using debug prints on receiver.
-#define PREFIX ""
-
-
-//What Speed do you want to use to transmit?
-//Valid Values:  Configuration defaults to using 250kbps only.
-#define DATA_RATE RF24_250KBPS
-
-//Use channel 125 as we are using this for Configuration.
-#define TRANSMIT_CHANNEL 125
-
-//What board are you using to connect your nRF24L01+?
-//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
-//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE MINIMALIST_SHIELD
-
-// Ethernet controller MAC address...
-// must be unique...can generate with:
-// http://www.miniwebtool.com/mac-address-generator/
+// If you're not using OTA, these values are for the actual data coming over
+// your wireless komby network.
 //
-//TODO Refactor into NRF_TYPE Call
-RF24Wrapper radio(9, 8);
+
+// DATA_RATE Description:
+//		If you're using OTA, this most likely needs to be set to RF24_250KBPS.  That
+//		is the speed your OTA configuration packets are transmitted at if you didn't
+//		customize the OTA configuration sketch.  The OTA packets you send from the
+//		configuration web page set the data rate for the RF data your RF transmitter
+//		is configured for.
+//
+//		If you're not using OTA, set this to whatever your RF transmitter sketch was
+//		set to when configuring that sketch.
+//
+// Valid Values:
+//		RF24_250KBPS
+//		RF24_1MBPS
+//
+// More Information:
+//		http://learn.komby.com/wiki/Configuration:Data_Rate
+//
+#define DATA_RATE					RF24_250KBPS
+
+// NRF_TYPE Description:
+//		What board are you using to connect your nRF24L01+?
+//
+// Valid Values:
+//		RF1 - Most RF1 Devices including RF1_12V devices
+//		MINIMALIST_SHIELD - Minimalist shield designed to go atop a standard arduino
+//		WM_2999_NRF - WM299 specific board
+//		RFCOLOR_2_4 - RFColor24 device to control GECEs
+//
+// More Information:
+//		http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+//
+#define NRF_TYPE					MINIMALIST_SHIELD
+
+
 
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
 // CHANGE THIS TO MATCH YOUR HOST NETWORK
 static uint8_t ip[] = { 192, 168, 1, 99 };
 // set up the radio.   change pins for particular board
 
+
+
+/********************** END OF REQUIRED CONFIGURATION ************************/
+
+/******************** START OF ADVANCED SETTINGS SECTION *********************/
+//#define DEBUG						1
+#define PIXEL_TYPE					NONE
+
+#define PACKET_SEND_DELAY			1000   // delay between packets.  Increase if using debug prints on receiver.
+#define PREFIX						""
+
+#define RF_WRAPPER					1
+/********************* END OF ADVANCED SETTINGS SECTION **********************/
+
+//Include this after all configuration variables are set
+#include "RFPixelControlConfig.h"
+
+
 WebServer webserver(PREFIX, 80);
 //radio packet buffers - one for controller;
 #define MAX_LOGICAL_CONTROLLERS 5
 
-//additional constants
-//
-//
-
-//RF info
-
-#define RF_DELAY 2000
-#define RF_NODE_CONFIGURATION_CHANNEL 125
-
-const uint64_t pipes[2] = {
-	0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
-};
-// static HTML info (global) below
+void doRFSend(WebServer &server);
 
 // no-cost stream operator as described at
 // http://sundial.org/arduino/?page_id=119
@@ -123,93 +147,12 @@ P(redirect) = "<h1>Success!</h1><form action=\"/logical\" method=\"post\">"
               "<div class = class=\"container\" id=\"buttons\">"
               "<input type=\"submit\"  name=\"doneinit\" value=\"Return\">"
               "<input type=\"submit\"  name=\"doneinit\" value=\"Resend\">"
-            //  "<input type=\"submit\"  name=\"doneinit\" value=\"Raw\">"
               "</div> </form> ";
 P(dcontain) = "<div class=\"container\"> <div class=\"content\">";
 P(contain) = "<p class=\"container\">";
 
 P(writeInit) = "Writing Payload For init packet";
 P(writeLogical) = "Writing Payload For logical packet ";
-
-//P(rawinput)=
- //   "<h1>Raw input</h1>"
-   // "<form id=\"rawinput\" name=\"rawinput\" method=\"post\" action=\"/rawpost\">"
-   // "<table width=\"95%\" border=\"0\" cellpadding=\"2\">"
-   // "<tr><td width=\"19%\">byte     0  - 15	:</td>"
-   // "<td width=\"81%\">"
- //"<input type=\"text\" name=\"0x00\" id=\"D00\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x01\" id=\"D01\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x02\" id=\"D02\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x03\" id=\"D03\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x04\" id=\"D04\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x05\" id=\"D05\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x06\" id=\"D06\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x07\" id=\"D07\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x08\" id=\"D08\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x09\" id=\"D09\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x10\" id=\"D10\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x11\" id=\"D11\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x12\" id=\"D12\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x13\" id=\"D13\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x14\" id=\"D14\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x15\" id=\"D15\"  size=\"2\" />"
-//
- //"</td></tr><tr><td><br />byte 16- 31:</td><td>"
-//
- //"<input type=\"text\" name=\"0x16\" id=\"D16\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x17\" id=\"D17\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x18\" id=\"D18\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x19\" id=\"D19\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x20\" id=\"D20\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x21\" id=\"D21\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x22\" id=\"D22\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x23\" id=\"D23\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x24\" id=\"D24\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x25\" id=\"D25\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x26\" id=\"D26\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x27\" id=\"D27\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x28\" id=\"D28\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x29\" id=\"D29\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x30\" id=\"D30\"  size=\"2\" />"
- //"<input type=\"text\" name=\"0x31\" id=\"D31\"  size=\"2\" />"
-    //"<input type=\"text\" name=\"0x00\" id=\"D00\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x01\" id=\"D01\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x02\" id=\"D02\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x03\" id=\"D03\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x04\" id=\"D04\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x05\" id=\"D05\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x06\" id=\"D06\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x07\" id=\"D07\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x08\" id=\"D08\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x09\" id=\"D09\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x10\" id=\"D10\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x11\" id=\"D11\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x12\" id=\"D12\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x13\" id=\"D13\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x14\" id=\"D14\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x15\" id=\"D15\" maxlength=\"2\" size=\"2\" />"
-//
-    //"</td></tr><tr><td><br />byte 16- 31:</td><td>"
-//
-    //"<input type=\"text\" name=\"0x16\" id=\"D16\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x17\" id=\"D17\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x18\" id=\"D18\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x19\" id=\"D19\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x20\" id=\"D20\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x21\" id=\"D21\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x22\" id=\"D22\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x23\" id=\"D23\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x24\" id=\"D24\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x25\" id=\"D25\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x26\" id=\"D26\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x27\" id=\"D27\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x28\" id=\"D28\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x29\" id=\"D29\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x30\" id=\"D30\" maxlength=\"2\" size=\"2\" />"
-    //"<input type=\"text\" name=\"0x31\" id=\"D31\" maxlength=\"2\" size=\"2\" />"
-
-   // "</td></tr></table><input type=\"submit\" value=\"Send the Raw Packet\"/></form><p>&nbsp;</p><p></p><p>"
-    //"</p>";
 
 uint8_t cfg_pkt[32];
 
@@ -220,23 +163,9 @@ uint8_t lcfg_pkt[MAX_LOGICAL_CONTROLLERS][32];
 int iterations;
 int num_logcont;    //number of logical controllers
 
-
-//void rawInit(WebServer &server, WebServer::ConnectionType type ,char *url_tail, bool tail_complete)
-//{
-    //server.httpSuccess();
-////send out header
-    //server.printP(htmlHead);
-    //server << "<body>";
-    //server.printP(dcontain);
-    //server.printP(rawinput);
-//
-    //server << "</div></div></body></html>";
-//}
 void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tail, bool tail_complete)
 {
-
     int i;
-
 
     P(initHtml) =
         "<body>"
@@ -262,7 +191,6 @@ void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tai
         "<p class=\"container\">"
         //change Intro text below
         "<i>RFPixelControl OTA Programming</i></p>"
-        //
         "<p class=\"container\">&nbsp;</p>"
         "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"/init\">"
         "<p>Controller ID:  <input type=\"text\" name=\"controller\" id=\"controller-id\" maxlength=\"3\"/> </p>"
@@ -292,11 +220,9 @@ void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tai
     server.printP(initHtml);
 
     server << "</body></html>";
-
 }
 
 //initCMD -- called after receiving main parameters.
-
 void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {
 
@@ -329,18 +255,22 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
             repeat = server.readPOSTparam(name, 16, value, 16);
 
 #ifdef DEBUG
-            for (int q = 0; q<16; q++) Serial.print(name[q]);
+            for (int q = 0; q<16; q++)
+			{
+				Serial.print(name[q]);
+			}
             Serial.println();
-            for (int q = 0; q<16; q++) Serial.print(value[q]);
+            for (int q = 0; q<16; q++)
+			{
+				Serial.print(value[q]);
+			}
             Serial.println();
 #endif
 
 
             if (!(strcmp(name, "controller")))   // controller id
             {
-
                 c_hdr->controllerID = htonl(strtoul(value, NULL, 0));
-                //cfg_pkt[IDX_CONTROLLER_ID]  = (uint8_t)strtoul(value, NULL, 0);
             }
             else if (!(strcmp(name, "radio")))   // radio speed
             {
@@ -349,7 +279,6 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                 {
                 case 0:
                     c_hdr->rfListenRate  = RF24_250KBPS;
-                    //cfg_pkt[IDX_RF_LISTEN_RATE] = RF24_250KBPS;
 					break;
                 case 1:
                     c_hdr->rfListenRate  = RF24_1MBPS;
@@ -393,17 +322,14 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                 // extract the array number
                 lcont = (int)(name[5] & 0x0f);
 
-//#ifdef DEBUG
+#ifdef DEBUG
                 Serial.print ("lcont value: ");
                 Serial.println(lcont, DEC);
-//#endif
+#endif
 
                 // set the overlayed structure to point at the logical controller buffer we are placing the element in;
                 struct LogicalInitInfo *l_hdr = (struct LogicalInitInfo*) lcfg_pkt;
                 for (int zz=1; zz < lcont; zz++)l_hdr++;
-
-                // load logical controller number into packet
-                // l_hdr->logicalControllerNumber=(uint8_t)lcont;
 
 
                 //load values into packet
@@ -438,39 +364,26 @@ void initCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, 
                 case 'z':
                     l_hdr->baudRate=htonl((uint32_t)strtoul(value, NULL, 0));
                     break;
-
                 }
-
             }
-
-
-
-
-
         }
         while (repeat);
+
         //all data is in place, so time to send to the radio and update the console
         doRFSend(server);
     }
-    else
-        ;
 }
 
 // got all the parameters at this point -- time to send to RF and update the screen with status info
-
 void sendRFPacket(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
-//web connection link to doRFsend //
+//web connection link to doRFsend
 {
     doRFSend(server);
 }
 //send the configuration (held in global variables) to the radio and update the web page
-//
 
 void doRFSend(WebServer &server)
 {
-
-
-
     //update HTML Page with status
 
     //send out header
@@ -536,7 +449,9 @@ void doRFSend(WebServer &server)
         server << zz;
         server << "<br/>";
 
+#ifdef DEBUG
         Serial.println(zz);
+#endif
         while (radio.get_status() & 0x01) ;  // wait for FIFO spot
         radio.write_payload( fred, 32 );
         fred+=32;
@@ -553,8 +468,6 @@ void doRFSend(WebServer &server)
     server << "</body></html>";
 
 }
-
-
 
 void initsuccess(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
 {
@@ -581,7 +494,6 @@ void initsuccess(WebServer &server, WebServer::ConnectionType type, char *url_ta
     //send out html success message
     server.printP(successHTML);
     server << "</body></html>";
-
 }
 
 void rawCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete)
@@ -590,7 +502,6 @@ void rawCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, b
     boolean repeat;
     int holdme;
 
-
     server.httpSuccess();
     //name will consist of dat followed by two digits.  We'll use the init array only for sending
     //
@@ -598,13 +509,10 @@ void rawCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, b
     memset (cfg_pkt,0,32);
 
     // now indicate zero logical controllers, so a call to sendRF will only send one packet
-
     num_logcont=0;
 
     if (type == WebServer::POST)
     {
-
-
         do
         {
             repeat = server.readPOSTparam(name, 16, value, 16);
@@ -619,19 +527,25 @@ void rawCmd(WebServer &server, WebServer::ConnectionType type, char *url_tail, b
                 cfg_pkt[holdme] = (uint8_t)strtoul(value, NULL, 16);
 
 
-//#ifdef DEBUG
-                for (int q = 0; q<16; q++) Serial.print(name[q]);
+#ifdef DEBUG
+                for (int q = 0; q<16; q++)
+				{
+					Serial.print(name[q]);
+				}
                 Serial.print(" holdme is ");
                 Serial.print(holdme, DEC);
                 Serial.print(" ");
                 Serial.println();
-                for (int q = 0; q<16; q++) Serial.print(value[q]);
+                for (int q = 0; q<16; q++)
+				{
+					Serial.print(value[q]);
+				}
                 Serial.print(" config packet ");
                 Serial.print(holdme, DEC);
                 Serial.print(" is ");
                 Serial.print(cfg_pkt[holdme], HEX);
                 Serial.println();
-//#endif
+#endif
             }
         }
         while (repeat);
@@ -646,7 +560,6 @@ void logicalInit(WebServer &server, WebServer::ConnectionType type, char *url_ta
     char name[16], value[16];
     boolean repeat;
 
-
     do
     {
         repeat = server.readPOSTparam(name, 16, value, 16);
@@ -659,37 +572,37 @@ void logicalInit(WebServer &server, WebServer::ConnectionType type, char *url_ta
         {
             server.httpSeeOther("/");
         }
-   
     }
     while (repeat);
-
 }
-
-
 
 void setup()
 {
-
+#ifdef DEBUG
     Serial.begin(57600);
     printf_begin();
     printf("Startup\n");
+#endif
 
     Ethernet.begin(mac, ip);
     delay(1000);
     webserver.begin();
+#ifdef DEBUG
     printf("Webserver up\n");
+#endif
     
 	radio.Initialize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, DATA_RATE);
-//radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-
     delayMicroseconds(5000);
+
+#ifdef DEBUG
     radio.printDetails();
+#endif
+
     webserver.setDefaultCommand(&configInit);
     webserver.addCommand("init", &initCmd);
     webserver.addCommand("initsuccess", &initsuccess);
     webserver.addCommand("logical", &logicalInit);
     webserver.addCommand("sendrf", &sendRFPacket);
-   
 }
 
 void loop()

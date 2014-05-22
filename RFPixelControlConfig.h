@@ -1,25 +1,41 @@
+/*
+ * Author: Greg Scull/Mat Mrosko
+ *
+ * License:
+ *		Users of this software agree to hold harmless the creators and
+ *		contributors of this software.  By using this software you agree that
+ *		you are doing so at your own risk, you could kill yourself or someone
+ *		else by using this software and/or modifying the factory controller.
+ *		By using this software you are assuming all legal responsibility for
+ *		the use of the software and any hardware it is used on.
+ *
+ *		The Commercial Use of this Software is Prohibited.
+ */
 #ifndef __RF_PIXEL_CONTROL_CONFIG__
 #define __RF_PIXEL_CONTROL_CONFIG__
 
+#include "RFPixelControl.h"
 
 #if (NRF_TYPE == MINIMALIST_SHIELD)
-#define 	__CE  9
-#define		__CSN 8
-#elif (NRF_TYPE == RF1_1_2) || \
+	#define		__CE	9
+	#define		__CSN	8
+#elif \
 	(NRF_TYPE == RF1) || \
-	(NRF_TYPE == RF1_1_3) || \
 	(NRF_TYPE == RF1_0_2) || \
+	(NRF_TYPE == RF1_1_2) || \
+	(NRF_TYPE == RF1_1_3) || \
 	(NRF_TYPE == RF1_12V_0_1) ||\
 	(NRF_TYPE == KOMBEE)
-#define 	__CE  8
-#define		__CSN 7
+		#define		__CE	8
+		#define		__CSN	7
 #elif (NRF_TYPE == WM_2999_NRF) || \
-	(NRF_TYPE == RFCOLOR2_4)
-#define 	__CE  9
-#define		__CSN 10
+	(NRF_TYPE == RFCOLOR_2_4)
+		#define		__CE	9
+		#define		__CSN	10
 #else
-#error Must define an NRF type!
+	#error Must define an NRF type!
 #endif
+
 
 #if (RF_WRAPPER==1)
 RF24Wrapper radio(__CE, __CSN);
@@ -28,36 +44,32 @@ RFPixelControl radio(__CE, __CSN);
 #endif
 
 
-
-
 #if (PIXEL_TYPE == GWTS_EARS)
 #include "GWTSControl.h"
 #include <GwtS.h>
 GWTSControl strip = GWTSControl();
-
 #endif
 
 
 #if (PIXEL_TYPE == GECE)
 #include "GECEPixelControl.h"
 #include <GEColorEffects.h>
-GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_CHANNELS/3);
-
+GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
 #endif
 
 
 #if (PIXEL_TYPE == RENARD)
 #include "RenardControl.h"
 RenardControl strip = RenardControl(RENARD_BAUD_RATE);
-
 #endif
+
 
 #if (PIXEL_TYPE == WM_2999)
 #include <WM2999.h>
 #include "WM2999PixelControl.h"
-WM2999PixelControl strip =  WM2999PixelControl(PIXEL_DATA_PIN);
-
+WM2999PixelControl strip = WM2999PixelControl(PIXEL_DATA_PIN);
 #endif
+
 
 #if (PIXEL_TYPE == LPD_6803)
 #ifndef ADAFRUITILIB6803
@@ -66,7 +78,7 @@ WM2999PixelControl strip =  WM2999PixelControl(PIXEL_DATA_PIN);
 #endif
 #include "LPD6803PixelControl.h"
 #include <TimerOne.h>
-LPD6803PixelControl  strip =  LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
+LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
 #endif
 
 

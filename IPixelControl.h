@@ -1,15 +1,26 @@
 /*
  * IPixelControl.h
  *
- *  Created on: Mar 19, 2013
- *      Author: Greg
+ * Created on: Mar 19, 2013
+ * Author: Greg Scull
+ *
+ * Updated: May 20, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ *
+ * License:
+ *		Users of this software agree to hold harmless the creators and
+ *		contributors of this software.  By using this software you agree that
+ *		you are doing so at your own risk, you could kill yourself or someone
+ *		else by using this software and/or modifying the factory controller.
+ *		By using this software you are assuming all legal responsibility for
+ *		the use of the software and any hardware it is used on.
+ *
+ *		The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef IPIXELCONTROL_H_
-#define IPIXELCONTROL_H_
+#ifndef __IPIXELCONTROL_H__
+#define __IPIXELCONTROL_H__
 
 #include <Arduino.h>
-
 
 // Define RGB orderings
 enum ColorOrder {
@@ -22,27 +33,26 @@ enum ColorOrder {
 };
 
 //base class for pixels
-class IPixelControl {
+class IPixelControl
+{
 public:
-	IPixelControl();
-	
-	
-	virtual ~IPixelControl();
+	IPixelControl(void);
 
+	virtual ~IPixelControl(void);
 
 	/*
-	 *  Begin so we can have some initalization
+	 * Begin so we can have some initalization
 	 *
 	 */
-	void Begin(uint8_t* pDataPointer, int pNumLEDs);
- 
+	void Begin(uint8_t *pDataPointer, int pNumLEDs);
+
 	/*
 	 * Return the protected value of the number
 	 * of pixels this instance is configured for.
 	 *
 	 * @return the pixel count as a uint16_t
 	 */
-	uint16_t GetPixelCount( void );
+	uint16_t GetPixelCount(void);
 
 	/*
 	 * Sets a new value of pixels.  The function
@@ -51,7 +61,7 @@ public:
 	 *
 	 * @param count - Number of pixels in string
 	 */
-	void SetPixelCount( uint16_t count );
+	void SetPixelCount(uint16_t count);
 
 	/*
 	 * Helper function to get the color of one pixel.
@@ -96,12 +106,12 @@ public:
 	 * the color data stored in "pixels" to the LED string attached.
 	 */
 	void virtual Paint(void) = 0;
-	
+
 	/*
-	 * Set the base data pointer as provided by 
+	 * Set the base data pointer as provided by
 	 * RFPixelControl and the OTAConfig
 	 */
-	void SetDataBasePointer( uint8_t* dataPointer);
+	void SetDataBasePointer(uint8_t *dataPointer);
 
 protected:
 	/*
@@ -122,4 +132,4 @@ protected:
 	uint8_t dataPin;
 };
 
-#endif // IPIXELCONTROL_H_
+#endif //__IPIXELCONTROL_H__

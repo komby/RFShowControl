@@ -2,6 +2,7 @@
 #ifndef __EEPROMUtils_h
 #define __EEPROMUtils_h
 
+#include <Arduino.h>
 #include <EEPROM.h>
 //
 // Absolute min and max eeprom addresses.

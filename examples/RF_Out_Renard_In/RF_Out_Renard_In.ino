@@ -32,7 +32,8 @@
 
 /***************************  END CONFIGURATION SECTION *************************************************/
 #define RF_WRAPPER 1
-#include <RFPixelControlConfig.h>
+#include "RFPixelControlConfig.h"
+
 #define RF_NUM_PACKETS 18     // 18 * 30 total Channels can be broadcasted
 #define RECEIVER_UNIQUE_ID 0
 #define PIXEL_TYPE			NONE
@@ -79,6 +80,7 @@ void loop()
  This is the interrupt service handler for the serial data
  */
 /**************************************************************************/
+/*
 ISR(USART_RX_vect)
 {
   unsigned char status = UCSR0A;
@@ -119,3 +121,4 @@ default:
     break;
   }
 }
+*/

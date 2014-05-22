@@ -1,11 +1,10 @@
 /*
- * FastSPI_LED2Receiver  RFPixel Control Receiver Sketch for handling the FAST_SPI2 Release candidate.
+ * LPD6803RFReceiver
  *
  *		Input: nRF
- *		Output: Multiple Pixel Types (configurable below)
+ *		Output: LPD680
  *
  * Created on: Mar 2013
- * Updated 3/18/2014 - Added FastLED v2 release
  * Author: Greg Scull, komby@komby.com
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
@@ -23,12 +22,13 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <FastSPI_LED2.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
+#include <TimerOne.h>
 
 #include "IPixelControl.h"
+#include "LPD6803PixelControl.h"
 #include "printf.h"
 #include "RFPixelControl.h"
 
@@ -237,17 +237,14 @@
 
 /******************** START OF ADVANCED SETTINGS SECTION *********************/
 //#define DEBUG						1
-#define PIXEL_TYPE					FAST_SPI
-
-//How Bright should our LEDs start at
-#define LED_BRIGHTNESS				128 //50%
+#define PIXEL_TYPE					LPD_6803
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
-CRGB *leds;
+uint8_t *data;
 
 //Arduino setup function.
 void setup(void)
@@ -256,74 +253,83 @@ void setup(void)
 	Serial.begin(57600);
 	printf_begin();
 #endif
+	strip.SetPixelCount(HARDCODED_NUM_PIXELS);
 
-	LEDS.setBrightness(LED_BRIGHTNESS);
-	// sanity check delay - allows reprogramming if accidently blowing power w/leds
-	delay(2000);
+#ifdef DEBUG
+	Serial.write("Initializing Radio\n");
+#endif
 
 	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-
 	uint8_t logicalControllerNumber = 0;
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
 		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, 0);
 	}
 
-	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE, RECEIVER_UNIQUE_ID);
-
+	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 #ifdef DEBUG
 	radio.printDetails();
-	Serial.print(F("PixelColorOrder: "));
-	printf("%d\n", PIXEL_COLOR_ORDER);
 #endif
-
-	LEDS.setBrightness(LED_BRIGHTNESS);
 
 	logicalControllerNumber = 0;
-	leds = (CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-	int countOfPixels = radio.GetNumberOfChannels(0)/3;
-
+	data = radio.GetControllerDataBase(logicalControllerNumber);
+	strip.Begin(data, radio.GetNumberOfChannels(logicalControllerNumber));
+	strip.setCPUmax(100);
 #ifdef DEBUG
-	Serial.print(F("Number of channels configured "));
-	printf("%d\n", countOfPixels);
+	Serial.write("Init and Paint LEDS for startup \n");
 #endif
+	delay(2);
 
-	#if (PIXEL_PROTOCOL == LPD_8806)
-	LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2801)
-	LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == SM_16716)
-	LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1809)
-	LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == TM_1803)
-	LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == UCS_1903)
-	LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-	#elif (PIXEL_PROTOCOL == WS_2811)
-	LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 0, 0, 0);
+	strip.Paint();
+	delay(2000);
 
-	#else
-		#error Must define PIXEL_PROTOCOL: (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716)
-	#endif
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 255, 255, 255);
+	strip.Paint();
+	delay(2000);
 
-	//Initalize the data for LEDs
-	//todo eventually this will be a bug
-	memset(leds, 0, countOfPixels * sizeof(struct CRGB));
-	delay (200);
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 0, 0, 0);
+	strip.Paint();
+	delay(2000);
 
-#ifdef DEBUG
-	radio.PrintControllerConfig();
-	Serial.print(F("freeMemory()="));
-	Serial.println(freeMemory());
-#endif
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 255, 0, 0);
+	strip.Paint();
+	delay(2000);
+
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 0, 255, 0);
+	strip.Paint();
+	delay(2000);
+
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 0, 0, 255);
+	strip.Paint();
+	delay(2000);
+
+	for(int i=0; i <= strip.GetPixelCount(); i++)
+		strip.SetPixelColor(i, 0, 0, 0);
+	strip.Paint();
+	delay(2000);
 }
 
 void loop(void)
 {
-	//When Radio.Listen returns true its time to update the LEDs for all controllers, a full update was made
 	if (radio.Listen())
 	{
-		LEDS.show();
+		noInterrupts();
+		for(int i=1;i<strip.GetPixelCount(); i++)
+		{
+			// critical, time-sensitive code here
+			// other code here
+			int offset = i*3;
+			strip.SetPixelColor(i, data[(offset)], data[(offset)+1], data[offset+2]);
+		}
+
+		interrupts();
+		strip.Paint();
 	}
 }

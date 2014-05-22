@@ -1,125 +1,133 @@
 /*
-* RFPixelControl.cpp
-* This class is built to serve as an extension of the RF24 library for use in Pixel controllers
-* This code was created based on the RF ColorNode code by Joe Johnson
-* it has been refactored such that the RF24 core library is not needed
-* to be modified in order to be used.
-*
-*  Created on: Mar, 2013
-*      Author: Greg Scull - komby@komby.com
+ * RFPixelControl.cpp
+ * This class is built to serve as an extension of the RF24 library for use in Pixel controllers
+ * This code was created based on the RF ColorNode code by Joe Johnson
+ * it has been refactored such that the RF24 core library is not needed
+ * to be modified in order to be used.
+ *
+ * Created on: Mar, 2013
+ * Author: Greg Scull - komby@komby.com
+ *
+ * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ *
+ * License:
+ *		Users of this software agree to hold harmless the creators and
+ *		contributors of this software.  By using this software you agree that
+ *		you are doing so at your own risk, you could kill yourself or someone
+ *		else by using this software and/or modifying the factory controller.
+ *		By using this software you are assuming all legal responsibility for
+ *		the use of the software and any hardware it is used on.
+ *
+ *		The Commercial Use of this Software is Prohibited.
 */
 
 #include "RFPixelControl.h"
 
-/**
-* Constructor
-*
-* Creates a new instance of this driver.  Before using, you create an instance
-* and send in the unique pins that this chip is connected to.
-*
-* This constructor calls the related constructor on the RF24 base class.
-*
-* @param _cepin The pin attached to Chip Enable on the RF module
-* @param _cspin The pin attached to Chip Select
-*/
-RFPixelControl::RFPixelControl(uint8_t _cepin, uint8_t _cspin) :  RF24Wrapper(_cepin, _cspin)
+/*
+ * Constructor
+ *
+ * Creates a new instance of this driver.  Before using, you create an instance
+ * and send in the unique pins that this chip is connected to.
+ *
+ * This constructor calls the related constructor on the RF24 base class.
+ *
+ * @param _cepin The pin attached to Chip Enable on the RF module
+ * @param _cspin The pin attached to Chip Select
+ */
+RFPixelControl::RFPixelControl(uint8_t _cepin, uint8_t _cspin) : RF24Wrapper(_cepin, _cspin), _otaConfigEnable(false)
 {
-	this->_numControllers=0;
-	this->_startChannel=0;
-	this->_endChannel=0;
-	
+	this->_numControllers = 0;
+	this->_startChannel = 0;
+	this->_endChannel = 0;
 }
 
-RFPixelControl::~RFPixelControl() {
+RFPixelControl::~RFPixelControl(void)
+{
 	// TODO Auto-generated destructor stub
 }
 
-/**
-*  Initalize Method
-* Setup the radio as a transmitter or Receiver.
-* The values for this are stored in
-* the TRANSMITTER and RECEIVER values.
-* @param role - the role (TRANSMITTER or RECEIVER)
-* @param pPipes - the addressses to listen on
-*
-*/
-bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChannel, rf24_datarate_e pDataRate, int pNodeId )
+/*
+ * Initalize Method
+ * Setup the radio as a transmitter or Receiver.
+ * The values for this are stored in
+ * the TRANSMITTER and RECEIVER values.
+ *
+ * @param role - the role (TRANSMITTER or RECEIVER)
+ * @param pPipes - the addressses to listen on
+ */
+bool RFPixelControl::Initialize(int pRole, const uint64_t *pPipes, int pChannel, rf24_datarate_e pDataRate, int pNodeId)
 {
 	bool r = false;
 	this->_controllerId = pNodeId;
-	this->_channel =pChannel;
+	this->_channel = pChannel;
 	this->dataRateSuccess = false;
 	this->payloadSizeSetSuccessful = false;
-	//this->_channel = pChannel;
-	this->begin();  //initalize RF
-	this->setRetries(0,0);  //set # of retries & delay between retries
-	this->dataRateSuccess=this->setDataRate( pDataRate );  //set RF data rate
-	this->setPayloadSize(32);   //set RF packet size
-	
-	if ( this->getPayloadSize() == 32 )
+	this->begin(); //initalize RF
+	this->setRetries(0,0); //set # of retries & delay between retries
+	this->dataRateSuccess = this->setDataRate(pDataRate); //set RF data rate
+	this->setPayloadSize(32); //set RF packet size
+
+	if (this->getPayloadSize() == 32)
 	{
 		this->payloadSizeSetSuccessful = true;
 	}
-	
-	this->setAutoAck(0);  //Turn off Auto Ack!!!!
-	this->setChannel(pChannel); //Change from the default channel...
-	
-	this->setCRCLength(RF24_CRC_16 );  //Setup CRC
 
-	if ( pRole == TRANSMITTER)
+	this->setAutoAck(0); //Turn off Auto Ack!!!!
+	this->setChannel(pChannel); //Change from the default channel...
+
+	this->setCRCLength(RF24_CRC_16); //Setup CRC
+
+	if (pRole == TRANSMITTER)
 	{
 		this->setChannel(pChannel); //Change from the default channel...
 		channelSetSuccessfully = false;
-		if ( this->GetChannel() == pChannel)
+		if (this->GetChannel() == pChannel)
 		{
 			this->channelSetSuccessfully = true;
 		}
-		this->openWritingPipe(pPipes[0]);  //Open pipe for Writing
-		this->openReadingPipe(1,pPipes[1]);  //Open pipe for Reading...But we aren't reading anything....
-		//this->setPALevel(RF24_PA_HIGH);  //Set the power level to high!
-		this->setPALevel(RF24_PA_MAX);  //Set the power level to high!
-		
-		this->write_register(CONFIG, ( this->read_register(CONFIG) | _BV(PWR_UP) ) & ~_BV(PRIM_RX) );  //set up radio for writing!
-		this->flush_tx();  //Clear the TX FIFO Buffers
-		this->powerUp();  //Fire up the radio
-		this->ce(HIGH);  //Turn on transmitter!
+		this->openWritingPipe(pPipes[0]); //Open pipe for Writing
+		this->openReadingPipe(1,pPipes[1]); //Open pipe for Reading...But we aren't reading anything....
+		this->setPALevel(RF24_PA_MAX); //Set the power level to high!
+
+		this->write_register(CONFIG, (this->read_register(CONFIG) | _BV(PWR_UP)) & ~_BV(PRIM_RX)); //set up radio for writing!
+		this->flush_tx(); //Clear the TX FIFO Buffers
+		this->powerUp(); //Fire up the radio
+		this->ce(HIGH); //Turn on transmitter!
 		return this->channelSetSuccessfully;
 	}
 
-	else	
+	else
 	{
 		this->channelData = (uint8_t*)calloc(1024,sizeof(uint8_t));
 		if (this->_otaConfigEnable)
 		{
 			printf_P(PSTR("OTACONFIG-Begin\n"));
-			//We are setting up a receiver,  Before we can come online we need configuration information
+			//We are setting up a receiver, Before we can come online we need configuration information
 			//Check to see if we have a configuration node online.
 			this->setChannel(RF_NODE_CONFIGURATION_CHANNEL); //Change from the default channel...
-			
+
 			//Setup Receiver to listen for configuration packets on the Configuration Channel
-			this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
-			this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
-			this->startListening();  //Start Listening!
-			
+			this->openWritingPipe(pPipes[1]); //Open pipe for Writing
+			this->openReadingPipe(1,pPipes[0]); //Open pipe for Reading
+			this->startListening(); //Start Listening!
+
 			delay(2);
-			
+
 			printDetails();
 			long elapsed = 0;
 			long maxTimeout = OTA_CONFIG_WINDOW;
-			//&& (millis() - configurationTime )<= RF_CONFIG_STARTUP_WINDOW
 			printf_P(PSTR("attempting OTA Config \n\t#"));
 
-//			for(	unsigned long configurationTime = millis();!this->ConfigureReceiverAtStartup(pNodeId) && elapsed < maxTimeout ;)
 			unsigned long configurationTime = millis();
-			bool configged=false;
-			while (!configged && elapsed < maxTimeout )
+			bool configged = false;
+			while (!configged && elapsed < maxTimeout)
 			{
 				configged = this->ConfigureReceiverAtStartup(pNodeId);
 				elapsed = millis() - configurationTime;
 				if (!(elapsed % 1000))
 				printf("#");
 			}
-			if (this->_controllers ==NULL || this->_numControllers <= 0)
+			if (this->_controllers == NULL || this->_numControllers <= 0)
 			{
 				//We were not successful in getting OTA Configuration,
 				printf_P(PSTR("\nUnable to OTAConfig\n"));
@@ -130,14 +138,14 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 					printf_P(PSTR("EEPROM VERSION IS %d\n"),eepromVersion);
 					if (eepromVersion == EEPROM_VERSION)
 					{
-						if( eeprom_read_bytes(EEPROM_CONTROLLER_CONFIG_IDX, this->packetData, EEPROM_PACKET_SIZE))
+						if(eeprom_read_bytes(EEPROM_CONTROLLER_CONFIG_IDX, this->packetData, EEPROM_PACKET_SIZE))
 						{
 							int logicalControllerCount = processConntrollerConfigPacket(this->packetData);
-							for ( int i=0; i< logicalControllerCount; i++)
+							for (int i = 0; i< logicalControllerCount; i++)
 							{
 								eeprom_read_bytes(EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX+(i*EEPROM_PACKET_SIZE), this->packetData, EEPROM_PACKET_SIZE);
 								processLogicalConfigPacket(packetData);
-								
+
 							}
 						}
 					}
@@ -147,73 +155,71 @@ bool RFPixelControl::Initialize( int  pRole, const uint64_t * pPipes, int pChann
 						return false;
 					}
 				}
-				
+
 			}
-			
-			//OTA Successful,  Save to EEPROM,  Reset Listen channel and rate;
+
+			//OTA Successful, Save to EEPROM, Reset Listen channel and rate;
 			printf_P(PSTR("OTAConfig Success\n"));
 			this->stopListening();
 			this->setChannel(this->_channel);
 			this->setDataRate(this->_rf_data_rate);
 		}
-	
+
 		this->setChannel(this->_channel); //Change from the default channel...
 		channelSetSuccessfully = false;
-		if ( this->GetChannel() == pChannel)
+		if (this->GetChannel() == pChannel)
 		this->channelSetSuccessfully = true;
 		this->SetStartAndEndChannels();
-		
+
 		//setup as a receiver
-		this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
-		this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
-		this->startListening();  //Start Listening!
+		this->openWritingPipe(pPipes[1]); //Open pipe for Writing
+		this->openReadingPipe(1,pPipes[0]); //Open pipe for Reading
+		this->startListening(); //Start Listening!
 		return this->channelSetSuccessfully;
 	}
 
-	
+
 	this->setChannel(this->_channel); //Change from the default channel...
-	//channelSetSuccessfully = false;
-		
+
 	this->_rf_data_rate = pDataRate;
-	this->channelSetSuccessfully = true;	
+	this->channelSetSuccessfully = true;
 	//Setup Receiver to listen for configuration packets on the Configuration Channel
-	this->openWritingPipe(pPipes[1]);  //Open pipe for Writing
-	this->openReadingPipe(1,pPipes[0]);  //Open pipe for Reading
-	this->startListening();  //Start Listening!
+	this->openWritingPipe(pPipes[1]); //Open pipe for Writing
+	this->openReadingPipe(1,pPipes[0]); //Open pipe for Reading
+	this->startListening(); //Start Listening!
 	this->PrintControllerConfig();
-	return r;	
+	return r;
 }
 
 /************************************************************************/
-/* AddLogicalController												  */
+/* AddLogicalController													*/
 /************************************************************************/
 void RFPixelControl::AddLogicalController(uint8_t pLControllerName, uint32_t pLcontrollerStartChannel, uint32_t pLControllerNumChannels, uint32_t pLControllerBaudRate)
 {
 //	printf("alc1%d\n", this->_numControllers);
 	ControllerInfo* t = this->_controllers;
-	this->_controllers= new ControllerInfo[this->_numControllers+1];
+	this->_controllers = new ControllerInfo[this->_numControllers+1];
 	int i=0;
 	for (; i< this->_numControllers; i++)
 	{
 		this->_controllers[i].baudRate = t[i].baudRate;
-		this->_controllers[i].numChannels =  t[i].numChannels;
-		
+		this->_controllers[i].numChannels = t[i].numChannels;
+
 		this->_controllers[i].startChannel = t[i].startChannel;
 		this->_controllers[i].logicalControllerNumber = t[i].logicalControllerNumber;
 		//t[i].customConfig;
 		//t[i].reserved;//
 	}
-	
+
 	this->_numControllers++;
 	this->_controllers[i].logicalControllerNumber = i;
 	this->_controllers[i].startChannel = pLcontrollerStartChannel;
 	this->_controllers[i].numChannels = pLControllerNumChannels;
 	this->_controllers[i].baudRate = pLControllerBaudRate;
-	//   this->PrintControllerConfig()	  ;
-	int num =0;
+	int num = 0;
 	this->_startChannel = this->_controllers[0].startChannel;
-	
-	for ( int i = 0; i < this->_numControllers; i++)
+
+	for (int i = 0; i < this->_numControllers; i++)
 	{
 		num += this->_controllers[i].numChannels;
 	}
@@ -222,12 +228,11 @@ void RFPixelControl::AddLogicalController(uint8_t pLControllerName, uint32_t pLc
 }
 
 /************************************************************************/
-/* Diagnostic print                                                                     */
+/* Diagnostic print														*/
 /************************************************************************/
 void RFPixelControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 {
-	
-	printf_P(PSTR("LNumber:\t%d\n"),pControllerInfo.logicalControllerNumber );
+	printf_P(PSTR("LNumber:\t%d\n"),pControllerInfo.logicalControllerNumber);
 	printf_P(PSTR("StartCh:\t%lu\n"),pControllerInfo.startChannel);
 	printf_P(PSTR("NumCh:\t%lu\n"), pControllerInfo.numChannels);
 	printf_P(PSTR("Baud:\t%lu\n"),pControllerInfo.baudRate);
@@ -235,34 +240,33 @@ void RFPixelControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 }
 
 /************************************************************************/
-/* Diagnostic print     all controllers								  */
+/* Diagnostic print all controllers										*/
 /************************************************************************/
 void RFPixelControl::PrintControllerConfig(void)
 {
 	printf("Cntl Info:\t%d\n", this->_controllerId);
 	printf("LCntrl:\t%d\n", this->_numControllers);
 	printf("Listen:\t%d\n", this->_channel);
-	printf("Start:\t%lu\n", this->_startChannel );
+	printf("Start:\t%lu\n", this->_startChannel);
 	printf("End:\t% lu\n", this->_endChannel);
 	printf("Num:\t%d\n", this->_endChannel - this->_startChannel);
-	for (int i=0;i< this->_numControllers;i++)
+	for (int i = 0; i < this->_numControllers; i++)
 	{
 		PrintControllerConfig(this->_controllers[i]);
 	}
-
 }
 
-/************************************************************************/
-/* Return the pointer for the base data of the current logical controller
-/************************************************************************/
-uint8_t* RFPixelControl::GetControllerDataBase( uint8_t pLogicalControllerNumber )
+/**************************************************************************/
+/* Return the pointer for the base data of the current logical controller */
+/**************************************************************************/
+uint8_t *RFPixelControl::GetControllerDataBase(uint8_t pLogicalControllerNumber)
 {
 	int numChannelsOffset = 0;
-	for ( int i = 0; i < this->_numControllers; i++){
+	for (int i = 0; i < this->_numControllers; i++){
 		if (this->_controllers[i].logicalControllerNumber == pLogicalControllerNumber){
 			printf_P(PSTR("GetControllerDataBase1\n"));
 			PrintControllerConfig();
-			if (numChannelsOffset ==0)
+			if (numChannelsOffset == 0)
 			{
 				return this->channelData;
 			}
@@ -275,18 +279,18 @@ uint8_t* RFPixelControl::GetControllerDataBase( uint8_t pLogicalControllerNumber
 		numChannelsOffset += this->_controllers[i].numChannels;
 		}
 	}
-	
+
 	PrintControllerConfig();
 }
 
-void RFPixelControl::SetStartAndEndChannels()
+void RFPixelControl::SetStartAndEndChannels(void)
 {
 
 	//update overall start and end range for all controllers on this device
 	this->_startChannel = this->_controllers[0].startChannel;
 	//count all the channels on this receiver
-	this->_endChannel=0;
-	for (int i=0;i<this->_numControllers;i++){
+	this->_endChannel = 0;
+	for (int i = 0; i < this->_numControllers; i++){
 		this->_endChannel += this->_controllers[i].numChannels;
 	}
 	//add the count of channels to the _startChannel
@@ -294,12 +298,12 @@ void RFPixelControl::SetStartAndEndChannels()
 }
 
 
-int RFPixelControl::processConntrollerConfigPacket(uint8_t* pConfigPacket)
+int RFPixelControl::processConntrollerConfigPacket(uint8_t *pConfigPacket)
 {
 
 	int rfListenRate = (int) pConfigPacket[IDX_RF_LISTEN_RATE];;
 	this->_numControllers = 0;//we will let the logical controllers up this number as they get processed.
-	int numLogic =  pConfigPacket[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
+	int numLogic = pConfigPacket[IDX_NUMBER_OF_LOGICAL_CONTROLLERS];
 	this->_channel = pConfigPacket[IDX_RF_LISTEN_CHANNEL];;
 
 	switch (rfListenRate)
@@ -319,13 +323,13 @@ int RFPixelControl::processConntrollerConfigPacket(uint8_t* pConfigPacket)
 }
 
 
-void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
+void RFPixelControl::processLogicalConfigPacket(uint8_t *pLogicalConfigPacket)
 {
-    printf_P(PSTR("OTA Logical Packet "));
+	printf_P(PSTR("OTA Logical Packet "));
 	printf("%d\n", pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_NUMBER]);
 
 	uint32_t baudrate = 0;
-	switch( pLogicalConfigPacket[IDX_CONFIG_PACKET_TYPE])
+	switch(pLogicalConfigPacket[IDX_CONFIG_PACKET_TYPE])
 	{
 		case LOGICALCONTROLLER_LED:
 		case LOGICALCONTROLLER_CUSTOM:
@@ -333,34 +337,32 @@ void  RFPixelControl::processLogicalConfigPacket(uint8_t* pLogicalConfigPacket)
 
 		break;
 		case LOGICALCONTROLLER_SERIAL:
-			
+
 			baudrate = convert8BitTo32Bit(&pLogicalConfigPacket[IDX_LOGICAL_CONTROLLER_CLOCK_OR_BAUD]);
 			printf_P(PSTR("BaudRate is set to "));
 			printf("%lu\n", baudrate);
 			break;
-			//memcpy(&ciTemp->reserved, &this->packetData[IDX_LOGICAL_CONTROLLER_RESERVED], RESERVED_BYTES_LEN);
-			//memcpy(&ciTemp->customConfig, &this->packetData[IDX_CUSTOM_CONTROLLER_CONFIG_SPACE], CUSTOM_CONFIG_INFO_LEN);
 
 	}
 	this->AddLogicalController(pLogicalConfigPacket[IDX_CONTROLLER_ID], convert8BitTo32Bit(pLogicalConfigPacket+IDX_LOGICAL_CONTROLLER_START_CHANNEL),convert8BitTo32Bit(pLogicalConfigPacket + IDX_LOGICAL_CONTROLLER_NUM_CHANNELS), baudrate);
 }
-	
-	int32_t RFPixelControl::convert8BitTo32Bit(uint8_t *  highByteAddrPtr)
+
+	int32_t RFPixelControl::convert8BitTo32Bit(uint8_t *highByteAddrPtr)
 	{
 		return (uint32_t)highByteAddrPtr[0] << 24|
 		(uint32_t)highByteAddrPtr[1] << 16|
 		(uint32_t)highByteAddrPtr[2] << 8|
-		(uint32_t)highByteAddrPtr[3];	
+		(uint32_t)highByteAddrPtr[3];
 	}
-	
+
 
 /************************************************************************/
-/* OTA Configuration handler
+/* OTA Configuration handler											*/
 /************************************************************************/
 bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 
-									//Get the current time,  This will break out of configuration if longer than RF_CONFIG_STARTUP_WINDOW
-	ControllerInfo * ciTemp;
+									//Get the current time, This will break out of configuration if longer than RF_CONFIG_STARTUP_WINDOW
+	ControllerInfo *ciTemp;
 	bool returnValue = false;
 	int rfListenChannel = 0;
 	int rfListenRate = 0;
@@ -368,34 +370,30 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 
 	if (this->available())
 	{
-		
-	
 		// Fetch the payload, and see if this was the last one.
-		this->read( &this->packetData, 32 );
-		
-	//	printf("got packet ... what its?");
+		this->read(&this->packetData, 32);
+
 		//The First Configuration Packet contains the number of logical controllers for a given controller
-		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && ( convert8BitTo32Bit(this->packetData+IDX_CONTROLLER_ID)  == pReceiverId))
+		if(this->packetData[IDX_CONFIG_PACKET_TYPE] == CONTROLLERINFOINIT && (convert8BitTo32Bit(this->packetData+IDX_CONTROLLER_ID) == pReceiverId))
 		{
 #ifdef DEBUG_PRINT
 			printf_P(PSTR("received Config Packet for controller\n"));
-			for ( int i =0;i<32 ;i++)
+			for (int i = 0; i < 32; i++)
 			{
 				printf(" 0x%02X", this->packetData[i]);
-				if ( (i-7) % 8 == 0 )
+				if ((i-7) % 8 == 0)
 				{
-					printf("\n\r--%3d:", i  );
+					printf("\n\r--%3d:", i);
 				}
 			}
 #endif
 			int numLogic = processConntrollerConfigPacket(this->packetData);
-					//processConntrollerConfigPacket();
 			//save the controller config packet into the eeprom.
-			eeprom_erase_all();
+			eeprom_erase_all(0xFF);
 			delay(1000);
 			uint32_t version = EEPROM_VERSION;
-			eeprom_write_bytes(EEPROM_VERSION_IDX, (byte * ) &version, 4 );
-			eeprom_write_bytes(EEPROM_CONTROLLER_CONFIG_IDX, (byte * )this->packetData, EEPROM_PACKET_SIZE );
+			eeprom_write_bytes(EEPROM_VERSION_IDX, (byte *) &version, 4);
+			eeprom_write_bytes(EEPROM_CONTROLLER_CONFIG_IDX, (byte *)this->packetData, EEPROM_PACKET_SIZE);
 			int lControllerCount = 0;
 
 			//get each logical controller
@@ -404,17 +402,17 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 				//printf("innumlogicloop %d \n", i);
 				while(!this->available());
 				delay(4);
-				for(bool found=false; this->read( &this->packetData, 32 ) && !found;)
+				for(bool found = false; this->read(&this->packetData, 32) && !found;)
 				{
 
 #ifdef DEBUG_PRINT
 					printf_P(PSTR("received OTA logical\n"));
-					for ( int i =0;i<32 ;i++)
+					for (int i = 0; i < 32; i++)
 					{
 							printf(" 0x%02X", this->packetData[i]);
-							if ( (i-7) % 8 == 0 )
+							if ((i-7) % 8 == 0)
 							{
-    							printf("\n\r--%3d:", i  );
+								printf("\n\r--%3d:", i);
 							}
 					}
 #endif
@@ -423,7 +421,7 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 	//that we have the next logical controller ID
 	//and that its for this physical receiver
 	//delay(1000);
-					if (this->packetData[IDX_CONFIG_PACKET_TYPE] != CONTROLLERINFOINIT &&(convert8BitTo32Bit(this->packetData+IDX_CONTROLLER_ID) == pReceiverId )&& this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER]==i)
+					if (this->packetData[IDX_CONFIG_PACKET_TYPE] != CONTROLLERINFOINIT &&(convert8BitTo32Bit(this->packetData+IDX_CONTROLLER_ID) == pReceiverId)&& this->packetData[IDX_LOGICAL_CONTROLLER_NUMBER] == i)
 					{
 
 
@@ -431,21 +429,21 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 #ifdef DEBUG_PRINT
 						printf_P(PSTR("configured Logical Packet\n"));
 #endif
-						found=true;
+						found = true;
 						//if the logical packet was processed we can save it for later.
-						eeprom_write_bytes(EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX+i, (byte * )this->packetData, EEPROM_PACKET_SIZE);
+						eeprom_write_bytes(EEPROM_BASE_LOGICAL_CONTROLLER_CONFIG_IDX+i, (byte *)this->packetData, EEPROM_PACKET_SIZE);
 
 
 						//only increment the loop counter when we have the packet
 						i++;
 
 					}
-					if (i==this->_numControllers)	
+					if (i == this->_numControllers)
 					{
 						returnValue = true;
 					}
 			}
-		}	
+		}
 		printf_P(PSTR("eeprom:"));
 		eeprom_serial_dump_table();
 		//delay(1000);
@@ -454,39 +452,40 @@ bool RFPixelControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
 	return returnValue;
 }
 
-
-
-void RFPixelControl::DisplayDiagnosticStartup(IPixelControl * string)
+void RFPixelControl::DisplayDiagnosticStartup(IPixelControl *string)
 {
-if ( payloadSizeSetSuccessful && dataRateSuccess && channelSetSuccessfully ) {
-for ( int i = 0 ; i < string->GetPixelCount(); i++){
-string->SetPixelColor(i, 0, 255, 0);
-}
-}
-else {
-for ( int i = 0 ; i < string->GetPixelCount(); i++){
-string->SetPixelColor(i, 255, 0, 0);
-}
-}
-string->Paint();
-delay(10000);
-}
+	if (payloadSizeSetSuccessful && dataRateSuccess && channelSetSuccessfully)
+	{
+		for (int i = 0 ; i < string->GetPixelCount(); i++)
+		{
+			string->SetPixelColor(i, 0, 255, 0);
+		}
+	}
+	else
+	{
+		for (int i = 0 ; i < string->GetPixelCount(); i++)
+		{
+			string->SetPixelColor(i, 255, 0, 0);
+		}
+	}
 
-
-
-
+	string->Paint();
+	delay(10000);
+}
 
 bool RFPixelControl::Listen(void)
 {
 	// See if there is any data in the RF buffer
-	if ( this->available() ){
-		for (bool done = false;!done;){
+	if (this->available())
+	{
+		for (bool done = false; !done;)
+		{
 			// Fetch the payload, and see if this was the last one.
-			done = this->read( &this->packetData, 32 );
+			done = this->read(&this->packetData, 32);
 			//when process packet returns true we got the last channel we are listening to and its time to output....
-			if (ProcessPacket( this->channelData, this->packetData))
+			if (ProcessPacket(this->channelData, this->packetData))
 			{
-			//return true to the sketch and let it handle updates
+				//return true to the sketch and let it handle updates
 				return true;
 			}
 		}
@@ -494,20 +493,20 @@ bool RFPixelControl::Listen(void)
 	return false;
 }
 
-/**
-*  processPacket - handles copying the needed channels from the radio data into the Renard data.
-*        This method takes a different approach for getting the data.  Originally I was looping through
-*        all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
-*        I haven't done performance timing so who knows?  It passed my tests :)
-*
-*  return - true if the last channel was found and its time for an update, otherwise false.
-*/
-bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
+/*
+ * processPacket - handles copying the needed channels from the radio data into the Renard data.
+ *	This method takes a different approach for getting the data.  Originally I was looping through
+ *	all the channels and I got bored.  So I wrote this convoluted code hoping to make things faster by using memcpy
+ *	I haven't done performance timing so who knows?  It passed my tests :)
+ *
+ * return - true if the last channel was found and its time for an update, otherwise false.
+ */
+bool RFPixelControl::ProcessPacket(byte *dest, byte *p)
 {
 	int startChannel = this->_startChannel -1;
 	int finalChannel = this->_endChannel- 1;
 
-	//  Way too many variables here need to refactor...
+	// Way too many variables here need to refactor...
 	bool retVal = false;
 	int packetSequence = p[PACKET_SEQ_IDX];
 	int packetStartChann = packetSequence * CHANNELS_PER_PACKET;
@@ -526,7 +525,7 @@ bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
 	int channelCopyStartIdx = 0;
 	int channelCopyEndIdx = CHANNELS_PER_PACKET - 1;
 	int numberOfValidChannelsInPacket = channelCopyEndIdx;
-						
+
 	//First we need to know what is the first valid channel in this packet
 	if (startChannel >= packetStartChann)
 	{
@@ -540,17 +539,17 @@ bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
 			//offset the idx for source by the channel count factor
 			calcStartSourceIdx = startChannel - packetStartChann;
 			//start is after the packet start and before or equal to the end channel.
-	
+
 		}
 		else
 		{
-			//start channel was after the range of channels in this packet.  skip this packet.
+			//start channel was after the range of channels in this packet. skip this packet.
 			return retVal;
 		}
 	}
 	else
 	{
-		calcStartChannel =  packetStartChann;
+		calcStartChannel = packetStartChann;
 		calcStartDestIdx = packetStartChann - startChannel;
 		calcStartSourceIdx = 0;
 		//we started before this packet
@@ -573,18 +572,17 @@ bool  RFPixelControl::ProcessPacket(byte*  dest, byte* p)
 	}
 	else
 	{
-		//final channel is before the end of this packet  (packetEndChannel >= finalChann )
+		//final channel is before the end of this packet (packetEndChannel >= finalChann)
 		if (finalChannel >= packetStartChann)
 		{
 			//Because final is less than the packet end
 			//and >= start we know that the final channel is in this packet
-			calcEndChannel =  this->_endChannel ;
+			calcEndChannel = this->_endChannel ;
 			calcEndDestIdx = finalChannel - startChannel ;
 			calcEndSourceIdx = finalChannel - packetStartChann;
-	
-			//because this is the last packet we care about,  return true
-			retVal=true;
 
+			//because this is the last packet we care about, return true
+			retVal = true;
 		}
 		else
 		{
@@ -620,5 +618,3 @@ int RFPixelControl::GetNumberOfChannels(int pLogicalController)
 {
 	return this->_controllers[pLogicalController].numChannels;
 }
-
-

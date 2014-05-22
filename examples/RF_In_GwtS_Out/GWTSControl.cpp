@@ -1,9 +1,20 @@
 /*
- * GWTSControl.cpp
- * This class is a wrapper of the GwtS library for an IPixelControl implementation.
+ * GWTSControl - Wrapper of the GwtS library for IPixelControl
  * 
- *  Created on: November 25th, 2013
- *      Author: Mat Mrosko
+ * Created on: November 25th, 2013
+ * Author: Mat Mrosko
+ *
+ * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ *
+ * License:
+ *		Users of this software agree to hold harmless the creators and
+ *		contributors of this software.  By using this software you agree that
+ *		you are doing so at your own risk, you could kill yourself or someone
+ *		else by using this software and/or modifying the factory controller.
+ *		By using this software you are assuming all legal responsibility for
+ *		the use of the software and any hardware it is used on.
+ *
+ *		The Commercial Use of this Software is Prohibited.
  */
 
 #include <GWTSControl.h>
