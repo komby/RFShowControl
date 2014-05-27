@@ -54,8 +54,9 @@
 
 void setup()
 {
-
-	radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE ,0);
+      pinMode(A0, OUTPUT);
+      digitalWrite(A0, HIGH);
+        radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE ,0);
 	ModifiedDMXSerial.maxChannel(DMX_NUM_CHANNELS);
 	ModifiedDMXSerial.init(DMXReceiver);
 }
@@ -69,4 +70,3 @@ void loop()
 		ModifiedDMXSerial.setPacketReady(false);
 	}
 }
-
