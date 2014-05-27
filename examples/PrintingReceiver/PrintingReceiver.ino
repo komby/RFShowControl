@@ -17,8 +17,9 @@
 #include <EEPROM.h>
 /**************CONFIGURATION SECTION ***************************/
 
-//Uncomment for serial output of all data
-//#define FULL_PRINT_DEBUG 1
+//Set to 1 for serial output of all data
+//Set to 0 for only printing packet index ( better sequence order)
+#define FULL_PRINT_DEBUG 0
 
 //NRF24L01+ Items
 //What board are you using to connect your nRF24L01+?
