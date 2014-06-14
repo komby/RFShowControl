@@ -24,7 +24,7 @@
 #ifndef __RFPIXELCONTROL_H__
 #define __RFPIXELCONTROL_H__
 
-#include <EEPROMUtils.h>
+#include "EEPROMUtils.h"
 #include "IPixelControl.h"
 #include "OTAConfig.h"
 #include "RF24Wrapper.h"

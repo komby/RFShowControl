@@ -34,76 +34,37 @@
 #include "WebServer.h"
 
 
-
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// This configuration section is required whether you're using OTA or not.
-//
-// If you're using OTA, these values need to be what you configured your
-// OTA configuration node to send packets on.
-//
-// If you're not using OTA, these values are for the actual data coming over
-// your wireless komby network.
-//
-
-// DATA_RATE Description:
-//		If you're using OTA, this most likely needs to be set to RF24_250KBPS.  That
-//		is the speed your OTA configuration packets are transmitted at if you didn't
-//		customize the OTA configuration sketch.  The OTA packets you send from the
-//		configuration web page set the data rate for the RF data your RF transmitter
-//		is configured for.
-//
-//		If you're not using OTA, set this to whatever your RF transmitter sketch was
-//		set to when configuring that sketch.
-//
-// Valid Values:
-//		RF24_250KBPS
-//		RF24_1MBPS
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Data_Rate
-//
-#define DATA_RATE					RF24_250KBPS
-
-// NRF_TYPE Description:
-//		What board are you using to connect your nRF24L01+?
-//
-// Valid Values:
-//		RF1 - Most RF1 Devices including RF1_12V devices
-//		MINIMALIST_SHIELD - Minimalist shield designed to go atop a standard arduino
-//		WM_2999_NRF - WM299 specific board
-//		RFCOLOR_2_4 - RFColor24 device to control GECEs
-//
-// More Information:
-//		http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-//
+// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE					MINIMALIST_SHIELD
 
-
-
+// MAC Address Description: http://learn.komby.com/Configuration#MAC_Address
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
-// CHANGE THIS TO MATCH YOUR HOST NETWORK
+// IP Address Description: http://learn.komby.com/Configuration#IP_Address
 static uint8_t ip[] = { 192, 168, 1, 99 };
-// set up the radio.   change pins for particular board
-
-
-
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
-/******************** START OF ADVANCED SETTINGS SECTION *********************/
+/****************** START OF NON-OTA CONFIGURATION SECTION *******************/
+// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// Valid Values: RF24_250KBPS, RF24_1MBPS 
+#define DATA_RATE					RF24_250KBPS
+/******************* END OF NON-OTA CONFIGURATION SECTION ********************/
+
+/************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
 //#define DEBUG						1
-#define PIXEL_TYPE					NONE
 
-#define PACKET_SEND_DELAY			1000   // delay between packets.  Increase if using debug prints on receiver.
-#define PREFIX						""
-
-#define RF_WRAPPER					1
+// Delay between packets.  Increase if using debug prints on receiver.
+#define PACKET_SEND_DELAY			1000
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
+
+#define RF_WRAPPER					1
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
 
-WebServer webserver(PREFIX, 80);
+WebServer webserver("", 80);
 //radio packet buffers - one for controller;
 #define MAX_LOGICAL_CONTROLLERS 5
 

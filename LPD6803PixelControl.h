@@ -34,7 +34,6 @@ class LPD6803PixelControl: public IPixelControl, public LPD6803
 public:
 	LPD6803PixelControl(uint8_t pClock, uint8_t pData);
 
-	void SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
 	void Paint(void);
 };
 

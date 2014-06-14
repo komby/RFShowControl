@@ -1,37 +1,47 @@
 /*
  * Renard Transmitter
- * 
+ *
+ * TODO
+ *
  *  Author: Greg Scull
  *  		7/2013
  *   This transmitter uses 
  */
+//TODO HEADER CHECK
 #include <RFPixelControl.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <EEPROM.h>
-/*************************** CONFIGURATION SECTION *************************************************/
 
 
-//What board are you using to connect your nRF24L01+?
-//Valid Values: RF1, MINIMALIST_SHIELD,KOMBEE
-//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE			RF1
+/********************* START OF REQUIRED CONFIGURATION ***********************/
+// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
+#define NRF_TYPE					RF1
+/********************** END OF REQUIRED CONFIGURATION ************************/
 
-//What Speed do you want to use to transmit?
-//Valid Values:   RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_250KBPS
+/****************** START OF NON-OTA CONFIGURATION SECTION *******************/
+// TRANSMIT_CHANNEL Description: http://learn.komby.com/Configuration#Transmit_Channel
+// Valid Values: 1-124
+#define TRANSMIT_CHANNEL				100
 
-//What RF Channel do you want to transmit on?  
-//Valid Values: 1-124
-#define TRANSMIT_CHANNEL 100
+// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// Valid Values: RF24_250KBPS, RF24_1MBPS 
+#define DATA_RATE					RF24_250KBPS
 
-//What is the baud rate of the incoming serial data?
-#define RENARD_SERIAL_BAUD	57600
+// RENARD_BAUD_RATE Description: http://learn.komby.com/Configuration#Renard_Baud_Rate
+// Valid Values: 19200, 38400, 57600, 115200, 230400, 460800
+#define RENARD_BAUD_RATE			57600
+/******************* END OF NON-OTA CONFIGURATION SECTION ********************/
+
+/************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+//#define DEBUG						1
+/********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
-/***************************  END CONFIGURATION SECTION *************************************************/
 #define RF_WRAPPER 1
+//Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
 #define RF_NUM_PACKETS 18     // 18 * 30 total Channels can be broadcasted
@@ -59,7 +69,7 @@ void setup()
 {
 	radio.Initialize( radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID );
 	UCSR0C |= (1<<USBS0);
-	Serial.begin(RENARD_SERIAL_BAUD);
+	Serial.begin(RENARD_BAUD_RATE);
 
 }
 

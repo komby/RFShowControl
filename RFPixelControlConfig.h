@@ -82,6 +82,26 @@ LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN)
 #endif
 
 
+
+
+
+#ifdef PIXEL_TYPE
+#if ((PIXEL_TYPE == LPD_8806) || \
+	 (PIXEL_TYPE == WS_2801) || \
+	 (PIXEL_TYPE == SM_16716) || \
+	 (PIXEL_TYPE == TM_1809) || \
+	 (PIXEL_TYPE == TM_1803) || \
+	 (PIXEL_TYPE == UCS_1903) || \
+	 (PIXEL_TYPE == WS_2811))
+#include <FastSPI_LED2.h>
+CRGB *leds;
+#define FAST_SPI_CONTROL
+#endif
+#endif
+
+
+
+
 // Radio pipe
 // addresses for the 2 nodes to communicate.
 const uint64_t pipes[2] = {

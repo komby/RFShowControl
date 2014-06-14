@@ -1,3 +1,17 @@
+/*
+* ArduinoEthernet Shield Unicast E1.31 Transmitter
+*
+* TODO
+*
+* Unicast transmitter for RFPixelControl receivers
+* This code can be used to send data to the RF1 series controllers.
+*
+* Created on: June 17, 2013
+* Updated: October 2013
+* Author: Greg Scull
+*/
+
+//TODO HEADER CHECK
 #include <Dhcp.h>
 #include <Dns.h>
 #include <EEPROM.h>
@@ -15,62 +29,42 @@
 #include "RFPixelControl.h"
 
 
-/*
-* ArduinoEthernet Shield Unicast E1.31 Transmitter
-*
-* Unicast transmitter for RFPixelControl receivers
-* This code can be used to send data to the RF1 series controllers.
-*
-* Created on: June 17, 2013
-* Updated: October 2013
-* Author: Greg Scull
-*/
+/********************* START OF REQUIRED CONFIGURATION ***********************/
+// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
+#define NRF_TYPE					RF1
 
+// UNIVERSE Description: http://learn.komby.com/Configuration#Universe
+// Valid Values: 1-255
+#define UNIVERSE					1
 
-/*************************** CONFIGURATION SECTION *************************************************/
+// MAC Address Description: http://learn.komby.com/Configuration#MAC_Address
+static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x85 };
+// IP Address Description: http://learn.komby.com/Configuration#IP_Address
+static uint8_t ip[] = { 192, 168, 1, 99 };
+/********************** END OF REQUIRED CONFIGURATION ************************/
 
-//What board are you using to connect your nRF24L01+?
-//Valid Values: MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1,KOMBYONE_DUE,
-//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-#define NRF_TYPE			MINIMALIST_SHIELD
+/****************** START OF NON-OTA CONFIGURATION SECTION *******************/
+// TRANSMIT_CHANNEL Description: http://learn.komby.com/Configuration#Transmit_Channel
+// Valid Values: 1-124
+#define TRANSMIT_CHANNEL			100
 
-//What Speed do you want to use to transmit?
-//Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_250KBPS
+// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// Valid Values: RF24_250KBPS, RF24_1MBPS 
+#define DATA_RATE					RF24_250KBPS
+/******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
-//What RF Channel do you want to transmit on?
-//Valid Values: 1-124
-#define TRANSMIT_CHANNEL 100
+/************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+//#define DEBUG						1
 
-
-//Each ethernet device needs its own MAC address
-//You can get your own mac string for this at
-//http://www.miniwebtool.com/mac-address-generator/
-byte mac[] = {
-0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-
-//Change this IP to one on your network
-IPAddress ip(192, 168, 2, 151);
-
-//This is a rate in milliseconds which the transmitter will resend all the data if no data is received within this duration.
-//if this setting is set to 0 it will disable the keepalive
+// Rate in milliseconds which the transmitter will resend all the data if no new
+// data is received within this duration. (0 to disable)
 #define REFRESH_RATE 0
-
-//This is the universe you want to receive with this transmitter.
-//you can receive Multicast OR unicast with this setting
-#define UNIVERSE 2
-
-/*************************** CONFIGURATION SECTION *************************************************/
-//Changed to not use the RFPixelControl Config
-//and instead use the RF24Wrapper directly to save space
-//this can and should be reafactored eventually.
-
-#define RF_NUM_PACKETS 18
-// Radio pipe
-// addresses for the 2 nodes to communicate.
+/********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
 #define RF_WRAPPER 1
+//Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
 

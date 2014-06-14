@@ -14,36 +14,42 @@
 
 #include "RFPixelControl.h"
 #include "printf.h"
-/*************************** CONFIGURATION SECTION BEGIN *************************************************/
 
-//How many pixels do you want to transmit data for (NOTE: Pixels, not channels)
-#define NUM_PIXELS 170
 
-//Delay between RF transmissions (in microseconds)
-#define RF_DELAY					2000
-
-//What Speed do you want to use to transmit?
-//Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_250KBPS
-
-//What RF Channel do you want to transmit on?
-//Valid Values: 1-124
-#define TRANSMIT_CHANNEL 100
-
-//What board are you using to connect your nRF24L01+?
-//Valid Values: RF1, MINIMALIST_SHIELD, KOMBEE
-//Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+/********************* START OF REQUIRED CONFIGURATION ***********************/
+// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE					RF1
+/********************** END OF REQUIRED CONFIGURATION ************************/
+
+/****************** START OF NON-OTA CONFIGURATION SECTION *******************/
+// TRANSMIT_CHANNEL Description: http://learn.komby.com/Configuration#Transmit_Channel
+// Valid Values: 1-124
+#define TRANSMIT_CHANNEL				100
+
+// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// Valid Values: RF24_250KBPS, RF24_1MBPS 
+#define DATA_RATE					RF24_250KBPS
+
+// HARDCODED_NUM_PIXELS Description: http://learn.komby.com/Configuration#Hardcoded_Num_Pixels
+// Valid Values: 1-170
+#define HARDCODED_NUM_PIXELS		170
+/******************* END OF NON-OTA CONFIGURATION SECTION ********************/
+
+/************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+//#define DEBUG						1
+
+#define RF_DELAY					2000
+/********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
-/*************************** END CONFIGURATION SECTION *************************************************/
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 
 //Initialize the RF packet buffer
 byte str[32];
 
-const int numberOfChannels = NUM_PIXELS * 3;
+const int numberOfChannels = HARDCODED_NUM_PIXELS * 3;
 
 byte buffer[numberOfChannels];
 void rainbow(int num);
@@ -65,7 +71,7 @@ void setup(void)
 
 void loop(void)
 {
-	rainbow(NUM_PIXELS);
+	rainbow(HARDCODED_NUM_PIXELS);
 }
 
 

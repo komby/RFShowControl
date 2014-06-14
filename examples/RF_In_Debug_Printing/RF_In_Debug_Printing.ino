@@ -31,67 +31,23 @@
 #include "RFPixelControl.h"
 
 
-
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// This configuration section is required whether you're using OTA or not.
-//
-// Note that this sketch doesn't support OTA.  You can only configure it manually
-// to receive data on a known channel and print the output.
+// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
+#define NRF_TYPE					RF1
+/********************** END OF REQUIRED CONFIGURATION ************************/
 
-// DATA_RATE Description:
-//		If you're using OTA, this most likely needs to be set to RF24_250KBPS.  That
-//		is the speed your OTA configuration packets are transmitted at if you didn't
-//		customize the OTA configuration sketch.  The OTA packets you send from the
-//		configuration web page set the data rate for the RF data your RF transmitter
-//		is configured for.
-//
-//		If you're not using OTA, set this to whatever your RF transmitter sketch was
-//		set to when configuring that sketch.
-//
-// Valid Values:
-//		RF24_250KBPS
-//		RF24_1MBPS
-//
-// More Information:
-//		http://learn.komby.com/wiki/Configuration:Data_Rate
-//
-#define DATA_RATE					RF24_250KBPS
-
-// NRF_TYPE Description:
-//		What board are you using to connect your nRF24L01+?
-//
-// Valid Values:
-//		RF1 - Most RF1 Devices including RF1_12V devices
-//		MINIMALIST_SHIELD - Minimalist shield designed to go atop a standard arduino
-//		WM_2999_NRF - WM299 specific board
-//		RFCOLOR_2_4 - RFColor24 device to control GECEs
-//
-// More Information:
-//		http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-//
-#define NRF_TYPE					MINIMALIST_SHIELD
-
-// LISTEN_CHANNEL Description:
-//		RF Channel do you want to listen on? This needs to match the channel you've
-//		configured your transmitter for broadcasting it's data.  If you're broadcasting
-//		multiple universes worth of data, you'll want each transmit/listen channel to be
-//		at least X channels away from each other for best results.  There is also a
-//		scanner sketch available for your RF1 to log RF activity in the 2.4GHz range
-//		to aid in selecting your channels.  Keep in mind, regular WiFi and many other
-//		devices are in this range and can cause interference.
-//
-// Valid Values:
-//		1-124
-//
-// More Information:
-//		http://learn.komby.com/Configuration:Listen_Channel
-//
+/****************** START OF NON-OTA CONFIGURATION SECTION *******************/
+// LISTEN_CHANNEL Description: http://learn.komby.com/Configuration:Listen_Channel
+// Valid Values: 1-124
 #define LISTEN_CHANNEL				100
-/*********************** END OF CONFIGURATION SECTION ************************/
 
+// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// Valid Values: RF24_250KBPS, RF24_1MBPS 
+#define DATA_RATE					RF24_250KBPS
+/******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
-
-/******************** START OF ADVANCED SETTINGS SECTION *********************/
+/************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
 //#define DEBUG						1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
