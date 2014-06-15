@@ -45,6 +45,9 @@ SCR driver for the Raptor12
 //Valid Values   RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE RF24_250KBPS
 
+//IS this an AC controler?
+bool acControler = true;
+
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
 #include <RFPixelControlConfig.h>
@@ -57,8 +60,7 @@ byte * buffer;
 //Uncomment for serial
 #define DEBUG 0
 
-//IS this an AC controler?
-bool acControler = true;
+
 
 #include <TimerOne.h>   
  int totalChannel = 12;
@@ -129,40 +131,40 @@ int invDimLevel = dimLevel ^ 255;// 255 accely means off in this loop so we need
 ////////////////////////////////////////////////////////////////////////////////////////
 //////////////////note to self make this a function ////////////////////////////////////
 ///Channel 1
-if (channelLevel[0] == invDimLevel){
+if (buffer[0] == invDimLevel){
   PORTB = PORTB | B00000001; 
 }//Channel 2
-if (channelLevel[1] == invDimLevel){
+if (buffer[1] == invDimLevel){
   PORTC =  PORTC | B00100000; 
 }//Channel 3
-if (channelLevel[2] == invDimLevel){
+if (buffer[2] == invDimLevel){
   PORTC =  PORTC | B00010000;
 }//Channel 4
-if (channelLevel[3] == invDimLevel){
+if (buffer[3] == invDimLevel){
   PORTC =  PORTC | B00001000;
 }//Channel 5
-if (channelLevel[4] == invDimLevel){
+if (buffer[4] == invDimLevel){
   PORTC =  PORTC | B00000100;
 }//Channel 6
-if (channelLevel[1] == invDimLevel){
+if (buffer[1] == invDimLevel){
   PORTC =  PORTC | B00000010;
 }//Channel 7
-if (channelLevel[6] == invDimLevel){
+if (buffer[6] == invDimLevel){
   PORTC =  PORTC | B00000001;
 }//Channel 8
-if (channelLevel[7] == invDimLevel){
+if (buffer[7] == invDimLevel){
   PORTD =  PORTD | B10000000;
 }//Channel 9
-if (channelLevel[8] == invDimLevel){
+if (buffer[8] == invDimLevel){
   PORTD =  PORTD | B01000000; 
 }//Channel 10
-if (channelLevel[9] == invDimLevel){
+if (buffer[9] == invDimLevel){
   PORTD =  PORTD | B00100000; 
 }//Channel 11
-if (channelLevel[10] == invDimLevel){
+if (buffer[10] == invDimLevel){
   PORTD =  PORTD | B00010000; 
 }//Channel 12
-if (channelLevel[11] == invDimLevel){
+if (buffer[11] == invDimLevel){
   PORTD =  PORTD | B00001000; 
 }
  
