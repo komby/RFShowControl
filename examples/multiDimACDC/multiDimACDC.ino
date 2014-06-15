@@ -65,7 +65,7 @@ byte * buffer;
 #include <TimerOne.h>   
  int totalChannel = 12;
  ///0-127 aka 7bits
- int channelLevel [] = {20,20,30,40,50,60,70,90,100,110,120,127}; //dim level 0-255 just for testing
+ //int channelLevel [] = {20,20,30,40,50,60,70,90,100,110,120,127}; //dim level 0-255 just for testing
  
   volatile int dimLevel=255;               // Variable to use as a counter
   volatile boolean zero_cross = false;  // Boolean to store a "switch" to tell us if we have crossed zero
