@@ -170,15 +170,15 @@ if (buffer[11] == invDimLevel){
 
 ///unused pins 
 //}//Channel 13  //Normaly ZeroCross
-//if (buffer[] == invDimLevel){
+//if (buffer[12] == invDimLevel){
 //  PORTD =  PORTD | B00000100; 
 //}
 //}//Channel 14  //Normaly TX
-//if (buffer[] == invDimLevel){
+//if (buffer[13] == invDimLevel){
 //  PORTD =  PORTD | B00000010; 
 //} 
 //}//Channel 15  //Normaly RX
-//if (buffer[] == invDimLevel){
+//if (buffer[14] == invDimLevel){
 //  PORTD =  PORTD | B00000001; 
 }
 //////////////////////////////////////////////////////////////////////////////////////////
