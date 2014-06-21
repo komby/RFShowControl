@@ -28,7 +28,7 @@
  //What board are you using to connect your nRF24L01+?
  //Valid Values:  MINIMALIST_SHIELD, RF1,KOMBEE, 
  //Definitions: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
- #define NRF_TYPE  KOMBEE
+ #define NRF_TYPE  RF1
 
 // Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
 // your RF1s in the field.  This will cause the RF1s to search for a
@@ -36,9 +36,9 @@
 // read EEPROM for the last known working configuration.
 #define OVER_THE_AIR_CONFIG_ENABLE 0
 
-#define NUM_CHANNELS 4  
+#define NUM_CHANNELS 3  
 #define START_CHANNEL 1 //Where in the universe do we start
-#define FINAL_CHANNEL 4 //DO Refactory out, addition would be easy...
+
 
 
 //What RF Channel do you want to listen on?  
