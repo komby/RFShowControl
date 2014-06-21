@@ -75,7 +75,8 @@ void setup() {
 	pinMode(REDPIN, OUTPUT);
 	pinMode(GREENPIN, OUTPUT);
 	pinMode(BLUEPIN, OUTPUT);
-          
+        pinMode(WHITEPIN, OUTPUT);
+        
 	buffer[0]=255;
    
     
