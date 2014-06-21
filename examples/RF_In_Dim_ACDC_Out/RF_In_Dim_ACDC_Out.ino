@@ -14,7 +14,7 @@ SCR driver for the Raptor12
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <EEPROM.h>
-
+#include <TimerOne.h>  
 
 /*************************** CONFIGURATION SECTION *************************************************/
 // Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
@@ -46,7 +46,7 @@ SCR driver for the Raptor12
 #define DATA_RATE RF24_250KBPS
 
 //IS this an AC controler?
-bool acControler = true;
+#define acControler true
 
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
@@ -62,7 +62,7 @@ byte * buffer;
 
 
 
-#include <TimerOne.h>   
+ 
  int totalChannel = 12;
  ///0-127 aka 7bits
  //int channelLevel [] = {20,20,30,40,50,60,70,90,100,110,120,127}; //dim level 0-255 just for testing
@@ -133,7 +133,7 @@ int invDimLevel = dimLevel ^ 255;// 255 accely means off in this loop so we need
 ///Channel 1
 if (buffer[0] == invDimLevel){
   PORTB = PORTB | B00000001; 
-}//Channel 2
+}//Channel 2//////////////////////////////PortC
 if (buffer[1] == invDimLevel){
   PORTC =  PORTC | B00100000; 
 }//Channel 3
@@ -151,7 +151,7 @@ if (buffer[1] == invDimLevel){
 }//Channel 7
 if (buffer[6] == invDimLevel){
   PORTC =  PORTC | B00000001;
-}//Channel 8
+}//Channel 8/////////////////////////////////PortD
 if (buffer[7] == invDimLevel){
   PORTD =  PORTD | B10000000;
 }//Channel 9
@@ -167,7 +167,20 @@ if (buffer[10] == invDimLevel){
 if (buffer[11] == invDimLevel){
   PORTD =  PORTD | B00001000; 
 }
- 
+
+///unused pins 
+//}//Channel 13  //Normaly ZeroCross
+//if (buffer[] == invDimLevel){
+//  PORTD =  PORTD | B00000100; 
+//}
+//}//Channel 14  //Normaly TX
+//if (buffer[] == invDimLevel){
+//  PORTD =  PORTD | B00000010; 
+//} 
+//}//Channel 15  //Normaly RX
+//if (buffer[] == invDimLevel){
+//  PORTD =  PORTD | B00000001; 
+}
 //////////////////////////////////////////////////////////////////////////////////////////
     dimLevel = dimLevel + 1; // decrese time step counter                     
     }                                                                 
