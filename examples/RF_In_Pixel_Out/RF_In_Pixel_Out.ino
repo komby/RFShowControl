@@ -23,11 +23,18 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
+#include <FastLED.h>
+#include <GEColorEffects.h>
+#include <LPD6803.h>
+#include <TimerOne.h>
+#include <WM2999.h>
 
+#include "LPD6803.h"
 #include "IPixelControl.h"
+#include "FastLED_PixelControl.h"
 #include "printf.h"
 #include "RFPixelControl.h"
-
+#include "WM2999PixelControl.h"
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
