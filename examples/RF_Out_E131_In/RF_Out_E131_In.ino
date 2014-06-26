@@ -1,17 +1,18 @@
 /*
-* ArduinoEthernet Shield Unicast E1.31 Transmitter
+* ArduinoEthernet Shield E1.31 Transmitter
 *
-* TODO
+* Streaming ACN (E1.31) receiver to RF transmitter for RFPixelControl receivers
+* This code can be used to send data to any RFPixelControl Packet format compatible
+* Receiving device
 *
-* Unicast transmitter for RFPixelControl receivers
-* This code can be used to send data to the RF1 series controllers.
+* This sketch can be used with Unicast or Multicast.  It is recommended to set the ip address and use in unicast mode for best performance.
 *
 * Created on: June 17, 2013
-* Updated: October 2013
+* Updated: June 25, 2014
 * Author: Greg Scull
 */
 
-//TODO HEADER CHECK
+
 #include <Dhcp.h>
 #include <Dns.h>
 #include <EEPROM.h>
@@ -30,27 +31,27 @@
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
-// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
-#define NRF_TYPE					RF1
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
+// Valid Values: RF1, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4
+#define NRF_TYPE					MINIMALIST_SHIELD
 
-// UNIVERSE Description: http://learn.komby.com/Configuration#Universe
+// UNIVERSE Description: http://learn.komby.com/wiki/58/configuration-settings#UNIVERSE
 // Valid Values: 1-255
 #define UNIVERSE					1
 
-// MAC Address Description: http://learn.komby.com/Configuration#MAC_Address
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC_ADDRESS
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x85 };
-// IP Address Description: http://learn.komby.com/Configuration#IP_Address
+// IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP_ADDRESS
 static uint8_t ip[] = { 192, 168, 1, 99 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
-// TRANSMIT_CHANNEL Description: http://learn.komby.com/Configuration#Transmit_Channel
+// TRANSMIT_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#TRANSMIT_CHANNEL
 // Valid Values: 1-124
 #define TRANSMIT_CHANNEL			100
 
-// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
-// Valid Values: RF24_250KBPS, RF24_1MBPS 
+// DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
+// Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE					RF24_250KBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 

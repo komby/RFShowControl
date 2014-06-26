@@ -1,8 +1,10 @@
 /*
  * FastSPI_LED2_PixelControl - This class is built as an adapter to control all of the pixels supported by FastSPI_LED2 with the RFPixel Control library.
- * 
+ *
  * Created on: May 28th, 2014
  * Author: Mat Mrosko
+ *
+ * Updated: June 25th 2014 Greg Scull - Renaming to reflect the Fast SPI Library rename
  *
  * License:
  *		Users of this software agree to hold harmless the creators and
@@ -15,13 +17,13 @@
  *		The Commercial Use of this Software is Prohibited.
  */
 
-#include "FastSPI_LED2_PixelControl.h"
+#include "FastLED_PixelControl.h"
 
-FastSPI_LED2_PixelControl::FastSPI_LED2_PixelControl(CLEDController *pLed) : mLed(pLed)
+FastLED_PixelControl::FastLED_PixelControl(CLEDController *pLed) : mLed(pLed)
 {
 }
 
-void FastSPI_LED2_PixelControl::Begin(RFPixelControl *radio)
+void FastLED_PixelControl::Begin(RFPixelControl *radio)
 {
 	LEDS.setBrightness(128);
 	leds = (CRGB*) radio->GetControllerDataBase(0);
@@ -33,7 +35,7 @@ void FastSPI_LED2_PixelControl::Begin(RFPixelControl *radio)
 /**
  * Paint method to keep compatibility with the other Pixel types
  */
-void FastSPI_LED2_PixelControl::Paint()
+void FastLED_PixelControl::Paint()
 {
 	LEDS.show();
 }

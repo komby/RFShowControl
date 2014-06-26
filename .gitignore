@@ -6,3 +6,6 @@ tags
 examples/*/Arduino-Makefile/
 examples/*/Makefile
 examples/*/build-cli/
+*.atsln
+*.atsuo
+*.cproj

@@ -30,55 +30,55 @@
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
 // Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE					RF1
 
-// PIXEL_TYPE Description: http://learn.komby.com/wiki/Configuration#Pixel_Type
+// PIXEL_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_TYPE
 // Valid Values: GECE, LPD_6803, LPD_8806, SM_16716, TM_1803, TM_1809, UCS_1903, WM_2999, WS_2801, WS_2811
 #define PIXEL_TYPE				GECE
 
-// PIXEL_COLOR_ORDER Description: http://learn.komby.com/wiki/Configuration#Pixel_Color_Order
+// PIXEL_COLOR_ORDER Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_COLOR_ORDER
 // Valid Values: RGB, RBG, GRB, GBR, BRG, BGR
 #define PIXEL_COLOR_ORDER			RGB
 
-// OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/Configuration#OTA
+// OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/wiki/58/configuration-settings#OVER_THE_AIR_CONFIG_ENABLE
 // Valid Values: OTA_ENABLED, OTA_DISABLED
 #define OVER_THE_AIR_CONFIG_ENABLE	0
 
-// RECEIVER_UNIQUE_ID Description: http://learn.komby.com/Configuration#Receiver_Unique_Id
+// RECEIVER_UNIQUE_ID Description: http://learn.komby.com/wiki/58/configuration-settings#RECEIVER_UNIQUE_ID
 // Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID			33
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
-// LISTEN_CHANNEL Description: http://learn.komby.com/Configuration:Listen_Channel
+// LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
 // Valid Values: 1-124
 #define LISTEN_CHANNEL				100
 
-// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
-// Valid Values: RF24_250KBPS, RF24_1MBPS 
+// DATA_RATE Description:  http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
+// Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE					RF24_250KBPS
 
-// HARDCODED_START_CHANNEL Description: http://learn.komby.com/Configuration#Hardcoded_Start_Channel
+// HARDCODED_START_CHANNEL Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
 #define HARDCODED_START_CHANNEL		1
 
-// HARDCODED_NUM_PIXELS Description: http://learn.komby.com/Configuration#Hardcoded_Num_Pixels
+// HARDCODED_NUM_PIXELS Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_PIXELS
 // Valid Values: 1-170
 #define HARDCODED_NUM_PIXELS		170
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
-// PIXEL_DATA_PIN Description: http://learn.komby.com/wiki/Configuration#Pixel_Data_Pin
-// Valid Values: Any arduino Analog or Digital pin, typically ~1-16 
+// PIXEL_DATA_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_DATA_PIN
+// Valid Values: Any arduino Analog or Digital pin, typically ~1-16
 #define PIXEL_DATA_PIN				2
 
-// PIXEL_CLOCK_PIN Description: http://learn.komby.com/wiki/Configuration#Pixel_Clock_Pin
+// PIXEL_CLOCK_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_CLOCK_PIN
 // Valid Values: Any arduino Analog or Digital pin, typically ~1-16
 #define PIXEL_CLOCK_PIN				4
 
-//How Bright should our LEDs start at
+//How Bright should our LEDs start at Description:  http://learn.komby.com/wiki/58/configuration-settings#LED_BRIGHTNESS
 #define LED_BRIGHTNESS				128 //50%
 
 //#define DEBUG						1
