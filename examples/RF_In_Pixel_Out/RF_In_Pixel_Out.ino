@@ -139,7 +139,7 @@ void setup(void)
 #else
 	strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
 
-	for (int i = 0; i < strip.GetPixelCount(); i++)
+	for (int i = 0; i < strip.GetPixelCount() / 3; i++)
 	{
 		strip.SetPixelColor(i, strip.Color(0, 0, 0));
 	}
