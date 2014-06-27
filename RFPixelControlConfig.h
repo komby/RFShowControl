@@ -93,7 +93,7 @@ LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN)
 	 (PIXEL_TYPE == TM_1803) || \
 	 (PIXEL_TYPE == UCS_1903) || \
 	 (PIXEL_TYPE == WS_2811))
-#include <FastSPI_LED2.h>
+#include <FastLED.h>
 CRGB *leds;
 #define FAST_SPI_CONTROL
 #endif
