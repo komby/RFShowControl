@@ -32,6 +32,7 @@
 #include "LPD6803.h"
 #include "IPixelControl.h"
 #include "FastLED_PixelControl.h"
+#include "MemoryFree.h"
 #include "printf.h"
 #include "RFPixelControl.h"
 #include "WM2999PixelControl.h"
