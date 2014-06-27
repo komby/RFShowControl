@@ -1,6 +1,6 @@
 /*
  * RF1DumbRGB - RFPixelControl Receiver code for the DumbRGB expansion board.
- * 
+ *
  * Created on: Mar 2013
  * Updated 6/2/2013
  * Author: Greg Scull, komby@komby.com
@@ -49,7 +49,7 @@
 #define LISTEN_CHANNEL				100
 
 // DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
-// Valid Values: RF24_250KBPS, RF24_1MBPS 
+// Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE					RF24_250KBPS
 
 // HARDCODED_START_CHANNEL Description: http://learn.komby.com/Configuration#Hardcoded_Start_Channel
@@ -96,12 +96,12 @@ void setup(void)
 	{
 		 radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS, 0);
 	}
-	
+
  	delay(2);
 
 	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 #ifdef DEBUG
-	radio.printDetails(); 
+	radio.printDetails();
 #endif
 
 	buffer= radio.GetControllerDataBase(0);
@@ -123,7 +123,7 @@ void loop(void)
 		dumbRGBShow(buffer[0], buffer[1], buffer[2], 1);
 	}
 }
- 
+
 void dumbRGBShow(int r, int g, int b, int d)
 {
 	analogWrite(RED_PIN, r);

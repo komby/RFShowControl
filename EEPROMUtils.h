@@ -33,7 +33,7 @@ inline void eeprom_erase_all(byte b = 0xFF) {
 // Dump eeprom memory contents over serial port.
 // For each byte, address and value are written.
 //
-inline void eeprom_serial_dump_column() {
+inline void eeprom_serial_dump_column(void) {
 	// counter
 	int i;
 

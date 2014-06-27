@@ -103,18 +103,18 @@ public:
 	void PrintControllerConfig(ControllerInfo pControllerInfo);
 
 	bool GetControllerDataUpdate(void);
-	
+
 	bool ProcessPacket(byte *dest, byte *src);
-	
+
 	uint8_t *GetControllerDataBase(uint8_t pLogicalControllerNumber);
 	/**
 	ConfigureReceiverAtStartup
 	Returns true if OTAConfig is received.
 	*/
 	bool ConfigureReceiverAtStartup(uint32_t pReceiverId);
-	
+
 	int processConntrollerConfigPacket(uint8_t *pConfigPacket);
-	
+
 	void processLogicalConfigPacket(uint8_t *pLogicalConfigPacket);
 
 	int32_t littleToBigEndianLong(uint8_t *lowByteAddrPtr) ;
@@ -124,7 +124,7 @@ public:
 	bool EnableOverTheAirConfiguration(uint8_t enabled);
 
 	int GetNumberOfChannels(int pLogicalController);
-	
+
 	void AddLogicalController(uint8_t pLControllerName, uint32_t pLcontrollerStartChannel, uint32_t pLControllerNumChannels, uint32_t pLControllerBaudRate);
 
 	void PrintControllerConfig(void);
@@ -143,4 +143,4 @@ private:
 };
 
 #endif //__RFPIXELCONTROL_H__
-	
+

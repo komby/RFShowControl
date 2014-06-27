@@ -31,9 +31,9 @@ class WM2999PixelControl: public WM2999, public IPixelControl
 public:
 	WM2999PixelControl(uint8_t ppin);
 	void Begin(uint8_t *pDataPointer, int pNumLEDs);
-	
+
 	void SetDataBasePointer(uint8_t *dataPointer);
-	
+
 	void Paint(void);
 };
 

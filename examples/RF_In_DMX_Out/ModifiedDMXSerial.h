@@ -1,10 +1,10 @@
 // - - - - -
 // DMXSerial - A hardware supported interface to DMX.
 // DMXSerial.h: Library header file
-// 
+//
 // Copyright (c) 2011 by Matthias Hertel, http://www.mathertel.de
 // This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
-// 
+//
 // Documentation and samples are available at http://www.mathertel.de/Arduino
 // 25.07.2011 creation of the DMXSerial library.
 // 01.12.2011 include file changed to work with the Arduino 1.0 environment
@@ -27,7 +27,7 @@
 // ----- Enumerations -----
 
 // Mode of Operation
-typedef enum { 
+typedef enum {
   DMXNone, // unspecified
   DMXController, // always sending
   DMXReceiver, // always listening
@@ -53,7 +53,7 @@ class ModifiedDMXSerialClass
     void    write      (int channel, uint8_t value);
 
     // Calculate how long no data backet was received
-    unsigned long noDataSince();
+    unsigned long noDataSince(void);
 
     // Terminate operation.
     void    term       (void);

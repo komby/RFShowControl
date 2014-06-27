@@ -1,6 +1,6 @@
 /*
  * RenardControl
- * 
+ *
  * Created on: June 20th, 2013
  * Author: Mat Mrosko
  *
@@ -27,7 +27,7 @@ RenardControl::RenardControl(uint32_t baud_rate)
 }
 
 
-void RenardControl::Paint()
+void RenardControl::Paint(void)
 {
 	Serial.write(0x7E);
 	Serial.write(0x80);

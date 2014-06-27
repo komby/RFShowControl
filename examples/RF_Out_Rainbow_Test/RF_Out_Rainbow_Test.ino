@@ -28,7 +28,7 @@
 #define TRANSMIT_CHANNEL				100
 
 // DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
-// Valid Values: RF24_250KBPS, RF24_1MBPS 
+// Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE					RF24_250KBPS
 
 // HARDCODED_NUM_PIXELS Description: http://learn.komby.com/Configuration#Hardcoded_Num_Pixels

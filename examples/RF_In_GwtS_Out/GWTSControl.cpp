@@ -1,6 +1,6 @@
 /*
  * GWTSControl - Wrapper of the GwtS library for IPixelControl
- * 
+ *
  * Created on: November 25th, 2013
  * Author: Mat Mrosko
  *
@@ -17,18 +17,18 @@
  *		The Commercial Use of this Software is Prohibited.
  */
 
-#include <GWTSControl.h>
+#include "GWTSControl.h"
 
-GWTSControl::GWTSControl() : GWTS()
+GWTSControl::GWTSControl(void) : GWTS()
 {
 }
 
 
 /**
  * Paint method to keep compatibility with the other Pixel types
- * 
+ *
  */
-void GWTSControl::Paint()
+void GWTSControl::Paint(void)
 {
 	this->set_colors(pixels[0],
 					 pixels[1],

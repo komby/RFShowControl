@@ -1,6 +1,6 @@
 /*
  * GECEPixelControl: Wrappter of the GEColorEffects library for IPixelControl
- * 
+ *
  * Created on: June 20th, 2013
  * Author: Mat Mrosko
  *
@@ -26,7 +26,7 @@ GECEPixelControl::GECEPixelControl(uint8_t pin, int pixelCount) : GEColorEffects
 /**
  * Paint method to keep compatibility with the other Pixel types
  */
-void GECEPixelControl::Paint()
+void GECEPixelControl::Paint(void)
 {
 	cli();
     int numPixels = numLEDs/3;

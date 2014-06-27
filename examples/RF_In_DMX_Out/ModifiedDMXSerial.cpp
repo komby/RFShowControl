@@ -1,10 +1,10 @@
 // - - - - -
 // DMXSerial - A hardware supported interface to DMX.
 // DMXSerial.cpp: Library implementation file
-// 
+//
 // Copyright (c) 2011 by Matthias Hertel, http://www.mathertel.de
 // This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
-// 
+//
 // Documentation and samples are available at http://www.mathertel.de/Arduino
 // 25.07.2011 creation of the DMXSerial library.
 // 10.09.2011 fully control the serial hardware register
@@ -18,10 +18,10 @@
 
 // - - - - -
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <avr/interrupt.h>
 
 #include "ModifiedDMXSerial.h"
-#include <avr/interrupt.h>
 
 // ----- Debugging -----
 
@@ -43,7 +43,7 @@
 
 #define UCSRnB UCSR0B  // USART Control and Status Register B
 
-#define RXCIEn RXCIE0  // Enable Receive Complete Interrupt 
+#define RXCIEn RXCIE0  // Enable Receive Complete Interrupt
 #define TXCIEn TXCIE0  // Enable Transmission Complete Interrupt
 #define UDRIEn UDRIE0  // Enable Data Register Empty Interrupt
 #define RXENn  RXEN0   // Enable Receiving
@@ -108,7 +108,7 @@ volatile uint8_t *  _dmxData;
 // Create a single class instance. Multiple class instances (multiple simultaneous DMX ports) are not supported.
 ModifiedDMXSerialClass ModifiedDMXSerial;
 
-  
+
 // ----- forwards -----
 
 void _DMXSerialBaud(uint16_t baud_setting, uint8_t format);
@@ -131,7 +131,7 @@ void ModifiedDMXSerialClass::init (int mode, uint8_t* data)
   _dmxRecvState= IDLE; // initial state
   _dmxChannel = 0;
   _gotLastPacket = millis(); // remember current (relative) time in msecs.
-  
+
   // initialize the DMX buffer
   for (int n = 0; n < DMXSERIAL_MAX+1; n++)
     _dmxData[n] = 0;
@@ -140,7 +140,7 @@ void ModifiedDMXSerialClass::init (int mode, uint8_t* data)
   _dmxMode = (DMXMode)mode;
 
   if (_dmxMode == DMXController) {
-    // Setup external mode signal 
+    // Setup external mode signal
     pinMode(DmxModePin, OUTPUT); // enables pin 2 for output to control data direction
     digitalWrite(DmxModePin, DmxModeOut); // data Out direction
 
@@ -152,9 +152,9 @@ void ModifiedDMXSerialClass::init (int mode, uint8_t* data)
     _DMXSerialBaud(Calcprescale(BREAKSPEED), BREAKFORMAT);
     _DMXSerialWriteByte((uint8_t)0);
     _dmxChannel = 0;
-    
+
   } else if (_dmxMode == DMXReceiver) {
-    // Setup external mode signal 
+    // Setup external mode signal
     pinMode(DmxModePin, OUTPUT); // enables pin 2 for output to control data direction
     digitalWrite(DmxModePin, DmxModeIn); // data in direction
 
@@ -209,7 +209,7 @@ void ModifiedDMXSerialClass::write(int channel, uint8_t value)
 
 
 // Calculate how long no data packet was received
-unsigned long ModifiedDMXSerialClass::noDataSince()
+unsigned long ModifiedDMXSerialClass::noDataSince(void)
 {
   unsigned long now = millis();
   return(now - _gotLastPacket);
@@ -224,7 +224,7 @@ void ModifiedDMXSerialClass::term(void)
 } // term()
 
 
-// ----- internal functions and interrupt implementations ----- 
+// ----- internal functions and interrupt implementations -----
 
 
 // Initialize the Hardware serial port with the given baud rate
@@ -273,19 +273,19 @@ ISR(USART_RX_vect)
       _dmxRecvState = DATA;  // normal DMX start code detected
       _dmxChannel= 1;       // start with channel # 1
       _gotLastPacket = millis(); // remember current (relative) time in msecs.
-      
+
     } else {
       // This might be a RDM command -> not implemented so wait for next BREAK !
       _dmxRecvState= IDLE;
     } // if
-    
+
   } else if (DmxState == DATA) {
     _dmxData[_dmxChannel]= DmxByte;	// store received data into dmx data buffer.
     _dmxChannel++;
     if (_dmxChannel > DMXSERIAL_MAX) { // all channels done.
       _dmxRecvState = IDLE;	// wait for next break
     } // if
-   
+
   } // if
 
 #ifdef SCOPEDEBUG
@@ -318,7 +318,7 @@ ISR(USART_TX_vect)
   } else if (_dmxChannel == 0) {
     // this interrupt occurs after the stop bits of the break byte
     // now back to DMX speed: 250000baud
-    _DMXSerialBaud(Calcprescale(DMXSPEED), DMXFORMAT); 
+    _DMXSerialBaud(Calcprescale(DMXSPEED), DMXFORMAT);
     // take next interrupt when data register empty (early)
     UCSRnB = (1<<TXENn) | (1<<UDRIEn);
     // write start code

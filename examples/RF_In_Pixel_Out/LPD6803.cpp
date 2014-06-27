@@ -1,4 +1,5 @@
 #include <TimerOne.h>
+
 #include "LPD6803.h"
 
 /*****************************************************************************
@@ -16,7 +17,7 @@ static uint16_t *pixels;
 static uint16_t numLEDs;
 
 static uint8_t dataPin, clockPin;
- 
+
 enum lpd6803mode {
   START,
   HEADER,
@@ -36,26 +37,26 @@ static uint16_t swapAsap = 0;   //flag to indicate that the colors need an updat
 //Frequency was set in setup(). Called once for every bit of data sent
 //In your code, set global Sendmode to 0 to re-send the data to the pixels
 //Otherwise it will just send clocks.
-void LedOut() {
+void LedOut(void) {
   // PORTB |= _BV(5);    // port 13 LED for timing debug
 
   switch(SendMode) {
     case DONE:            //Done..just send clocks with zero data
       if (swapAsap>0) {
-        if(!BlankCounter)    //AS SOON AS CURRENT pwm IS DONE. BlankCounter 
+        if(!BlankCounter)    //AS SOON AS CURRENT pwm IS DONE. BlankCounter
       	{
         	BitCount = 0;
         	LedIndex = swapAsap;  //set current led
         	SendMode = HEADER;
 	      	swapAsap = 0;
-      	}   	
+      	}
       }
       break;
 
     case DATA:               //Sending Data
       if ((1 << (15-BitCount)) & pixels[LedIndex]) {
 		if (!lastdata) {     // digitalwrites take a long time, avoid if possible
-	  		// If not the first bit then output the next bits 
+	  		// If not the first bit then output the next bits
 	  		// (Starting with MSB bit 15 down.)
 	  		digitalWrite(dataPin, 1);
 	  		lastdata = 1;
@@ -67,7 +68,7 @@ void LedOut() {
 		}
       }
       BitCount++;
-      
+
       if(BitCount == 16)    //Last bit?
       {
         LedIndex++;        //Move to next LED
@@ -81,7 +82,7 @@ void LedOut() {
           	SendMode = DONE;  //No more LEDs to go, we are done!
 		}
       }
-      break;      
+      break;
     case HEADER:            //Header
       if (BitCount < 32) {
 		digitalWrite(dataPin, 0);
@@ -95,20 +96,20 @@ void LedOut() {
       }
       break;
     case START:            //Start
-      if (!BlankCounter)    //AS SOON AS CURRENT pwm IS DONE. BlankCounter 
+      if (!BlankCounter)    //AS SOON AS CURRENT pwm IS DONE. BlankCounter
       {
         BitCount = 0;
         LedIndex = 0;
-        SendMode = HEADER; 
-      }  
-      break;   
+        SendMode = HEADER;
+      }
+      break;
   }
 
   // Clock out data (or clock LEDs)
   digitalWrite(clockPin, HIGH);
   digitalWrite(clockPin, LOW);
-  
-  //Keep track of where the LEDs are at in their pwm cycle. 
+
+  //Keep track of where the LEDs are at in their pwm cycle.
   BlankCounter++;
 
   // PORTB &= ~_BV(5);   // pin 13 digital output debug
@@ -169,7 +170,7 @@ void LPD6803::doSwapBuffersAsap(uint16_t idx) {
 //---
 void LPD6803::setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
   uint16_t data;
-	
+
   if (n > numLEDs) return;
 
   data = g & 0x1F;
@@ -178,7 +179,7 @@ void LPD6803::setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
   data <<= 5;
   data |= r & 0x1F;
   data |= 0x8000;
-  
+
   pixels[n] = data;
 }
 

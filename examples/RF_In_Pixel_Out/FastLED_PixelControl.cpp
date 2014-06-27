@@ -35,7 +35,7 @@ void FastLED_PixelControl::Begin(RFPixelControl *radio)
 /**
  * Paint method to keep compatibility with the other Pixel types
  */
-void FastLED_PixelControl::Paint()
+void FastLED_PixelControl::Paint(void)
 {
 	LEDS.show();
 }

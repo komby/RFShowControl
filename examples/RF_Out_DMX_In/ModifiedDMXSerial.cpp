@@ -15,10 +15,10 @@
 // ModifiedDMXSerial created  2014 - Author: Greg Scull, http://www.komby.com
 //
 
-#include "Arduino.h"
+#include <Arduino.h>
+#include <avr/interrupt.h>
 
 #include "ModifiedDMXSerial.h"
-#include <avr/interrupt.h>
 
 // ----- Debugging -----
 
@@ -152,7 +152,7 @@ void ModifiedDMXSerialClass::init (int mode)
 	//TODO Refactor to constant A0 is used as the RX/TX en pin on the RF1 Serial adapter
 	pinMode(A0, OUTPUT); // enables pin 2 for output to control data direction
 	digitalWrite(A0, LOW); //Set it low to put the RS485 chip in Receive mode
-	
+
 	#ifdef SCOPEDEBUG
 	//if in debug mode define some pins for watching the timing in the logic analyzer
 	pinMode(rxStatusPin, OUTPUT); // enables pin 2 for output to control data direction
@@ -194,12 +194,12 @@ void ModifiedDMXSerialClass::maxChannel(int channel)
 
 //TODO, Pull the RF packet writing out of the main loop so we dont have to hand out
 //these pointers
-byte * ModifiedDMXSerialClass::GetPacketPointer(){
+byte * ModifiedDMXSerialClass::GetPacketPointer(void){
 	return &str[sub1-1][0];
 }
 
 //TODO refactor me
-bool ModifiedDMXSerialClass::isPacketReady(){
+bool ModifiedDMXSerialClass::isPacketReady(void){
 	return packetready;
 }
 
@@ -236,10 +236,10 @@ void _DMXSerialBaud(uint16_t baud_setting, uint8_t format)
 // Interrupt Service Routine, called when a byte or frame error was received.
 ISR(USART_RX_vect)
 {
-	
+
 	unsigned char status = UCSR0A;
 	unsigned char data = UDR0;
-      
+
       //ISR Refactored from Switch to preserve memory
 	if(dmx_state== DMX_IDLE){
 		if (status & (1<<FE0))
@@ -261,11 +261,11 @@ ISR(USART_RX_vect)
 	}
 	else if(dmx_state== DMX_START)
 	{
-                //New DMX frame 
+                //New DMX frame
 		dmx_addr++;
                 //Logic to handle the first channel
 		if (dmx_addr == dmx_start_addr)
-		{                
+		{
 			chan_cnt = 0;  //Reset Channel Count
 			sub1=0;  //Reset array subscripts to 0
 			sub2=0;
@@ -280,7 +280,7 @@ ISR(USART_RX_vect)
 		chan_cnt++;  //increment channel
 
                 //If we just added the 30th byte, its time to prep this packet for send.
-		if (sub2==30) 
+		if (sub2==30)
 		{
 			str[sub1][30]=sub1;   //set packet number in byte 30
 			sub2=0;               //reset packet byte counter
@@ -303,4 +303,4 @@ ISR(USART_RX_vect)
 		dmx_state = DMX_IDLE;
 	}
 }
-	
+

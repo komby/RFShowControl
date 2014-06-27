@@ -52,7 +52,7 @@
 #define LISTEN_CHANNEL				100
 
 // DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
-// Valid Values: RF24_250KBPS, RF24_1MBPS 
+// Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE					RF24_250KBPS
 
 // HARDCODED_START_CHANNEL Description: http://learn.komby.com/Configuration#Hardcoded_Start_Channel
@@ -66,7 +66,7 @@
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
 // PIXEL_DATA_PIN Description: http://learn.komby.com/wiki/Configuration#Pixel_Data_Pin
-// Valid Values: Any arduino Analog or Digital pin, typically ~1-16 
+// Valid Values: Any arduino Analog or Digital pin, typically ~1-16
 #define PIXEL_DATA_PIN				2
 
 //#define DEBUG						1

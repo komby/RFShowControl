@@ -52,15 +52,15 @@ class ModifiedDMXSerialClass
 	void    write      (int channel, uint8_t value);
 
 	// Calculate how long no data packet was received
-	unsigned long noDataSince();
+	unsigned long noDataSince(void);
 
 	// Terminate operation.
 	void    term       (void);
 
-	bool isPacketReady();
+	bool isPacketReady(void);
 
 	void setPacketReady(bool in);
-	byte * GetPacketPointer();
+	byte * GetPacketPointer(void);
 };
 
 // Use the DMXSerial library through the DMXSerial object.
