@@ -80,7 +80,7 @@ void dumbRGBShow(int r, int g, int b, int d);
 void setup(void)
 {
 #ifdef DEBUG
-	Serial.begin(57600);
+	Serial.begin(115200);
 	printf_begin();
 #endif
 

@@ -99,7 +99,7 @@
 void setup(void)
 {
 #ifdef DEBUG
-	Serial.begin(57600);
+	Serial.begin(115200);
 	printf_begin();
 	Serial.println("Initializing Radio");
 #endif
@@ -111,7 +111,7 @@ void setup(void)
 		radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, 0);
 	}
 
-	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE, RECEIVER_UNIQUE_ID);
+	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
 #ifdef DEBUG
 	radio.printDetails();

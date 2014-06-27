@@ -81,7 +81,7 @@
 void setup(void)
 {
 #ifdef DEBUG
-	Serial.begin(57600);
+	Serial.begin(115200);
 	printf_begin();
 	Serial.println("Initializing Radio");
 #endif

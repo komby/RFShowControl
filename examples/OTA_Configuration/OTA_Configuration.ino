@@ -540,7 +540,7 @@ void logicalInit(WebServer &server, WebServer::ConnectionType type, char *url_ta
 void setup()
 {
 #ifdef DEBUG
-    Serial.begin(57600);
+    Serial.begin(115200);
     printf_begin();
     printf("Startup\n");
 #endif

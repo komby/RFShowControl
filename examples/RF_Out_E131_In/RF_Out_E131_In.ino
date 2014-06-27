@@ -97,7 +97,7 @@ void setup(void)
 	Ethernet.begin(mac,ip);
 	Udp.begin(PortNr);
 
-	Serial.begin(57600);
+	Serial.begin(115200);
 	Serial.println(F("\n[E1.31 Arduino Ethernet Transmitter ]\n"));
 	printf_begin();
 
