@@ -9,3 +9,4 @@ examples/*/build-cli/
 *.atsln
 *.atsuo
 *.cproj
+*.swp
