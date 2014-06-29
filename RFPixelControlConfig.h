@@ -52,9 +52,15 @@ GWTSControl strip = GWTSControl();
 
 
 #if (PIXEL_TYPE == GECE)
+
+#if (HARDCODED_NUM_PIXELS > 63 )
+	#error "GECE only uses 6 address bits, maximum of 63 pixels allowed!"
+#endif
+
 #include "GECEPixelControl.h"
 #include <GEColorEffects.h>
 GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
+#warning "PIXEL_COLOR_ORDER Unsupported for GECEs"
 #endif
 
 
@@ -68,6 +74,7 @@ RenardControl strip = RenardControl(RENARD_BAUD_RATE);
 #include <WM2999.h>
 #include "WM2999PixelControl.h"
 WM2999PixelControl strip = WM2999PixelControl(PIXEL_DATA_PIN);
+#warning "PIXEL_COLOR_ORDER Unsupported for WM2999"
 #endif
 
 
@@ -79,6 +86,7 @@ WM2999PixelControl strip = WM2999PixelControl(PIXEL_DATA_PIN);
 #include "LPD6803PixelControl.h"
 #include <TimerOne.h>
 LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
+#warning "PIXEL_COLOR_ORDER Unsupported for LPD6803"
 #endif
 
 
