@@ -566,8 +566,9 @@ bool RFPixelControl::ProcessPacket(byte *dest, byte *p)
 			calcEndChannel = packetEndChannel;
 			calcEndDestIdx = packetEndChannel - (startChannel);
 			calcEndSourceIdx = packetEndChannel - packetStartChann;
-		}
 
+			retVal = true;
+		}
 	}
 	else
 	{
