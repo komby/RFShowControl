@@ -539,7 +539,6 @@ bool RFPixelControl::ProcessPacket(byte *dest, byte *p)
 			//offset the idx for source by the channel count factor
 			calcStartSourceIdx = startChannel - packetStartChann;
 			//start is after the packet start and before or equal to the end channel.
-
 		}
 		else
 		{
@@ -577,8 +576,8 @@ bool RFPixelControl::ProcessPacket(byte *dest, byte *p)
 		{
 			//Because final is less than the packet end
 			//and >= start we know that the final channel is in this packet
-			calcEndChannel = this->_endChannel ;
-			calcEndDestIdx = finalChannel - startChannel ;
+			calcEndChannel = this->_endChannel;
+			calcEndDestIdx = finalChannel - startChannel;
 			calcEndSourceIdx = finalChannel - packetStartChann;
 
 			//because this is the last packet we care about, return true
