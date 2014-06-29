@@ -65,6 +65,88 @@ GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
 
 
 #if (PIXEL_TYPE == RENARD)
+
+#if ((RENARD_BAUD_RATE != 460800) && \
+	 (RENARD_BAUD_RATE != 230400) && \
+	 (RENARD_BAUD_RATE != 115200) && \
+	 (RENARD_BAUD_RATE != 57600) && \
+	 (RENARD_BAUD_RATE != 38400) && \
+	 (RENARD_BAUD_RATE != 19200))
+	#error "Invalid Renard BAUD RATE"
+#endif
+
+#if (RENARD_BAUD_RATE == 460800)
+#if (HARDCODED_NUM_CHANNELS >= 4584)
+	#error "Cannot have more than 4584 channels with 460800 baud, even with 100ms refresh interval"
+#endif
+#if (HARDCODED_NUM_CHANNELS >= 2292)
+	#warning "Cannot have more than 2292 channels with 460800 baud with 50ms refresh interval"
+#if (HARDCODED_NUM_CHANNELS >= 1146)
+	#warning "Cannot have more than 1146 channels with 460800 baud with 25ms refresh interval"
+#endif
+#endif
+#endif
+
+#if (RENARD_BAUD_RATE == 230400)
+#if (HARDCODED_NUM_CHANNELS >= 2292)
+	#error "Cannot have more than 2292 channels with 230400 baud, even with 100ms refresh interval"
+#endif
+#if (HARDCODED_NUM_CHANNELS >= 1146)
+	#warning "Cannot have more than 1146 channels with 230400 baud with 50ms refresh interval"
+#if (HARDCODED_NUM_CHANNELS >= 573)
+	#warning "Cannot have more than 573 channels with 230400 baud with 25ms refresh interval"
+#endif
+#endif
+#endif
+
+#if (RENARD_BAUD_RATE == 115200)
+#if (HARDCODED_NUM_CHANNELS >= 1146)
+	#error "Cannot have more than 1146 channels with 115200 baud, even with 100ms refresh interval"
+#endif
+#if (HARDCODED_NUM_CHANNELS >= 573)
+	#warning "Cannot have more than 573 channels with 115200 baud with 50ms refresh interval"
+#if (HARDCODED_NUM_CHANNELS >= 285)
+	#warning "Cannot have more than 285 channels with 115200 baud with 25ms refresh interval"
+#endif
+#endif
+#endif
+
+#if (RENARD_BAUD_RATE == 57600)
+#if (HARDCODED_NUM_CHANNELS >= 573)
+	#error "Cannot have more than 573 channels with 57600 baud, even with 100ms refresh interval"
+#endif
+#if (HARDCODED_NUM_CHANNELS >= 285)
+	#warning "Cannot have more than 285 channels with 57600 baud with 50ms refresh interval"
+#if (HARDCODED_NUM_CHANNELS >= 141)
+	#warning "Cannot have more than 141 channels with 57600 baud with 25ms refresh interval"
+#endif
+#endif
+#endif
+
+#if (RENARD_BAUD_RATE == 38400)
+#if (HARDCODED_NUM_CHANNELS >= 381)
+	#error "Cannot have more than 381 channels with 38400 baud, even with 100ms refresh interval"
+#endif
+#if (HARDCODED_NUM_CHANNELS >= 189)
+	#warning "Cannot have more than 189 channels with 38400 baud with 50ms refresh interval"
+#if (HARDCODED_NUM_CHANNELS >= 93)
+	#warning "Cannot have more than 93 channels with 38400 baud with 25ms refresh interval"
+#endif
+#endif
+#endif
+
+#if (RENARD_BAUD_RATE == 19200)
+#if (HARDCODED_NUM_CHANNELS >= 189)
+	#error "Cannot have more than 189 channels with 19200 baud, even with 100ms refresh interval"
+#endif
+#if (HARDCODED_NUM_CHANNELS >= 93)
+	#warning "Cannot have more than 93 channels with 19200 baud with 50ms refresh interval"
+#if (HARDCODED_NUM_CHANNELS >= 45)
+	#warning "Cannot have more than 45 channels with 19200 baud with 25ms refresh interval"
+#endif
+#endif
+#endif
+
 #include "RenardControl.h"
 RenardControl strip = RenardControl(RENARD_BAUD_RATE);
 #endif
