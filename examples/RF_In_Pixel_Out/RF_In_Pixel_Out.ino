@@ -74,7 +74,7 @@
 
 // HARDCODED_NUM_PIXELS Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_PIXELS
 // Valid Values: 1-170
-#define HARDCODED_NUM_PIXELS		170
+#define HARDCODED_NUM_PIXELS		50
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
