@@ -68,8 +68,6 @@ void setup(void)
 
 	radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, 0);
 	radio.printDetails();
-
-	Serial.write("Init and Paint LEDS for startup \n");
 }
 
 void loop(void)
