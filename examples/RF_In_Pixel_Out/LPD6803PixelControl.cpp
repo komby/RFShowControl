@@ -12,7 +12,7 @@
 
 LPD6803PixelControl::LPD6803PixelControl(uint8_t pClock, uint8_t pData) : LPD6803(50,pClock,pData)
 {
-	this->LPD6803::begin();
+  this->LPD6803::begin();
 }
 
 /**
@@ -21,6 +21,6 @@ LPD6803PixelControl::LPD6803PixelControl(uint8_t pClock, uint8_t pData) : LPD680
  */
 void LPD6803PixelControl::Paint(void)
 {
-	this->show();
-	//delay(2);  //Hold for 2 milliseconds to latch color. This may be 1MS longer than needed??
+  this->show();
+  //delay(2);  //Hold for 2 milliseconds to latch color. This may be 1MS longer than needed??
 }

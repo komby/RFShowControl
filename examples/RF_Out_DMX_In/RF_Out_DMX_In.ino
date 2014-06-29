@@ -1,31 +1,31 @@
 /*
  * SerialDMXToRFTransmitter
  *
- *		This code is a derivative of the original work done by
- *		Joe Johnson RFColor_24 Receiver Program
+ *    This code is a derivative of the original work done by
+ *    Joe Johnson RFColor_24 Receiver Program
  *
- *		The Code which Joe wrote inspired this software, the related hardware and
- *		it was also used as a starting point for this class.
+ *    The Code which Joe wrote inspired this software, the related hardware and
+ *    it was also used as a starting point for this class.
  *
- *		As with the RFColor_24 The commercial Use of this software is Prohibited.
- *		Use this software and (especially) the hardware at your own risk.
+ *    As with the RFColor_24 The commercial Use of this software is Prohibited.
+ *    Use this software and (especially) the hardware at your own risk.
  *
- *		This code also uses a modified version of the DMXSerial library @see ModifiedDMXSerial for more information.
+ *    This code also uses a modified version of the DMXSerial library @see ModifiedDMXSerial for more information.
  *
- *		NOTE: This no longer requries the use of the hardware serial hack
+ *    NOTE: This no longer requries the use of the hardware serial hack
  *
  * Created on: Mar 2014
  * Author: Greg Scull, komby@komby.com
  *
  * License:
- *		Users of this software agree to hold harmless the creators and
- *		contributors of this software.  By using this software you agree that
- *		you are doing so at your own risk, you could kill yourself or someone
- *		else by using this software and/or modifying the factory controller.
- *		By using this software you are assuming all legal responsibility for
- *		the use of the software and any hardware it is used on.
+ *    Users of this software agree to hold harmless the creators and
+ *    contributors of this software.  By using this software you agree that
+ *    you are doing so at your own risk, you could kill yourself or someone
+ *    else by using this software and/or modifying the factory controller.
+ *    By using this software you are assuming all legal responsibility for
+ *    the use of the software and any hardware it is used on.
  *
- *		The Commercial Use of this Software is Prohibited.
+ *    The Commercial Use of this Software is Prohibited.
  */
 
 #include <EEPROM.h>
@@ -40,25 +40,25 @@
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
 // Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
-#define NRF_TYPE					RF1
+#define NRF_TYPE                        RF1
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // TRANSMIT_CHANNEL Description: http://learn.komby.com/Configuration#Transmit_Channel
 // Valid Values: 1-124
-#define TRANSMIT_CHANNEL				100
+#define TRANSMIT_CHANNEL                100
 
 // DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
 // Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE					RF24_250KBPS
+#define DATA_RATE                       RF24_250KBPS
 
 // HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/Configuration#Hardcoded_Num_Channels
 // Valid Values: 1-512
-#define HARDCODED_NUM_CHANNELS		512
+#define HARDCODED_NUM_CHANNELS          512
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
-//#define DEBUG						1
+//#define DEBUG                           1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
@@ -67,19 +67,19 @@
 
 void setup(void)
 {
-	pinMode(A0, OUTPUT);
-	digitalWrite(A0, HIGH);
+  pinMode(A0, OUTPUT);
+  digitalWrite(A0, HIGH);
 
-	radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE, 0);
-	ModifiedDMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
-	ModifiedDMXSerial.init(DMXReceiver);
+  radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE, 0);
+  ModifiedDMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
+  ModifiedDMXSerial.init(DMXReceiver);
 }
 
 void loop(void)
 {
-	if (ModifiedDMXSerial.isPacketReady())
-	{
-		radio.write_payload(ModifiedDMXSerial.GetPacketPointer(), 32);
-		ModifiedDMXSerial.setPacketReady(false);
-	}
+  if (ModifiedDMXSerial.isPacketReady())
+  {
+    radio.write_payload(ModifiedDMXSerial.GetPacketPointer(), 32);
+    ModifiedDMXSerial.setPacketReady(false);
+  }
 }

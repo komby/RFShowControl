@@ -28,8 +28,8 @@
 // to debug on an oscilloscope, enable this
 #undef SCOPEDEBUG
 #ifdef SCOPEDEBUG
-#define DmxTriggerPin 9	// low spike at beginning of start byte
-#define DmxISRPin 3	// low during interrupt service routines
+#define DmxTriggerPin 9  // low spike at beginning of start byte
+#define DmxISRPin 3  // low during interrupt service routines
 #endif
 
 // ----- Constants -----
@@ -257,10 +257,10 @@ ISR(USART_RX_vect)
 #endif
   //  digitalWrite(rxStatusPin, HIGH);
   uint8_t  USARTstate= UCSRnA;    //get state before data!
-  uint8_t  DmxByte   = UDRn;	    //get data
-  uint8_t  DmxState  = _dmxRecvState;	//just load once from SRAM to increase speed
+  uint8_t  DmxByte   = UDRn;      //get data
+  uint8_t  DmxState  = _dmxRecvState;  //just load once from SRAM to increase speed
 
-  if (USARTstate & (1<<FEn)) {  	//check for break
+  if (USARTstate & (1<<FEn)) {    //check for break
     _dmxRecvState = BREAK; // break condition detected.
     _dmxChannel= 0;        // The next data byte is the start byte
 
@@ -280,10 +280,10 @@ ISR(USART_RX_vect)
     } // if
 
   } else if (DmxState == DATA) {
-    _dmxData[_dmxChannel]= DmxByte;	// store received data into dmx data buffer.
+    _dmxData[_dmxChannel]= DmxByte;  // store received data into dmx data buffer.
     _dmxChannel++;
     if (_dmxChannel > DMXSERIAL_MAX) { // all channels done.
-      _dmxRecvState = IDLE;	// wait for next break
+      _dmxRecvState = IDLE;  // wait for next break
     } // if
 
   } // if

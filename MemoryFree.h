@@ -3,7 +3,7 @@
 //
 // Extended by Matthew Murdoch to include walking of the free list.
 
-#ifndef	MEMORY_FREE_H
+#ifndef MEMORY_FREE_H
 #define MEMORY_FREE_H
 
 #ifdef __cplusplus

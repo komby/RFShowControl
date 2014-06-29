@@ -27,10 +27,10 @@
 
 // Mode of Operation
 typedef enum {
-	DMXNone, // unspecified
-	DMXController, // always sending
-	DMXReceiver, // always listening
-	RDMTestmode // not implemented yet
+  DMXNone, // unspecified
+  DMXController, // always sending
+  DMXReceiver, // always listening
+  RDMTestmode // not implemented yet
 } DMXMode;  // not implemented yet.
 
 
@@ -38,29 +38,29 @@ typedef enum {
 
 class ModifiedDMXSerialClass
 {
-	public:
-	// Initialize for specific mode.
-	void    init       (int mode);
+  public:
+  // Initialize for specific mode.
+  void    init       (int mode);
 
-	// Set the maximum used channel for DMXController mode.
-	void    maxChannel (int channel);
+  // Set the maximum used channel for DMXController mode.
+  void    maxChannel (int channel);
 
-	// Read the last known value of a channel.
-	uint8_t read       (int channel);
+  // Read the last known value of a channel.
+  uint8_t read       (int channel);
 
-	// Write a new value of a channel.
-	void    write      (int channel, uint8_t value);
+  // Write a new value of a channel.
+  void    write      (int channel, uint8_t value);
 
-	// Calculate how long no data packet was received
-	unsigned long noDataSince(void);
+  // Calculate how long no data packet was received
+  unsigned long noDataSince(void);
 
-	// Terminate operation.
-	void    term       (void);
+  // Terminate operation.
+  void    term       (void);
 
-	bool isPacketReady(void);
+  bool isPacketReady(void);
 
-	void setPacketReady(bool in);
-	byte * GetPacketPointer(void);
+  void setPacketReady(bool in);
+  byte * GetPacketPointer(void);
 };
 
 // Use the DMXSerial library through the DMXSerial object.

@@ -44,28 +44,28 @@ void LedOut(void) {
     case DONE:            //Done..just send clocks with zero data
       if (swapAsap>0) {
         if(!BlankCounter)    //AS SOON AS CURRENT pwm IS DONE. BlankCounter
-      	{
-        	BitCount = 0;
-        	LedIndex = swapAsap;  //set current led
-        	SendMode = HEADER;
-	      	swapAsap = 0;
-      	}
+        {
+          BitCount = 0;
+          LedIndex = swapAsap;  //set current led
+          SendMode = HEADER;
+          swapAsap = 0;
+        }
       }
       break;
 
     case DATA:               //Sending Data
       if ((1 << (15-BitCount)) & pixels[LedIndex]) {
-		if (!lastdata) {     // digitalwrites take a long time, avoid if possible
-	  		// If not the first bit then output the next bits
-	  		// (Starting with MSB bit 15 down.)
-	  		digitalWrite(dataPin, 1);
-	  		lastdata = 1;
-		}
+    if (!lastdata) {     // digitalwrites take a long time, avoid if possible
+        // If not the first bit then output the next bits
+        // (Starting with MSB bit 15 down.)
+        digitalWrite(dataPin, 1);
+        lastdata = 1;
+    }
       } else {
-		if (lastdata) {       // digitalwrites take a long time, avoid if possible
-	  		digitalWrite(dataPin, 0);
-	  		lastdata = 0;
-		}
+    if (lastdata) {       // digitalwrites take a long time, avoid if possible
+        digitalWrite(dataPin, 0);
+        lastdata = 0;
+    }
       }
       BitCount++;
 
@@ -76,23 +76,23 @@ void LedOut(void) {
         {
           BitCount=0;      //Start from the fist bit of the next LED
         } else {
-	  		// no longer sending data, set the data pin low
-	  		digitalWrite(dataPin, 0);
-	  		lastdata = 0; // this is a lite optimization
-          	SendMode = DONE;  //No more LEDs to go, we are done!
-		}
+        // no longer sending data, set the data pin low
+        digitalWrite(dataPin, 0);
+        lastdata = 0; // this is a lite optimization
+            SendMode = DONE;  //No more LEDs to go, we are done!
+    }
       }
       break;
     case HEADER:            //Header
       if (BitCount < 32) {
-		digitalWrite(dataPin, 0);
-		lastdata = 0;
-		BitCount++;
-		if (BitCount==32) {
-	  		SendMode = DATA;      //If this was the last bit of header then move on to data.
-	  		LedIndex = 0;
-	  		BitCount = 0;
-		}
+    digitalWrite(dataPin, 0);
+    lastdata = 0;
+    BitCount++;
+    if (BitCount==32) {
+        SendMode = DATA;      //If this was the last bit of header then move on to data.
+        LedIndex = 0;
+        BitCount = 0;
+    }
       }
       break;
     case START:            //Start

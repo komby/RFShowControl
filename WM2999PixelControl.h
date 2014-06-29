@@ -8,14 +8,14 @@
  * Author: Greg Scull - komby@komby.com
  *
  * License:
- *		Users of this software agree to hold harmless the creators and
- *		contributors of this software.  By using this software you agree that
- *		you are doing so at your own risk, you could kill yourself or someone
- *		else by using this software and/or modifying the factory controller.
- *		By using this software you are assuming all legal responsibility for
- *		the use of the software and any hardware it is used on.
+ *    Users of this software agree to hold harmless the creators and
+ *    contributors of this software.  By using this software you agree that
+ *    you are doing so at your own risk, you could kill yourself or someone
+ *    else by using this software and/or modifying the factory controller.
+ *    By using this software you are assuming all legal responsibility for
+ *    the use of the software and any hardware it is used on.
  *
- *		The Commercial Use of this Software is Prohibited.
+ *    The Commercial Use of this Software is Prohibited.
  */
 
 #ifndef __WM2999PIXELCONTROL_H__
@@ -29,12 +29,12 @@
 class WM2999PixelControl: public WM2999, public IPixelControl
 {
 public:
-	WM2999PixelControl(uint8_t ppin);
-	void Begin(uint8_t *pDataPointer, int pNumLEDs);
+  WM2999PixelControl(uint8_t ppin);
+  void Begin(uint8_t *pDataPointer, int pNumLEDs);
 
-	void SetDataBasePointer(uint8_t *dataPointer);
+  void SetDataBasePointer(uint8_t *dataPointer);
 
-	void Paint(void);
+  void Paint(void);
 };
 
 #endif //__WM2999PIXELCONTROL_H__

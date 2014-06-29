@@ -7,14 +7,14 @@
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
  * License:
- *		Users of this software agree to hold harmless the creators and
- *		contributors of this software.  By using this software you agree that
- *		you are doing so at your own risk, you could kill yourself or someone
- *		else by using this software and/or modifying the factory controller.
- *		By using this software you are assuming all legal responsibility for
- *		the use of the software and any hardware it is used on.
+ *    Users of this software agree to hold harmless the creators and
+ *    contributors of this software.  By using this software you agree that
+ *    you are doing so at your own risk, you could kill yourself or someone
+ *    else by using this software and/or modifying the factory controller.
+ *    By using this software you are assuming all legal responsibility for
+ *    the use of the software and any hardware it is used on.
  *
- *		The Commercial Use of this Software is Prohibited.
+ *    The Commercial Use of this Software is Prohibited.
  */
 
 #ifndef __GWTSCONTROL_H__
@@ -29,8 +29,8 @@
 class GWTSControl: public GWTS, public IPixelControl
 {
 public:
-	GWTSControl(void);
-	void Paint(void);
+  GWTSControl(void);
+  void Paint(void);
 };
 
 #endif //__GWTSCONTROL_H__
