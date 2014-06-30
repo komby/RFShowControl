@@ -1,3 +1,5 @@
+#ifndef __E131_CONSTANTS_H__
+#define __E131_CONSTANTS_H__
 //E1.31Constants.h
 
 
@@ -144,3 +146,5 @@
 //DMX512-A START Code + data START Code + Data
 #define E1_31_DMP_START 125
 #define E1_31_DMP_FIRST 126
+
+#endif //__E131_CONSTANTS_H__
