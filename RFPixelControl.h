@@ -59,7 +59,13 @@
 #define WM_2999                         5
 #define LPD_6803                        6
 #define GWTS_EARS                       7
-
+#define LPD_8806                        8
+#define SM_16716                        9
+#define TM_1809                         10
+#define TM_1803                         11
+#define UCS_1903                        12
+#define DMX                             13
+#define NONE                            999
 
 class RFPixelControl : public RF24Wrapper
 {

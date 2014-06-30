@@ -68,6 +68,7 @@
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
+#define PIXEL_TYPE                      DMX
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
 

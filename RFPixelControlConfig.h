@@ -193,4 +193,25 @@ const uint64_t pipes[2] = {
   0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
 };
 
+
+#if ((PIXEL_TYPE != GECE) && \
+    (PIXEL_TYPE != WS_2801) && \
+    (PIXEL_TYPE != WS_2811) && \
+    (PIXEL_TYPE != RENARD) && \
+    (PIXEL_TYPE != WM_2999) && \
+    (PIXEL_TYPE != LPD_6803) && \
+    (PIXEL_TYPE != GWTS_EARS) && \
+    (PIXEL_TYPE != LPD_8806) && \
+    (PIXEL_TYPE != SM_16716) && \
+    (PIXEL_TYPE != TM_1809) && \
+    (PIXEL_TYPE != TM_1803) && \
+    (PIXEL_TYPE != UCS_1903) && \
+    (PIXEL_TYPE != DMX) && \
+    (PIXEL_TYPE != NONE))
+  #error "You must define PIXEL_TYPE as one of the following:"
+  #error "  GECE, WS_2801, WS_2811, RENARD, WM_2999,LPD_6803 , GWTS_EARS"
+  #error "  LPD_8806, SM_16716, TM_1809, TM_1803, UCS_1903, DMX"
+#endif
+
+
 #endif //__RF_PIXEL_CONTROL_CONFIG__

@@ -59,6 +59,7 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
+#define PIXEL_TYPE                      NONE
 #define RF_WRAPPER                      1
 //Include this after all configuration variables are set
 #include "RFPixelControlConfig.h"
