@@ -521,11 +521,6 @@ bool RFPixelControl::ProcessPacket(byte *dest, byte *p)
   int calcEndDestIdx = -1;
   int calcEndSourceIdx = -1;
 
-  //first assume we will be copying the whole packet.
-  int channelCopyStartIdx = 0;
-  int channelCopyEndIdx = CHANNELS_PER_PACKET - 1;
-  int numberOfValidChannelsInPacket = channelCopyEndIdx;
-
   //First we need to know what is the first valid channel in this packet
   if (startChannel >= packetStartChann)
   {
@@ -567,7 +562,14 @@ bool RFPixelControl::ProcessPacket(byte *dest, byte *p)
       calcEndDestIdx = packetEndChannel - (startChannel);
       calcEndSourceIdx = packetEndChannel - packetStartChann;
 
-      retVal = true;
+      // MM 2014/06/29:
+      // If we end on a packet boundry and no further packets are sent before
+      // looping, we previously never set retVal to true in this scenario and
+      // would never print our received data to the pixels.
+      if ( packetEndChannel == finalChannel )
+      {
+        retVal = true;
+      }
     }
   }
   else
