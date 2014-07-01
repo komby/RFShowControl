@@ -29,42 +29,43 @@
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
 // Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE                        RF1
 
-// OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/Configuration#OTA
+// OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/wiki/58/configuration-settings#OVER_THE_AIR_CONFIG_ENABLE
 // Valid Values: OTA_ENABLED, OTA_DISABLED
 #define OVER_THE_AIR_CONFIG_ENABLE      0
 
-// RECEIVER_UNIQUE_ID Description: http://learn.komby.com/Configuration#Receiver_Unique_Id
+// RECEIVER_UNIQUE_ID Description: http://learn.komby.com/wiki/58/configuration-settings#RECEIVER_UNIQUE_ID
 // Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID              33
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
-// LISTEN_CHANNEL Description: http://learn.komby.com/Configuration:Listen_Channel
+// LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
 // Valid Values: 1-124
 #define LISTEN_CHANNEL                  100
 
-// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE                       RF24_250KBPS
 
-// HARDCODED_START_CHANNEL Description: http://learn.komby.com/Configuration#Hardcoded_Start_Channel
+// HARDCODED_START_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
 #define HARDCODED_START_CHANNEL         1
 
-// HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/Configuration#Hardcoded_Num_Channels
+// HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
 // Valid Values: 1-512
 #define HARDCODED_NUM_CHANNELS          512
 
-// RENARD_BAUD_RATE Description: http://learn.komby.com/Configuration#Renard_Baud_Rate
+// RENARD_BAUD_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#RENARD_BAUD_RATE
 // Valid Values: 19200, 38400, 57600, 115200, 230400, 460800
 #define RENARD_BAUD_RATE                57600
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+// DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
 //#define DEBUG                           1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 

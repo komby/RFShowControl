@@ -32,22 +32,23 @@
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
 // Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE                        RF1
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
-// LISTEN_CHANNEL Description: http://learn.komby.com/Configuration:Listen_Channel
+// LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
 // Valid Values: 1-124
 #define LISTEN_CHANNEL                  100
 
-// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE                       RF24_250KBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+// DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
 //#define DEBUG                           1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 

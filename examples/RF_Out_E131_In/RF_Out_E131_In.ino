@@ -39,9 +39,9 @@
 // Valid Values: 1-255
 #define UNIVERSE                        1
 
-// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC_ADDRESS
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x85 };
-// IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP_ADDRESS
+// IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
@@ -56,10 +56,10 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+// DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
 //#define DEBUG                           1
 
-// Rate in milliseconds which the transmitter will resend all the data if no new
-// data is received within this duration. (0 to disable)
+// REFRESH_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#REFRESH_RATE
 #define REFRESH_RATE                    0
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 

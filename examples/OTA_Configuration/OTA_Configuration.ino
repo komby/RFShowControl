@@ -35,26 +35,28 @@
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
-// NRF_TYPE Description: http://learn.komby.com/wiki/46/rfpixelcontrol-nrf_type-definitions-explained
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
 // Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE                        MINIMALIST_SHIELD
 
-// MAC Address Description: http://learn.komby.com/Configuration#MAC_Address
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
 static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
-// IP Address Description: http://learn.komby.com/Configuration#IP_Address
+// IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
-// DATA_RATE Description: http://learn.komby.com/wiki/Configuration#Data_Rate
+// DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
 #define DATA_RATE                       RF24_250KBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+// DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
 //#define DEBUG                           1
 
 // Delay between packets.  Increase if using debug prints on receiver.
+// PACKET_SEND_DELAY Description: http://learn.komby.com/wiki/58/configuration-settings#PACKET_SEND_DELAY
 #define PACKET_SEND_DELAY               1000
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
