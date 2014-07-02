@@ -55,7 +55,6 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 // DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
 //#define DEBUG                           1
 
-// Delay between packets.  Increase if using debug prints on receiver.
 // PACKET_SEND_DELAY Description: http://learn.komby.com/wiki/58/configuration-settings#PACKET_SEND_DELAY
 #define PACKET_SEND_DELAY               1000
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
