@@ -1,7 +1,7 @@
 /*
- * RenardControl - This class is built as an adapter to control the Renard devices with the RFPixel Control library.
+ * GWTSControl - Wrapper of the GwtS library for IPixelControl
  *
- * Created on: June 20th, 2013
+ * Created on: November 25th, 2013
  * Author: Mat Mrosko
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
@@ -17,19 +17,23 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __RENARDCONTROL_H__
-#define __RENARDCONTROL_H__
+#include "GWTSControl.h"
 
-#include <Arduino.h>
-
-#include "IPixelControl.h"
-#include "RFPixelControl.h"
-
-class RenardControl: public IPixelControl
+GWTSControl::GWTSControl(void) : GWTS()
 {
-public:
-  RenardControl(uint32_t baud_rate);
-  void Paint(void);
-};
+}
 
-#endif //__RENARDCONTROL_H__
+
+/**
+ * Paint method to keep compatibility with the other Pixel types
+ *
+ */
+void GWTSControl::Paint(void)
+{
+  this->set_colors(pixels[0],
+                   pixels[1],
+                   pixels[2],
+                   pixels[3],
+                   pixels[4],
+                   pixels[5]);
+}
