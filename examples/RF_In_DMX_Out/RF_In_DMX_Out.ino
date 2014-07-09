@@ -47,8 +47,8 @@
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
-// Valid Values: 1-124
-#define LISTEN_CHANNEL                  100
+// Valid Values: 1-83
+#define LISTEN_CHANNEL                  10
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS

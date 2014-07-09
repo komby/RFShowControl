@@ -50,7 +50,7 @@
 #define KOMBYONE_DUE                    7
 #define RFCOLOR_2_4                     8
 #define KOMBEE                          9
-
+#define KOMBLINKIN						10
 //PIXEL TYPES
 #define GECE                            1
 #define WS_2801                         2
@@ -65,6 +65,7 @@
 #define TM_1803                         11
 #define UCS_1903                        12
 #define DMX                             13
+#define STROBE							14
 #define NONE                            999
 
 class RFPixelControl : public RF24Wrapper

@@ -25,6 +25,7 @@
   (NRF_TYPE == RF1_1_2) || \
   (NRF_TYPE == RF1_1_3) || \
   (NRF_TYPE == RF1_12V_0_1) ||\
+  (NRF_TYPE == KOMBLINKIN) ||\
   (NRF_TYPE == KOMBEE)
     #define    __CE  8
     #define    __CSN  7
@@ -171,6 +172,19 @@ LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN)
 #warning "PIXEL_COLOR_ORDER Unsupported for LPD6803"
 #endif
 
+#if (PIXEL_TYPE == STROBE)
+#include <ShiftPWM.h>
+#include <lib8tion.h>
+#ifndef ShiftPWM_H
+#error "You are missing the ShiftPWM library you need to download it from 'https://github.com/elcojacobs/ShiftPWM' and put it in your libraries folder"
+#endif
+#ifndef __INC_LIB8TION_H
+#error "You are missing the FastLED Library.  You need to download it from 'https://github.com/FastLED/FastLED' and put it in your libraries folder"
+#endif
+
+
+#endif
+
 
 #ifdef PIXEL_TYPE
 #if ((PIXEL_TYPE == LPD_8806) || \
@@ -183,6 +197,9 @@ LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN)
 #include <FastLED.h>
 CRGB *leds;
 #define FAST_SPI_CONTROL
+#ifndef __INC_FASTSPI_LED2_H
+#error "You are missing the newest FastLED Library.  You need to download it from 'https://github.com/FastLED/FastLED' and put it in your libraries folder"
+#endif
 #endif
 #endif
 
@@ -206,12 +223,16 @@ const uint64_t pipes[2] = {
     (PIXEL_TYPE != TM_1809) && \
     (PIXEL_TYPE != TM_1803) && \
     (PIXEL_TYPE != UCS_1903) && \
-    (PIXEL_TYPE != DMX) && \
+    (PIXEL_TYPE != DMX) && \ 
+	(PIXEL_TYPE != STROBE) && \
     (PIXEL_TYPE != NONE))
   #error "You must define PIXEL_TYPE as one of the following:"
   #error "  GECE, WS_2801, WS_2811, RENARD, WM_2999,LPD_6803 , GWTS_EARS"
-  #error "  LPD_8806, SM_16716, TM_1809, TM_1803, UCS_1903, DMX"
+  #error "  LPD_8806, SM_16716, TM_1809, TM_1803, UCS_1903, DMX, STROBE"
 #endif
 
+#if (LISTEN_CHANNEL >= 84)
+  #error "FCC Restricts the use of channels 84 and higher.  DO NOT use channels 84-125"
+#endif
 
 #endif //__RF_PIXEL_CONTROL_CONFIG__
