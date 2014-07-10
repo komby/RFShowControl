@@ -41,11 +41,15 @@
 // RECEIVER_UNIQUE_ID Description: http://learn.komby.com/wiki/58/configuration-settings#RECEIVER_UNIQUE_ID
 // Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID              33
+
+//RGB_BOARD_TYPE Description  http://learn.komby.com/wiki/58/configuration-settings#RGB_BOARD_TYPE
+//Valid Values: DUMB_RGB, FLOODUINO
+#define RGB_BOARD_TYPE DUMB_RGB
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
-// Valid Values: 1-83
+// Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
 #define LISTEN_CHANNEL                  10
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
@@ -56,19 +60,43 @@
 // Valid Values: 1-512
 #define HARDCODED_START_CHANNEL         1
 
-// HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
-// Valid Values: 1-512
-#define HARDCODED_NUM_CHANNELS          512
+
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+// HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
+// Valid Values: 3, 4
+#if (RGB_BOARD_TYPE == DUMB_RGB)
+#define HARDCODED_NUM_CHANNELS          3
+#elif (RGB_BOARD_TYPE == FLOODUINO)
+#define HARDCODED_NUM_CHANNELS			4
+#endif
+
+
 // DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
 //#define DEBUG                           1
 
+
+// Jrd: He is using 9, 3, 10, 5 RGBW respectively
+
+
 // RGB Pin Descriptions: http://learn.komby.com/wiki/58/configuration-settings#RGB-Pins
-#define RED_PIN                         3
-#define GREEN_PIN                       5
-#define BLUE_PIN                        9
+#if (RGB_BOARD_TYPE == DUMB_RGB)
+	#define RED_PIN                         3
+	#define GREEN_PIN                       5
+	#define BLUE_PIN                        9	
+#elif (RGB_BOARD_TYPE  == FLOODUINO)
+	#define RED_PIN                         9
+	#define GREEN_PIN                       3
+	#define BLUE_PIN                        10
+	#define WHITE_PIN                       5
+#endif
+
+
+
+//FCC_RESTRICT Description: http://learn.komby.com/wiki/58/configuration-settings#FCC_RESTRICT
+//Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
+#define FCC_RESTRICT 1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
@@ -77,7 +105,7 @@
 #include "RFPixelControlConfig.h"
 
 byte *buffer;
-void dumbRGBShow(int r, int g, int b, int d);
+void dumbRGBShow(int r, int g, int b, int w, int d);
 
 void setup(void)
 {
@@ -89,6 +117,10 @@ void setup(void)
   pinMode(RED_PIN, OUTPUT);
   pinMode(GREEN_PIN, OUTPUT);
   pinMode(BLUE_PIN, OUTPUT);
+
+#ifdef  WHITE_PIN 
+  pinMode(WHITE_PIN, OUTPUT);
+#endif
 
   buffer[0]=255;
 
@@ -109,27 +141,37 @@ void setup(void)
   buffer= radio.GetControllerDataBase(0);
   delay(200);
 
-  dumbRGBShow(255, 0, 0, 25);
+  dumbRGBShow(255, 0, 0, 0, 25);
   delay(200);
-  dumbRGBShow(0, 255, 0, 25);
+  dumbRGBShow(0, 255, 0, 0, 25);
   delay(200);
-  dumbRGBShow(0, 0, 255, 25);
+  dumbRGBShow(0, 0, 255, 0, 25);
   delay(200);
-  dumbRGBShow(0, 0, 0, 25);
+  dumbRGBShow(0, 0, 0, 0, 25);
 }
 
 void loop(void)
 {
   if (radio.Listen())
   {
-    dumbRGBShow(buffer[0], buffer[1], buffer[2], 1);
+	  
+	  #ifdef  WHITE_PIN 
+	  dumbRGBShow(buffer[0], buffer[1], buffer[2], buffer[3],1);  
+	  #else
+		dumbRGBShow(buffer[0], buffer[1], buffer[2], 0, 1);  
+	  #endif
+    
   }
 }
 
-void dumbRGBShow(int r, int g, int b, int d)
+
+void dumbRGBShow(int r, int g, int b, int w, int d)
 {
   analogWrite(RED_PIN, r);
   analogWrite(GREEN_PIN, g);
   analogWrite(BLUE_PIN, b);
+  #ifdef  WHITE_PIN 
+	analogWrite(WHITE_PIN, b);
+  #endif
   delay(d);
 }

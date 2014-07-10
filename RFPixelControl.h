@@ -51,6 +51,8 @@
 #define RFCOLOR_2_4                     8
 #define KOMBEE                          9
 #define KOMBLINKIN						10
+#define RAPTOR12						11
+
 //PIXEL TYPES
 #define GECE                            1
 #define WS_2801                         2
@@ -67,6 +69,11 @@
 #define DMX                             13
 #define STROBE							14
 #define NONE                            999
+
+
+//RGB_BOARD_TYPE definitions
+#define DUMB_RGB						1
+#define FLOODUINO						2
 
 class RFPixelControl : public RF24Wrapper
 {

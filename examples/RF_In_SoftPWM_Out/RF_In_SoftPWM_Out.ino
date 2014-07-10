@@ -1,11 +1,19 @@
 /*
-SCR driver for the Raptor12
+
+ SoftPWM SCR driver for the Raptor12
  
+ SoftPWM is an all in one PWM driver for 12 channels based on a Atmega328 chipset.  It supports
+ zerocross detection as well as simulated ZC for use as a DC based controller as well as an NON-Isolated
+ AC based contoroller.
+ 
+ Created by Travis Kneale   2014
  Adapted from sketch by by Robert Twomey <rtwomey@u.washington.edu>
  Adapted from sketch by Ryan McLaughlin <ryanjmclaughlin@gmail.com> 
+ 
+ Modified 7/9/2014 Greg Scull - komby@komby.com to work with Clarity release 
+ 
+ 
  */
-
-
 
 #include <Arduino.h>
 #include <RFPixelControl.h>
@@ -14,44 +22,67 @@ SCR driver for the Raptor12
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <EEPROM.h>
+#include <TimerOne.h>
 
 
 /*************************** CONFIGURATION SECTION *************************************************/
-// Define a Unique receiver ID.  This id should be unique for each receiver in your setup. 
-// If you are not using Over The air Configuration you do not need to change this setting.
-//Valid Values: 1-255
+// RECEIVER_UNIQUE_ID Description: http://learn.komby.com/wiki/58/configuration-settings#RECEIVER_UNIQUE_ID
+// Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID 33
 
- //What board are you using to connect your nRF24L01+?
- //Valid Values:  MINIMALIST_SHIELD, RF1_1_2, RF1_1_3, RF1_0_2, RF1_12V_0_1, KOMBYONE_DUE, WM_2999_NRF, RFCOLOR2_4
- #define NRF_TYPE  WM_2999_NRF
+// OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/wiki/58/configuration-settings#OVER_THE_AIR_CONFIG_ENABLE
+// Valid Values: OTA_ENABLED, OTA_DISABLED
+#define OVER_THE_AIR_CONFIG_ENABLE      0
 
-// Set OVER_THE_AIR_CONFIG_ENABLEG to 1 if you are making a configuration node to re-program
-// your RF1s in the field.  This will cause the RF1s to search for a
-// configuration broadcast for a short period after power-on before attempting to
-// read EEPROM for the last known working configuration.
-#define OVER_THE_AIR_CONFIG_ENABLE 0
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
+// Valid Values: RAPTOR12
+#define NRF_TYPE  RAPTOR12
 
-#define NUM_CHANNELS 12 //You should not relly ever need to change this.  
-#define START_CHANNEL 1 //Where in the universe do we start
-#define FINAL_CHANNEL 12 //DO Refactory out, addition would be easy.... 
+// NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#AC_DC
+// Valid Values: 1, 0
+#define AC_DC  1
 
 
-//What RF Channel do you want to listen on?  
-//Valid Values: 1-124
-#define LISTEN_CHANNEL 100	
+/********************** END OF REQUIRED CONFIGURATION ************************/
 
-//What Speed is your transmitter using?
-//Valid Values   RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE RF24_250KBPS
+/****************** START OF NON-OTA CONFIGURATION SECTION *******************/
+// LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
+// Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
+#define LISTEN_CHANNEL                  10
 
-//IS this an AC controler?
-bool acControler = true;
+// DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
+// Valid Values: RF24_250KBPS, RF24_1MBPS
+#define DATA_RATE                       RF24_250KBPS
+
+// HARDCODED_START_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
+// Valid Values: 1-512
+#define HARDCODED_START_CHANNEL         1
+
+// HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
+// Valid Values: 1
+// strobe control only uses one channel
+#define HARDCODED_NUM_CHANNELS          12
+
+/******************* END OF NON-OTA CONFIGURATION SECTION ********************/
+
+
+/************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+#define PIXEL_TYPE NONE
+
+
+
+
+#define FINAL_CHANNEL 12 //DO Refactor out, addition would be easy.... 
+
+
+//IS this an AC controller?
+bool acControler = AC_DC;
 
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
-#include <RFPixelControlConfig.h>
 #define RECEIVER_NODE 1
+#include <RFPixelControlConfig.h>
+
 bool readytoupdate=false;
 
 byte * buffer;
@@ -60,34 +91,31 @@ byte * buffer;
 //Uncomment for serial
 #define DEBUG 0
 
-
-
-#include <TimerOne.h>   
+ 
  int totalChannel = 12;
  ///0-127 aka 7bits
  //int channelLevel [] = {20,20,30,40,50,60,70,90,100,110,120,127}; //dim level 0-255 just for testing
  
   volatile int dimLevel=255;               // Variable to use as a counter
   volatile boolean zero_cross = false;  // Boolean to store a "switch" to tell us if we have crossed zero
-  int lastLevel;                         //This is for the Triac fireing function to do a bit of math
+  int lastLevel;                         //This is for the Triac firing function to do a bit of math
 
 
 void setup() {  // Begin setup  
     pinMode(2, INPUT);
-      attachInterrupt(0, zeroCrossDetect, CHANGE );      // Attach an Interupt to Pin 2 (interupt 0) for Zero Cross Detection
+      attachInterrupt(0, zeroCrossDetect, CHANGE );      // Attach an Interrupt to Pin 2 (interrupt 0) for Zero Cross Detection
   int freqStep = 32;                                     // Just guess and check at the moment  | 1000000 uS / 60 Hz) / 256 brightness steps = 16.25
   Timer1.initialize(freqStep);                           // Initialize TimerOne library for the freq we need
   Timer1.attachInterrupt(zeroCrossEvent, freqStep);      // See if we can fire the SCR.
    
   //Setup output port pins
   // B0    C0 C1 C2 C3 C4 C5    D3 D4 D5 D6 D7
-  //useing OR to make sure I dont modify any other pins.
+  //using OR to make only the correct pins are modified.
     DDRB = DDRB | B00000001; 
     DDRC = DDRC | B00111111;
     DDRD = DDRD | B11111000;
     
-    
-   //nrf komby stuff
+ 
    	Serial.begin(57600);
  	buffer[0]=255;
    
@@ -96,16 +124,17 @@ void setup() {  // Begin setup
 	if(!OVER_THE_AIR_CONFIG_ENABLE)
 	{
          int logicalControllerSequenceNum = 0;
-         radio.AddLogicalController(logicalControllerSequenceNum, START_CHANNEL, NUM_CHANNELS,0);
+         radio.AddLogicalController(logicalControllerSequenceNum, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS,0);
 	}
-	//printf_begin();//Probbly shoudl go figureout that printF incude
 	
    	delay(2);
 
      radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
       radio.printDetails(); 
-      //initalize data buffer
-      buffer= radio.GetControllerDataBase(0);
+    
+	//initialize data buffer
+    buffer= radio.GetControllerDataBase(0);
+	
 	delay (200); //needed or leftover code?
 
 
@@ -113,9 +142,9 @@ void setup() {  // Begin setup
 }
 
 void zeroCrossDetect() { 
-  if (dimLevel > 220){ //DO not triger again untill were at lowest dim level with a bit of slop
+  if (dimLevel > 220){ //DO not trigger again until were at lowest dim level with a bit of slop
     dimLevel=0;   
-    zero_cross = true;               // set the boolean to true to tell our dimming function that a zero cross has occured 
+    zero_cross = true;               // set the boolean to true to tell our dimming function that a zero cross has occurred 
 
     //Turn off all scrs here just in case should be off already?
     PORTB =  PORTB & B11111110; 
@@ -123,13 +152,14 @@ void zeroCrossDetect() {
     PORTD =  PORTD & B00000111;
   }
 } 
-//When ever one of the diming points are reached run this to enable pins
+//When ever one of the dimming points are reached run this to enable pins
 void zeroCrossEvent() {                   
   if(zero_cross == true) {   
     
-int invDimLevel = dimLevel ^ 255;// 255 accely means off in this loop so we need to invert the value
-////////////////////////////////////////////////////////////////////////////////////////
-//////////////////note to self make this a function ////////////////////////////////////
+int invDimLevel = dimLevel ^ 255;// 255  means off in this loop so we need to invert the value
+
+
+//TODO kingofkya THIS SHOULD BE A FUNCTION
 ///Channel 1
 if (buffer[0] == invDimLevel){
   PORTB = PORTB | B00000001; 
@@ -169,14 +199,14 @@ if (buffer[11] == invDimLevel){
 }
  
 //////////////////////////////////////////////////////////////////////////////////////////
-    dimLevel = dimLevel + 1; // decrese time step counter                     
+    dimLevel = dimLevel + 1; // decrease time step counter                     
     }                                                                 
 }
 
 void loop() {
 radio.Listen();
 
-//If we donet have to worry about zerocross just pretend we got a zerocross
+//If we don't have to worry about zerocross just pretend we got a zerocross
 if (acControler == false){
   if (dimLevel >= 255){
     zeroCrossDetect();

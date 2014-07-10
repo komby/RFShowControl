@@ -18,7 +18,7 @@
 #define __OTA_CONFIG_H__
 
 #define OTA_CONFIG_WINDOW               5000
-#define RF_NODE_CONFIGURATION_CHANNEL   1 //Modified from 125 to stay within the FCC restrictions for use of channels 84-125
+#define RF_NODE_CONFIGURATION_CHANNEL   125
 #define EEPROM_VERSION                  1
 #define EEPROM_PACKET_SIZE              32
 #define EEPROM_VERSION_IDX              0

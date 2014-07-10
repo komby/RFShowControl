@@ -30,7 +30,8 @@
     #define    __CE  8
     #define    __CSN  7
 #elif (NRF_TYPE == WM_2999_NRF) || \
-  (NRF_TYPE == RFCOLOR_2_4)
+  (NRF_TYPE == RFCOLOR_2_4) || \
+  (NRF_TYPE == RAPTOR12) 
     #define    __CE  9
     #define    __CSN  10
 #else
@@ -231,8 +232,8 @@ const uint64_t pipes[2] = {
   #error "  LPD_8806, SM_16716, TM_1809, TM_1803, UCS_1903, DMX, STROBE"
 #endif
 
-#if (LISTEN_CHANNEL >= 84)
-  #error "FCC Restricts the use of channels 84 and higher.  DO NOT use channels 84-125"
+#if (FCC_RESTRICT && LISTEN_CHANNEL > 83 && LISTEN_CHANNEL < 101 )
+  #error "FCC Restricts the use of channels 84-100 see http://learn.komby.com/wiki/58/configuration-settings#FCC_RESTRICT"
 #endif
 
 #endif //__RF_PIXEL_CONTROL_CONFIG__

@@ -60,7 +60,7 @@
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
-// Valid Values: 1-83
+// Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
 #define LISTEN_CHANNEL                  10
 
 // DATA_RATE Description:  http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
@@ -89,6 +89,10 @@
 #define LED_BRIGHTNESS                  128 //50%
 
 //#define DEBUG                           1
+
+//FCC_RESTRICT Description: http://learn.komby.com/wiki/58/configuration-settings#FCC_RESTRICT
+//Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
+#define FCC_RESTRICT 1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
