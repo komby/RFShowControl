@@ -36,7 +36,7 @@
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
-// Valid Values: RF1, MINIMALIST_SHEILD, WM_2999_NRF, RFCOLOR_2_4
+// Valid Values: RF1, MINIMALIST_SHIEILD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE                        MINIMALIST_SHIELD
 
 // MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
