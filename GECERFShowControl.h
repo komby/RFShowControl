@@ -1,5 +1,5 @@
 /*
- * GECEPixelControl - This class is built as an adapter to control the GECE pixels with the RFPixel Control library.
+ * GECERFShowControl - This class is built as an adapter to control the GECE pixels with the RFShow Control library.
  *
  * Created on: June 20th, 2013
  * Author: Mat Mrosko
@@ -17,20 +17,20 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __GECEPIXELCONTROL_H__
-#define __GECEPIXELCONTROL_H__
+#ifndef __GECERFSHOWCONTROL_H__
+#define __GECERFSHOWCONTROL_H__
 
 #include <Arduino.h>
 #include <GEColorEffects.h>
 
-#include "IPixelControl.h"
-#include "RFPixelControl.h"
+#include "IRFShowControl.h"
+#include "RFShowControl.h"
 
-class GECEPixelControl: public GEColorEffects, public IPixelControl
+class GECERFShowControl: public GEColorEffects, public IRFShowControl
 {
 public:
-  GECEPixelControl(uint8_t pin, int pixelCount);
+  GECERFShowControl(uint8_t pin, int pixelCount);
   void Paint(void);
 };
 
-#endif //__GECEPIXELCONTROL_H__
+#endif //__GECERFSHOWCONTROL_H__

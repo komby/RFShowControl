@@ -1,5 +1,5 @@
 /*
- * IPixelControl.h
+ * IRFShowControl.h
  *
  * Created on: Mar 19, 2013
  * Author: Greg Scull
@@ -17,10 +17,11 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __IPIXELCONTROL_H__
-#define __IPIXELCONTROL_H__
+#ifndef __IRFSHOWCONTROL_H__
+#define __IRFSHOWCONTROL_H__
 
 #include <Arduino.h>
+#include <SPI.h>
 
 // Define RGB orderings
 enum ColorOrder {
@@ -33,15 +34,15 @@ enum ColorOrder {
 };
 
 //base class for pixels
-class IPixelControl
+class IRFShowControl
 {
 public:
-  IPixelControl(void);
+  IRFShowControl(void);
 
-  virtual ~IPixelControl(void);
+  virtual ~IRFShowControl(void);
 
   /*
-   * Begin so we can have some initalization
+   * Begin so we can have some initialization
    *
    */
   void Begin(uint8_t *pDataPointer, int pNumLEDs);
@@ -52,7 +53,7 @@ public:
    *
    * @return the pixel count as a uint16_t
    */
-  uint16_t GetPixelCount(void);
+  uint16_t GetElementCount(void);
 
   /*
    * Sets a new value of pixels.  The function
@@ -61,7 +62,7 @@ public:
    *
    * @param count - Number of pixels in string
    */
-  void SetPixelCount(uint16_t count);
+  void SetElementCount(uint16_t count);
 
   /*
    * Helper function to get the color of one pixel.
@@ -70,7 +71,7 @@ public:
    *
    * @return - uint32_t packed color of the nth pixel
    */
-  uint32_t GetPixelColor(uint16_t n);
+  uint32_t GetElementColor(uint16_t n);
 
   /*
    * Sets pixel n to color c
@@ -78,7 +79,7 @@ public:
    * @param n - Pixel number to set
    * @param c - Color to set the nth pixel to
    */
-  void SetPixelColor(uint16_t n, uint32_t c, uint8_t colorOrder = RGB_ORDER);
+  void SetElementColor(uint16_t n, uint32_t c, uint8_t colorOrder = RGB_ORDER);
   /*
    * Sets pixel n to values r, g, b
    *
@@ -87,7 +88,7 @@ public:
    * @param g - green 0-255 value
    * @param b - blue 0-255 value
    */
-  void SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t colorOrder = RGB_ORDER);
+  void SetElementColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t colorOrder = RGB_ORDER);
 
   /*
    * Create a 24 bit color value from R,G,B
@@ -109,7 +110,7 @@ public:
 
   /*
    * Set the base data pointer as provided by
-   * RFPixelControl and the OTAConfig
+   * RFShowControl and the OTAConfig
    */
   void SetDataBasePointer(uint8_t *dataPointer);
 
@@ -132,4 +133,4 @@ protected:
   uint8_t dataPin;
 };
 
-#endif //__IPIXELCONTROL_H__
+#endif //__IRFSHOWCONTROL_H__

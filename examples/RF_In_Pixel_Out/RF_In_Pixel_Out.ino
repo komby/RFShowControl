@@ -30,11 +30,11 @@
 #include <WM2999.h>
 
 #include "LPD6803.h"
-#include "IPixelControl.h"
+#include "IRFShowControl.h"
 #include "MemoryFree.h"
 #include "printf.h"
-#include "RFPixelControl.h"
-#include "WM2999PixelControl.h"
+#include "RFShowControl.h"
+#include "WM2999RFShowControl.h"
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
@@ -97,7 +97,7 @@
 
 
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 //Arduino setup function.
 void setup(void)
@@ -142,9 +142,9 @@ void setup(void)
 #else
   strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
 
-  for (int i = 0; i < strip.GetPixelCount() / 3; i++)
+  for (int i = 0; i < strip.GetElementCount() / 3; i++)
   {
-    strip.SetPixelColor(i, strip.Color(0, 0, 0));
+    strip.SetElementColor(i, strip.Color(0, 0, 0));
   }
   strip.Paint();
 #endif

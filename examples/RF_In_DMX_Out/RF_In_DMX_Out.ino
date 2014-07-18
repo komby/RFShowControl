@@ -1,5 +1,5 @@
 /*
- * DMXSerial RFPixel Control Receiver Sketch for handling the RF to DMX
+ * DMXSerial RFShow Control Receiver Sketch for handling the RF to DMX
  *
  *    Input: nRF
  *    Output: DMX
@@ -26,9 +26,9 @@
 #include <RF24.h>
 #include <SPI.h>
 
-#include "IPixelControl.h"
+#include "IRFShowControl.h"
 #include "ModifiedDMXSerial.h"
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -75,7 +75,7 @@
 
 #define PIXEL_TYPE                      DMX
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 
 uint8_t *channels;

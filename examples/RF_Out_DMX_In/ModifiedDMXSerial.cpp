@@ -9,8 +9,8 @@
 // This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx
 //
 // Changes were made to the DMXSerial library which required the ISR that is used to handle
-// both the DMX and the RFPixelControl data for effciiencey reasons.  As such this work
-// is included in the RFPixelControl library for use as a DMX-Wireless bridge.
+// both the DMX and the RFShowControl data for effciiencey reasons.  As such this work
+// is included in the RFShowControl library for use as a DMX-Wireless bridge.
 //
 // ModifiedDMXSerial created  2014 - Author: Greg Scull, http://www.komby.com
 //
@@ -114,7 +114,7 @@ volatile unsigned long _gotLastPacket = 0; // the last time (using the millis fu
 //volatile uint8_t *  _dmxData;
 
 
-// Buffer for the RFPixelControl packet Structure.
+// Buffer for the RFShowControl packet Structure.
 byte str[18][32];
 
 // Create a single class instance. Multiple class instances (multiple simultaneous DMX ports) are not supported.

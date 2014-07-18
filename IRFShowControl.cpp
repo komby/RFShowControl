@@ -1,5 +1,5 @@
 /*
- * IPixelControl.cpp
+ * IRFShowControl.cpp
  *
  * Created on: Mar 19, 2013
  * Author: Greg Scull/Mat Mrosko
@@ -17,38 +17,38 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#include "IPixelControl.h"
+#include "IRFShowControl.h"
 
-IPixelControl::IPixelControl(void)
+IRFShowControl::IRFShowControl(void)
 {
   dataPin = 2;
 }
 
-IPixelControl::~IPixelControl(void)
+IRFShowControl::~IRFShowControl(void)
 {
   if (pixels != NULL)
     free(pixels);
 }
 
-void IPixelControl::Begin(uint8_t* pDataPointer, int pNumLEDs)
+void IRFShowControl::Begin(uint8_t* pDataPointer, int pNumLEDs)
 {
   this->pixels = pDataPointer;
   this->numLEDs = pNumLEDs;
 }
 
-uint16_t IPixelControl::GetPixelCount( void )
+uint16_t IRFShowControl::GetElementCount( void )
 {
   return numLEDs;
 }
 
-void IPixelControl::SetPixelCount(uint16_t count)
+void IRFShowControl::SetElementCount(uint16_t count)
 {
   if (pixels != NULL)
     free(pixels);
   numLEDs = ((pixels = (uint8_t *)calloc(count, 3)) != NULL) ? count : 0;
 }
 
-uint32_t IPixelControl::GetPixelColor(uint16_t n)
+uint32_t IRFShowControl::GetElementColor(uint16_t n)
 {
   if (n < numLEDs)
   {
@@ -63,7 +63,7 @@ uint32_t IPixelControl::GetPixelColor(uint16_t n)
   return 0; // Pixel # is out of bounds
 }
 
-void IPixelControl::SetPixelColor(uint16_t n, uint32_t c, uint8_t pColorOrder)
+void IRFShowControl::SetElementColor(uint16_t n, uint32_t c, uint8_t pColorOrder)
 {
   if (n < numLEDs)
   {
@@ -87,7 +87,7 @@ void IPixelControl::SetPixelColor(uint16_t n, uint32_t c, uint8_t pColorOrder)
   }
 }
 
-void IPixelControl::SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t pColorOrder)
+void IRFShowControl::SetElementColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, uint8_t pColorOrder)
 {
   if(n < numLEDs) // Arrays are 0-indexed, thus NOT '<='
   {
@@ -108,7 +108,7 @@ void IPixelControl::SetPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b, u
   }
 }
 
-uint32_t IPixelControl::Color(byte r, byte g, byte b)
+uint32_t IRFShowControl::Color(byte r, byte g, byte b)
 {
   uint32_t c;
   c = r;
@@ -119,7 +119,7 @@ uint32_t IPixelControl::Color(byte r, byte g, byte b)
   return c;
 }
 
-void IPixelControl::SetDataBasePointer(uint8_t* dataPointer)
+void IRFShowControl::SetDataBasePointer(uint8_t* dataPointer)
 {
   this->pixels = dataPointer;
 }

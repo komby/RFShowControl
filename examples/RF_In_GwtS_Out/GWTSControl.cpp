@@ -1,5 +1,5 @@
 /*
- * GWTSControl - Wrapper of the GwtS library for IPixelControl
+ * GWTSControl - Wrapper of the GwtS library for IRFShowControl
  *
  * Created on: November 25th, 2013
  * Author: Mat Mrosko

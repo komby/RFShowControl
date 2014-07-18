@@ -14,7 +14,7 @@
 #ifndef __RF_PIXEL_CONTROL_CONFIG__
 #define __RF_PIXEL_CONTROL_CONFIG__
 
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 
 #if (NRF_TYPE == MINIMALIST_SHIELD)
   #define    __CE  9
@@ -29,6 +29,9 @@
   (NRF_TYPE == KOMBEE)
     #define    __CE  8
     #define    __CSN  7
+	#define HEARTBEAT_PIN  A1
+	#define HEARTBEAT_PIN_1  3
+	
 #elif (NRF_TYPE == WM_2999_NRF) || \
   (NRF_TYPE == RFCOLOR_2_4) || \
   (NRF_TYPE == RAPTOR12) 
@@ -39,10 +42,11 @@
 #endif
 
 
+
 #if (RF_WRAPPER==1)
-RF24Wrapper radio(__CE, __CSN);
+RF24Wrapper radio =  RF24Wrapper(__CE, __CSN);
 #else
-RFPixelControl radio(__CE, __CSN);
+RFShowControl radio =  RFShowControl(__CE, __CSN);
 #endif
 
 
@@ -59,9 +63,9 @@ GWTSControl strip = GWTSControl();
   #error "GECE only uses 6 address bits, maximum of 63 pixels allowed!"
 #endif
 
-#include "GECEPixelControl.h"
+#include "GECERFShowControl.h"
 #include <GEColorEffects.h>
-GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
+GECERFShowControl strip = GECERFShowControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
 #warning "PIXEL_COLOR_ORDER Unsupported for GECEs"
 #endif
 
@@ -149,15 +153,15 @@ GECEPixelControl strip = GECEPixelControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
 #endif
 #endif
 
-#include "RenardControl.h"
-RenardControl strip = RenardControl(RENARD_BAUD_RATE);
+#include <RenardControl.h>
+RenardControl strip =  RenardControl(RENARD_BAUD_RATE);
 #endif
 
 
 #if (PIXEL_TYPE == WM_2999)
 #include <WM2999.h>
-#include "WM2999PixelControl.h"
-WM2999PixelControl strip = WM2999PixelControl(PIXEL_DATA_PIN);
+#include "WM2999RFShowControl.h"
+WM2999RFShowControl strip = WM2999RFShowControl(PIXEL_DATA_PIN);
 #warning "PIXEL_COLOR_ORDER Unsupported for WM2999"
 #endif
 
@@ -167,9 +171,9 @@ WM2999PixelControl strip = WM2999PixelControl(PIXEL_DATA_PIN);
 #define ADAFRUITILIB6803
 #include <LPD6803.h>
 #endif
-#include "LPD6803PixelControl.h"
+#include "LPD6803RFShowControl.h"
 #include <TimerOne.h>
-LPD6803PixelControl strip = LPD6803PixelControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
+LPD6803RFShowControl strip = LPD6803RFShowControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
 #warning "PIXEL_COLOR_ORDER Unsupported for LPD6803"
 #endif
 

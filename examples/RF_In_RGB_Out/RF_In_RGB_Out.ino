@@ -1,5 +1,5 @@
 /*
- * RF1DumbRGB - RFPixelControl Receiver code for the DumbRGB expansion board.
+ * RF1DumbRGB - RFShowControl Receiver code for the DumbRGB expansion board.
  *
  * Created on: Mar 2013
  * Updated 6/2/2013
@@ -24,9 +24,9 @@
 #include <RF24.h>
 #include <SPI.h>
 
-#include "IPixelControl.h"
+#include "IRFShowControl.h"
 #include "printf.h"
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -102,7 +102,7 @@
 
 #define PIXEL_TYPE                      NONE
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 byte *buffer;
 void dumbRGBShow(int r, int g, int b, int w, int d);

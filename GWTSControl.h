@@ -1,5 +1,5 @@
 /*
- * GWTSControl - This class is built as an adapter to control the GWTS Mickey Ears with the RFPixelControl library.
+ * GWTSControl - This class is built as an adapter to control the GWTS Mickey Ears with the RFShowControl library.
  *
  * Created on: June 20th, 2013
  * Author: Mat Mrosko
@@ -23,10 +23,10 @@
 #include <Arduino.h>
 #include <GwtS.h>
 
-#include "IPixelControl.h"
-#include "RFPixelControl.h"
+#include "IRFShowControl.h"
+#include "RFShowControl.h"
 
-class GWTSControl: public GWTS, public IPixelControl
+class GWTSControl: public GWTS, public IRFShowControl
 {
 public:
   GWTSControl(void);

@@ -12,7 +12,7 @@
 #include <RF24.h>
 #include <SPI.h>
 
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 #include "printf.h"
 
 
@@ -47,7 +47,7 @@
 
 #define PIXEL_TYPE                      NONE
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 //Initialize the RF packet buffer
 byte str[32];

@@ -1,5 +1,5 @@
 /*
- * GECEPixelControl: Wrappter of the GEColorEffects library for IPixelControl
+ * GECERFShowControl: Wrappter of the GEColorEffects library for IRFShowControl
  *
  * Created on: June 20th, 2013
  * Author: Mat Mrosko
@@ -17,16 +17,16 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#include "GECEPixelControl.h"
+#include "GECERFShowControl.h"
 
-GECEPixelControl::GECEPixelControl(uint8_t pin, int pixelCount) : GEColorEffects(pin,pixelCount)
+GECERFShowControl::GECERFShowControl(uint8_t pin, int pixelCount) : GEColorEffects(pin,pixelCount)
 {
 }
 
 /**
  * Paint method to keep compatibility with the other Pixel types
  */
-void GECEPixelControl::Paint(void)
+void GECERFShowControl::Paint(void)
 {
   cli();
   int numPixels = numLEDs/3;

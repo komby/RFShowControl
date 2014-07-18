@@ -1,11 +1,13 @@
 /*
- * WM2999PixelControl.h
- * This class is built as an adapter to control the WM2999 pixels with the RFPixel Control library.
+ * LPD6803RFShowControl.h
+ * This class is built as an adapter to control the LPD6803 pixels with the RFShow Control library.
  * It is using a library which was written by Adafruit as the main pixel logic
- * @see https://github.com/komby/WM2999 for more details
+ * @see https://github.com/adafruit/Adafruit-LPD6803-Library/ for more details
  *
  * Created on: Mar 19, 2013
- * Author: Greg Scull - komby@komby.com
+ * Author: Greg Scull
+ *
+ * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
  * License:
  *    Users of this software agree to hold harmless the creators and
@@ -18,23 +20,21 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __WM2999PIXELCONTROL_H__
-#define __WM2999PIXELCONTROL_H__
+#ifndef __LPD6803RFSHOWCONTROL_H__
+#define __LPD6803RFSHOWCONTROL_H__
 
-#include <WM2999.h>
+#include <TimerOne.h>
 
-#include "IPixelControl.h"
-#include "RFPixelControl.h"
+#include "IRFShowControl.h"
+#include "LPD6803.h"
+#include "RFShowControl.h"
 
-class WM2999PixelControl: public WM2999, public IPixelControl
+class LPD6803RFShowControl: public IRFShowControl, public LPD6803
 {
 public:
-  WM2999PixelControl(uint8_t ppin);
-  void Begin(uint8_t *pDataPointer, int pNumLEDs);
-
-  void SetDataBasePointer(uint8_t *dataPointer);
+  LPD6803RFShowControl(uint8_t pClock, uint8_t pData);
 
   void Paint(void);
 };
 
-#endif //__WM2999PIXELCONTROL_H__
+#endif /* __LPD6803RFSHOWCONTROL_H__ */

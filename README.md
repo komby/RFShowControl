@@ -1,9 +1,9 @@
-RFPixelControl
+RFShowControl
 ==============
 
-RFPixelControl - extension of the RF24 library for use with pixels
+RFShowControl - extension of the RF24 library for use with pixels
 
-The RFPixel control serves as a common code configuration for both Receiver and Transmitter.
+The RFShow control serves as a common code configuration for both Receiver and Transmitter.
 
 Hardware Support: 
 Arduino Uno, Atmega 168, 328 
@@ -27,7 +27,7 @@ US2811
 TM1803
 DMX
 
-For more information visit the Releases page :https://github.com/komby/RFPixelControl/releases
+For more information visit the Releases page :https://github.com/komby/RFShowControl/releases
 
 and 
 

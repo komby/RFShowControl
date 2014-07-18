@@ -1,5 +1,5 @@
 /*
- * RenardControl - This class is built as an adapter to control the Renard devices with the RFPixel Control library.
+ * RenardControl - This class is built as an adapter to control the Renard devices with the RFShow Control library.
  *
  * Created on: June 20th, 2013
  * Author: Mat Mrosko
@@ -22,10 +22,10 @@
 
 #include <Arduino.h>
 
-#include "IPixelControl.h"
-#include "RFPixelControl.h"
+#include "IRFShowControl.h"
+#include "RFShowControl.h"
 
-class RenardControl: public IPixelControl
+class RenardControl: public IRFShowControl
 {
 public:
   RenardControl(uint32_t baud_rate);

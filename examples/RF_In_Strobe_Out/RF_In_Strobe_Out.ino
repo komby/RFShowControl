@@ -12,8 +12,8 @@
 
 
 #include <Arduino.h>
-#include <RFPixelControl.h>
-#include <IPixelControl.h>
+#include <RFShowControl.h>
+#include <IRFShowControl.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
@@ -88,7 +88,7 @@ const bool ShiftPWM_balanceLoad = false;
 //Include this after all configuration variables are set
 #include <ShiftPWM.h>
 #include <lib8tion.h>
-#include <RFPixelControlConfig.h>
+#include <RFShowControlConfig.h>
 #define RECEIVER_NODE 1
 
 // Here you set the number of brightness levels, the update frequency and the number of shift registers.

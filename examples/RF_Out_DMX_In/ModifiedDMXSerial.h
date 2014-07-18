@@ -7,7 +7,7 @@
 //
 // Documentation and samples are available at http://www.mathertel.de/Arduino
 //
-// 17.03.2014 Greg Scull modified for the use in RFPixelControl.
+// 17.03.2014 Greg Scull modified for the use in RFShowControl.
 // - - - - -
 
 #ifndef ModifiedDmxSerial_h

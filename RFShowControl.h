@@ -1,5 +1,5 @@
 /*
- * RFPixelControl.h
+ * RFShowControl.h
  * This class is built to serve as an extension of the RF24 library for use in Pixel controllers
  * This code was created based on the RF ColorNode code by Joe Johnson
  * it has been refactored such that the RF24 core library is not needed
@@ -21,11 +21,11 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __RFPIXELCONTROL_H__
-#define __RFPIXELCONTROL_H__
+#ifndef __RFSHOWCONTROL_H__
+#define __RFSHOWCONTROL_H__
 
 #include "EEPROMUtils.h"
-#include "IPixelControl.h"
+#include "IRFShowControl.h"
 #include "OTAConfig.h"
 #include "RF24Wrapper.h"
 
@@ -75,10 +75,10 @@
 #define DUMB_RGB						1
 #define FLOODUINO						2
 
-class RFPixelControl : public RF24Wrapper
+class RFShowControl : public RF24Wrapper
 {
 public:
-  virtual ~RFPixelControl(void);
+  virtual ~RFShowControl(void);
 
   /*
    * Constructor
@@ -90,7 +90,7 @@ public:
    * @param _cspin The pin attached to Chip Select
    *
    */
-  RFPixelControl(uint8_t _cepin, uint8_t _cspin);
+  RFShowControl(uint8_t _cepin, uint8_t _cspin);
 
 
   /*
@@ -102,7 +102,7 @@ public:
 
   void SetStartAndEndChannels(void);
 
-  void DisplayDiagnosticStartup(IPixelControl *string);
+  void DisplayDiagnosticStartup(IRFShowControl *string);
 
   /************************************************************************
    * Listen will be listening for all the data needed for an update
@@ -156,4 +156,4 @@ private:
   bool _otaConfigEnable;
 };
 
-#endif //__RFPIXELCONTROL_H__
+#endif //__RFSHOWCONTROL_H__

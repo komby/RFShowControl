@@ -22,11 +22,11 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
-#include <IPixelControl.h>
+#include <IRFShowControl.h>
 #include <nRF24L01.h>
 #include <OTAConfig.h>
 #include <RF24.h>
-#include <RFPixelControl.h>
+#include <RFShowControl.h>
 #include <SPI.h>
 #include <GwtS.h>
 #include "printf.h"
@@ -80,7 +80,7 @@
 
 #define PIXEL_TYPE                      GWTS_EARS
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 void setup(void)
 {

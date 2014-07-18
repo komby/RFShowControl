@@ -16,8 +16,8 @@
  */
 
 #include <Arduino.h>
-#include <RFPixelControl.h>
-#include <IPixelControl.h>
+#include <RFShowControl.h>
+#include <IRFShowControl.h>
 #include <SPI.h>
 #include <nRF24L01.h>
 #include <RF24.h>
@@ -81,7 +81,7 @@ bool acControler = AC_DC;
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
 #define RECEIVER_NODE 1
-#include <RFPixelControlConfig.h>
+#include <RFShowControlConfig.h>
 
 bool readytoupdate=false;
 

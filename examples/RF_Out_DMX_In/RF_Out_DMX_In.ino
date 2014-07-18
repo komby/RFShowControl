@@ -34,7 +34,7 @@
 #include <SPI.h>
 
 #include "ModifiedDMXSerial.h"
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -65,7 +65,7 @@
 
 #define PIXEL_TYPE                      NONE
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 void setup(void)
 {

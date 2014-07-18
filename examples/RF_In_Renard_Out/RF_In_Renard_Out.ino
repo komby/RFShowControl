@@ -23,9 +23,9 @@
 #include <RF24.h>
 #include <SPI.h>
 
-#include "IPixelControl.h"
-#include "printf.h"
-#include "RFPixelControl.h"
+#include "IRFShowControl.h"
+//#include "printf.h"
+#include "RFShowControl.h"
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -57,7 +57,7 @@
 
 // HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
 // Valid Values: 1-512
-#define HARDCODED_NUM_CHANNELS          512
+#define HARDCODED_NUM_CHANNELS          64
 
 // RENARD_BAUD_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#RENARD_BAUD_RATE
 // Valid Values: 19200, 38400, 57600, 115200, 230400, 460800
@@ -76,7 +76,7 @@
 
 #define PIXEL_TYPE                      RENARD
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 int beat = 0;
 
@@ -92,8 +92,7 @@ void setup(void)
   pinMode(HEARTBEAT_PIN, OUTPUT);
   pinMode(HEARTBEAT_PIN_1, OUTPUT);
   #endif
-
-  radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+    radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
   uint8_t logicalControllerNumber = 0;
   if(!OVER_THE_AIR_CONFIG_ENABLE)
@@ -102,7 +101,6 @@ void setup(void)
   }
 
   radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
-
 #ifdef DEBUG
   radio.printDetails();
 #endif
@@ -110,22 +108,22 @@ void setup(void)
   logicalControllerNumber = 0;
   strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber++));
 
-  for (int i = 0; i < strip.GetPixelCount(); i++)
+  for (int i = 0; i < strip.GetElementCount(); i++)
   {
-    strip.SetPixelColor(i, strip.Color(0, 0, 0));
+    strip.SetElementColor(i, strip.Color(0, 0, 0));
   }
   strip.Paint();
 }
 
 void loop(void)
 {
-  if (radio.Listen())
-  {
-    strip.Paint();
-    #if (NRF_TYPE==KOMBEE)
-    beat=!beat;
-    digitalWrite(HEARTBEAT_PIN, beat);
-    digitalWrite(HEARTBEAT_PIN_1, beat);
-    #endif
-  }
+ if (radio.Listen())
+ {
+   strip.Paint();
+   #if (NRF_TYPE==KOMBEE)
+     beat=!beat;
+     digitalWrite(HEARTBEAT_PIN, beat);  
+     digitalWrite(HEARTBEAT_PIN_1, beat);  
+   #endif
+ }
 }

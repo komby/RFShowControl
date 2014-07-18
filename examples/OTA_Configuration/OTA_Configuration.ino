@@ -63,7 +63,7 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 #define PIXEL_TYPE                      NONE
 #define RF_WRAPPER                      1
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 
 WebServer webserver("", 80);
@@ -152,7 +152,7 @@ void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tai
     "<h1>RF Configurator</h1>"
     "<p class=\"container\">"
     //change Intro text below
-    "<i>RFPixelControl OTA Programming</i></p>"
+    "<i>RFShowControl OTA Programming</i></p>"
     "<p class=\"container\">&nbsp;</p>"
     "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"/init\">"
     "<p>Controller ID: <input type=\"text\" name=\"controller\" id=\"controller-id\" maxlength=\"3\"/> </p>"

@@ -21,7 +21,7 @@
 
 RenardControl::RenardControl(uint32_t baud_rate)
 {
-  Serial.begin(baud_rate);
+//  Serial.begin(baud_rate);
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
 }

@@ -29,6 +29,11 @@
  */
 RF24Wrapper::RF24Wrapper(uint8_t _cepin, uint8_t _cspin): RF24(_cepin, _cspin), csn_pin(_cspin)
 {
+	Serial.println("CE:");
+	Serial.println(_cepin);
+	Serial.println("CSN");
+	Serial.println(_cspin);
+	pinMode(_cspin, OUTPUT);
 }
 
 RF24Wrapper::~RF24Wrapper(void)

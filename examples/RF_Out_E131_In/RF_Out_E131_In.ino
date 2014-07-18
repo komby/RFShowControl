@@ -1,8 +1,8 @@
 /*
 * ArduinoEthernet Shield E1.31 Transmitter
 *
-* Streaming ACN (E1.31) receiver to RF transmitter for RFPixelControl receivers
-* This code can be used to send data to any RFPixelControl Packet format compatible
+* Streaming ACN (E1.31) receiver to RF transmitter for RFShowControl receivers
+* This code can be used to send data to any RFShowControl Packet format compatible
 * Receiving device
 *
 * This sketch can be used with Unicast or Multicast.  It is recommended to set the ip address and use in unicast mode for best performance.
@@ -27,7 +27,7 @@
 
 #include "E131Constants.h"
 #include "printf.h"
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -67,7 +67,7 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 #define PIXEL_TYPE                      NONE
 #define RF_WRAPPER                      1
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 
 //END Configuration

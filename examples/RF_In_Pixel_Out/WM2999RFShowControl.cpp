@@ -1,5 +1,5 @@
 /*
- * WM2999PixelControl - Wrapper of the Adafruit WM2999 pixel library
+ * WM2999RFShowControl - Wrapper of the Adafruit WM2999 pixel library
  *
  * Created on: Mar 19, 2013
  * Author: Greg
@@ -17,31 +17,31 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#include "WM2999PixelControl.h"
+#include "WM2999RFShowControl.h"
 
-WM2999PixelControl::WM2999PixelControl(uint8_t ppin): WM2999(ppin)
+WM2999RFShowControl::WM2999RFShowControl(uint8_t ppin): WM2999(ppin)
 {
   start();
 }
 
-void WM2999PixelControl::Paint(void)
+void WM2999RFShowControl::Paint(void)
 {
-  printf("WM2999PixelControl::Paint\n");
+  printf("WM2999RFShowControl::Paint\n");
   this->WM2999::paint();
 }
 
-void WM2999PixelControl::Begin(uint8_t* pDataPointer, int pNumLEDs)
+void WM2999RFShowControl::Begin(uint8_t* pDataPointer, int pNumLEDs)
 {
   this->externalDataPointerSet = true;
-  this->IPixelControl::pixels = pDataPointer;
+  this->IRFShowControl::pixels = pDataPointer;
   this->WM2999::pixels = pDataPointer;
   this->numLEDs  = pNumLEDs;
   this->numberOfPixels = pNumLEDs;
 }
 
-void WM2999PixelControl::SetDataBasePointer( uint8_t* dataPointer)
+void WM2999RFShowControl::SetDataBasePointer( uint8_t* dataPointer)
 {
-  this->IPixelControl::pixels = dataPointer;
+  this->IRFShowControl::pixels = dataPointer;
   this->WM2999::pixels = dataPointer;
   this->externalDataPointerSet = true;
 }

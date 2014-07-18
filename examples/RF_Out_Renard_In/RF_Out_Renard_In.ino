@@ -13,7 +13,7 @@
 #include <RF24.h>
 #include <SPI.h>
 
-#include "RFPixelControl.h"
+#include "RFShowControl.h"
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -45,7 +45,7 @@
 #define PIXEL_TYPE                      NONE
 #define RF_WRAPPER                      1
 //Include this after all configuration variables are set
-#include "RFPixelControlConfig.h"
+#include "RFShowControlConfig.h"
 
 #define RF_NUM_PACKETS                  18     // 18 * 30 total channels can be broadcasted
 #define RECEIVER_UNIQUE_ID              0
