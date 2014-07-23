@@ -86,10 +86,10 @@
 //} DMXReceivingState;
 enum
 {
-  DMX_IDLE,
-  DMX_BREAK,
-  DMX_START,
-  DMX_RUN
+	DMX_IDLE,
+	DMX_BREAK,
+	DMX_START,
+	DMX_RUN
 };
 
 // ----- Macros -----
@@ -128,12 +128,12 @@ volatile unsigned int dmx_start_addr = 1;
 volatile unsigned int dmx_addr;
 // this is used to keep track of the channels
 volatile unsigned int chan_cnt;
-volatile unsigned int sub1=0;
-volatile unsigned int sub2=0;
+volatile unsigned int sub1 = 0;
+volatile unsigned int sub2 = 0;
 
 // tell us when to update
 volatile unsigned char update;
-volatile bool packetready=false;
+volatile bool packetready = false;
 
 int rxStatusPin = 0;
 // ----- forwards -----
@@ -146,39 +146,39 @@ void _DMXSerialWriteByte(uint8_t data);
 
 // (Re)Initialize the specified mode.
 // The mode parameter should be a value from enum DMXMode.
-void ModifiedDMXSerialClass::init (int mode)
+void ModifiedDMXSerialClass::init(int mode)
 {
-  // Setup external mode signal
-  //TODO Refactor to constant A0 is used as the RX/TX en pin on the RF1 Serial adapter
-  pinMode(A0, OUTPUT); // enables pin 2 for output to control data direction
-  digitalWrite(A0, LOW); //Set it low to put the RS485 chip in Receive mode
+	// Setup external mode signal
+	//TODO Refactor to constant A0 is used as the RX/TX en pin on the RF1 Serial adapter
+	pinMode(A0, OUTPUT); // enables pin 2 for output to control data direction
+	digitalWrite(A0, LOW); //Set it low to put the RS485 chip in Receive mode
 
-  #ifdef SCOPEDEBUG
-  //if in debug mode define some pins for watching the timing in the logic analyzer
-  pinMode(rxStatusPin, OUTPUT); // enables pin 2 for output to control data direction
-  pinMode(DmxTriggerPin, OUTPUT);
-  pinMode(DmxISRPin, OUTPUT);
-  #endif
+#ifdef SCOPEDEBUG
+	//if in debug mode define some pins for watching the timing in the logic analyzer
+	pinMode(rxStatusPin, OUTPUT); // enables pin 2 for output to control data direction
+	pinMode(DmxTriggerPin, OUTPUT);
+	pinMode(DmxISRPin, OUTPUT);
+#endif
 
-  // initialize global variables
-  _dmxMode = DMXNone;
-  _dmxRecvState= DMX_IDLE; // initial state
-  _dmxChannel = 0;
-  _gotLastPacket = millis(); // remember current (relative) time in msecs.
+	// initialize global variables
+	_dmxMode = DMXNone;
+	_dmxRecvState = DMX_IDLE; // initial state
+	_dmxChannel = 0;
+	_gotLastPacket = millis(); // remember current (relative) time in msecs.
 
-  // initialize the DMX buffer
-  for (int n = 0; n < 18; n++){
-    for (int in = 0; in < 32; in++)
-    str[n][in]=0;
-  }
+	// initialize the DMX buffer
+	for (int n = 0; n < 18; n++){
+		for (int in = 0; in < 32; in++)
+			str[n][in] = 0;
+	}
 
-  // now start
-  _dmxMode = (DMXMode)mode;
+	// now start
+	_dmxMode = (DMXMode)mode;
 
-  // Setup Hardware
-  // Enable receiver and Receive interrupt
-  UCSRnB = (1<<RXENn) | (1<<RXCIEn);
-  _DMXSerialBaud(Calcprescale(DMXSPEED), DMXFORMAT); // Enable serial reception with a 250k rate
+	// Setup Hardware
+	// Enable receiver and Receive interrupt
+	UCSRnB = (1 << RXENn) | (1 << RXCIEn);
+	_DMXSerialBaud(Calcprescale(DMXSPEED), DMXFORMAT); // Enable serial reception with a 250k rate
 } // init()
 
 
@@ -186,32 +186,32 @@ void ModifiedDMXSerialClass::init (int mode)
 // This method can be called any time before or after the init() method.
 void ModifiedDMXSerialClass::maxChannel(int channel)
 {
-  if (channel < 1) channel = 1;
-  if (channel > DMXSERIAL_MAX) channel = DMXSERIAL_MAX;
-  _dmxMaxChannel = channel;
+	if (channel < 1) channel = 1;
+	if (channel > DMXSERIAL_MAX) channel = DMXSERIAL_MAX;
+	_dmxMaxChannel = channel;
 } // maxChannel
 
 
 //TODO, Pull the RF packet writing out of the main loop so we dont have to hand out
 //these pointers
 byte * ModifiedDMXSerialClass::GetPacketPointer(void){
-  return &str[sub1-1][0];
+	return &str[sub1 - 1][0];
 }
 
 //TODO refactor me
 bool ModifiedDMXSerialClass::isPacketReady(void){
-  return packetready;
+	return packetready;
 }
 
 void ModifiedDMXSerialClass::setPacketReady(bool in){
-  packetready=in;
+	packetready = in;
 }
 
 // Terminale operation
 void ModifiedDMXSerialClass::term(void)
 {
-  // Disable all USART Features, including Interrupts
-  UCSRnB = 0;
+	// Disable all USART Features, including Interrupts
+	UCSRnB = 0;
 } // term()
 
 
@@ -223,13 +223,13 @@ void ModifiedDMXSerialClass::term(void)
 // and 8 data bits, even parity, 1 stop bit for the break
 void _DMXSerialBaud(uint16_t baud_setting, uint8_t format)
 {
-  // assign the baud_setting to the USART Baud Rate Register
-  UCSRnA = 0;                 // 04.06.2012: use normal speed operation
-  UBRRnH = baud_setting >> 8;
-  UBRRnL = baud_setting;
+	// assign the baud_setting to the USART Baud Rate Register
+	UCSRnA = 0;                 // 04.06.2012: use normal speed operation
+	UBRRnH = baud_setting >> 8;
+	UBRRnL = baud_setting;
 
-  // 2 stop bits and 8 bit character size, no parity
-  UCSRnC = format;
+	// 2 stop bits and 8 bit character size, no parity
+	UCSRnC = format;
 } // _DMXSerialBaud
 
 
@@ -237,70 +237,70 @@ void _DMXSerialBaud(uint16_t baud_setting, uint8_t format)
 ISR(USART_RX_vect)
 {
 
-  unsigned char status = UCSR0A;
-  unsigned char data = UDR0;
+	unsigned char status = UCSR0A;
+	unsigned char data = UDR0;
 
-      //ISR Refactored from Switch to preserve memory
-  if(dmx_state== DMX_IDLE){
-    if (status & (1<<FE0))
-    {
-      dmx_addr = 0;
-      dmx_state = DMX_BREAK;  //Once we get a break, that means we are about to read a new DMX packet.
-    }
-  }
-  else if(dmx_state==DMX_BREAK)
-  {
-    if (data == 0)
-    {
-      dmx_state = DMX_START;
-    }
-    else
-    {
-      dmx_state = DMX_IDLE;
-    }
-  }
-  else if(dmx_state== DMX_START)
-  {
-                //New DMX frame
-    dmx_addr++;
-                //Logic to handle the first channel
-    if (dmx_addr == dmx_start_addr)
-    {
-      chan_cnt = 0;  //Reset Channel Count
-      sub1=0;  //Reset array subscripts to 0
-      sub2=0;
-      str[sub1][sub2++]=data;
-      chan_cnt++;
-      dmx_state = DMX_RUN;
-    }
-  }
-  else if(dmx_state== DMX_RUN)
-  {
-    str[sub1][sub2++]=data;
-    chan_cnt++;  //increment channel
+	//ISR Refactored from Switch to preserve memory
+	if (dmx_state == DMX_IDLE){
+		if (status & (1 << FE0))
+		{
+			dmx_addr = 0;
+			dmx_state = DMX_BREAK;  //Once we get a break, that means we are about to read a new DMX packet.
+		}
+	}
+	else if (dmx_state == DMX_BREAK)
+	{
+		if (data == 0)
+		{
+			dmx_state = DMX_START;
+		}
+		else
+		{
+			dmx_state = DMX_IDLE;
+		}
+	}
+	else if (dmx_state == DMX_START)
+	{
+		//New DMX frame
+		dmx_addr++;
+		//Logic to handle the first channel
+		if (dmx_addr == dmx_start_addr)
+		{
 
-                //If we just added the 30th byte, its time to prep this packet for send.
-    if (sub2==30)
-    {
-      str[sub1][30]=sub1;   //set packet number in byte 30
-      sub2=0;               //reset packet byte counter
-      sub1++;               //increment packet number
-      packetready=true;     //flag that packet is ready to transmit
-    }
-    else if (chan_cnt > DMX_NUM_CHANNELS)  //Once we have gotten all the channels we want, quit listening....
-    {
-      dmx_state = DMX_IDLE;
-      if (sub2>0)  //Check to see if we got here with a partial final packet we didn't yet send....  If we did, send it now.
-      {
-        sub2=0;
-        str[sub1][30]=sub1;
-              sub1=0;//we sent the last packet reset
-        packetready=true;
-      }
-    }
-  }
-  else{
-    dmx_state = DMX_IDLE;
-  }
+			chan_cnt = 0;  //Reset Channel Count
+			sub1 = 0;  //Reset array subscripts to 0
+			sub2 = 0;
+			str[sub1][sub2++] = data;
+			chan_cnt++;
+			dmx_state = DMX_RUN;
+		}
+	}
+	else if (dmx_state == DMX_RUN)
+	{
+		str[sub1][sub2++] = data;
+		chan_cnt++;  //increment channel
+
+		//If we just added the 30th byte, its time to prep this packet for send.
+		if (sub2 == 30)
+		{
+			str[sub1][30] = sub1;   //set packet number in byte 30
+			sub2 = 0;               //reset packet byte counter
+			sub1++;               //increment packet number
+			packetready = true;     //flag that packet is ready to transmit
+		}
+		else if (chan_cnt > DMX_NUM_CHANNELS)  //Once we have gotten all the channels we want, quit listening....
+		{
+			dmx_state = DMX_IDLE;
+			if (sub2>0 && ((sub1 * 30 + sub2 )== DMX_NUM_CHANNELS))  //Check to see if we got here with a partial final packet we didn't yet send....  If we did, send it now.
+			{
+				sub2 = 0;
+				str[sub1][30] = sub1;
+				sub1 = 0;//we sent the last packet reset
+				packetready = true;
+			}
+		}
+	}
+	else{
+		dmx_state = DMX_IDLE;
+	}
 }
-
