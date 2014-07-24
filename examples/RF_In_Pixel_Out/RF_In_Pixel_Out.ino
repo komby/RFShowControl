@@ -43,7 +43,7 @@
 
 // PIXEL_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_TYPE
 // Valid Values: GECE, LPD_6803, LPD_8806, SM_16716, TM_1803, TM_1809, UCS_1903, WM_2999, WS_2801, WS_2811
-#define PIXEL_TYPE                      GECE
+#define PIXEL_TYPE                      WS_2811
 
 // PIXEL_COLOR_ORDER Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_COLOR_ORDER
 // Valid Values: RGB, RBG, GRB, GBR, BRG, BGR
