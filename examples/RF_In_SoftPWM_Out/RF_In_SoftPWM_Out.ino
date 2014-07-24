@@ -91,17 +91,16 @@ byte * buffer;
 byte * bufferOutput;
 
 //Uncomment for serial
-#define DEBUG 0
+//#define DEBUG 0
 
  
  int totalChannel = 12;
- ///0-127 aka 7bits
- //int channelLevel [] = {20,20,30,40,50,60,70,90,100,110,120,127}; //dim level 0-255 just for testing
  
   volatile int dimLevel=316;               // Variable to use as a counter
   volatile boolean zero_cross = false;  // Boolean to store a "switch" to tell us if we have crossed zero
   int lastLevel;                         //This is for the Triac firing function to do a bit of math
-
+  int dataLedCycle = 120;  //set a 1 sec blink cycle
+  int dataAvaliable = 120;
 
 void setup() {  // Begin setup  
   pinMode(2, INPUT);
@@ -115,9 +114,16 @@ void setup() {  // Begin setup
   //using OR to make only the correct pins are modified.
   DDRB = DDRB | B00000001; 
   DDRC = DDRC | B00111111;
-  DDRD = DDRD | B11111000;
- 
-  Serial.begin(115200);
+  DDRD = DDRD | B11111000; 
+  
+  #ifdef DEBUG
+     Serial.begin(115200);
+  #else 
+     //Staus leds are disabled if debug is on
+     DDRD = DDRD | B00000011;
+  #endif 
+  
+
   buffer[0]=255;
  
   radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
@@ -128,8 +134,15 @@ void setup() {  // Begin setup
      }
 	
   delay(2);
-  radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-  radio.printDetails(); 
+  
+  //this detects if radio is accely functioning if not the led will stay off.
+  if(radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID)){
+    PORTD =  PORTD | B00000010;
+  }
+  
+  #ifdef DEBUG
+    radio.printDetails();
+  #endif 
   //initialize data buffer
   buffer= radio.GetControllerDataBase(0);	
   delay (200); //needed or leftover code?
@@ -193,7 +206,8 @@ void zeroCrossDetect() {
     //this may break timer1 in the future
     TCNT1 = 0; // Reset timer value attempt to stop it overfilling  
     interrupts();
-    
+    //flips leds on and off as needs based on interupt
+    ledDataToggle();
    //lazy people cut and paste and so do I 
    //I apologise to anyone the wants to remap pins:P (heres a hint dont do it)
    //This will flip on any channels that may be set to full brightness.
@@ -255,11 +269,27 @@ void zeroCrossEvent() {
   }
   //accely do the dimming after we check the importain stuff
  triggerOutputPin(); 
-}                                                                 
+} 
+
+void ledDataToggle(){
+  if  (dataAvaliable > 0){
+    if (dataLedCycle >= 60){
+      PORTD =  PORTD | B00000001;
+    }else{
+      PORTD =  PORTD & B11111110;
+    }
+    dataLedCycle = dataLedCycle - 1;
+    dataAvaliable = dataAvaliable - 1;
+    if (dataLedCycle == 0){
+      dataLedCycle = 120;
+    }
+  }
+}
 
 //Mailn loop that runs when nothing is goign on with interupts
 void loop() {
   if(radio.Listen()){
     bufferOutput = buffer;
+    dataAvaliable = 120; //reset couter when we get data.
    }
 }
