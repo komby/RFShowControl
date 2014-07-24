@@ -185,14 +185,56 @@ void triggerOutputPin(){
 
 void zeroCrossDetect() {
   if (dimLevel <= 400){
-  noInterrupts();   
-  dimLevel=316;
-  PORTB =  PORTB & B11111110; 
-  PORTC =  PORTC & B11000000;
-  PORTD =  PORTD & B00000111; 
-  //this may break timer1 in the future
-  TCNT1 = 0; // Reset timer value attempt to stop it overfilling  
-  interrupts();
+    noInterrupts();   
+    dimLevel=316;
+    PORTB =  PORTB & B11111110; 
+    PORTC =  PORTC & B11000000;
+    PORTD =  PORTD & B00000111; 
+    //this may break timer1 in the future
+    TCNT1 = 0; // Reset timer value attempt to stop it overfilling  
+    interrupts();
+    
+   //lazy people cut and paste and so do I 
+   //I apologise to anyone the wants to remap pins:P (heres a hint dont do it)
+   //This will flip on any channels that may be set to full brightness.
+   //less noise not that it matters mutch at all
+    if (buffer[0] == 255 ){
+      PORTB = PORTB | B00000001; 
+    }//Channel 2
+    if (buffer[1] == 255){
+      PORTC =  PORTC | B00000001;
+    }//Channel 3
+    if (buffer[2] == 255){
+      PORTC =  PORTC | B00000010;
+    }//Channel 4
+    if (buffer[3] == 255){
+      PORTC =  PORTC | B00000100;
+    }//Channel 5
+    if (buffer[4] == 255){      
+      PORTC =  PORTC | B00001000;
+    }//Channel 6
+    if (buffer[5] == 255){        
+      PORTC =  PORTC | B00010000;
+    }//Channel 7
+    if (buffer[6] == 255){        
+      PORTC =  PORTC | B00100000;        
+    }//Channel 8
+    if (buffer[7] == 255){
+      PORTD =  PORTD | B00001000; 
+    }//Channel 9
+    if (buffer[8] == 255){
+      PORTD =  PORTD | B00010000;
+    }//Channel 10
+    if (buffer[9] == 255){
+      PORTD =  PORTD | B00100000; 
+    }//Channel 11
+    if (buffer[10] == 255){
+      PORTD =  PORTD | B01000000; 
+    }//Channel 12
+    if (buffer[11] == 255){
+      PORTD =  PORTD | B10000000;
+    }
+ 
   }
 } 
 
@@ -215,7 +257,7 @@ void zeroCrossEvent() {
  triggerOutputPin(); 
 }                                                                 
 
-//MAil loop that runs when nothing is goign on with interupts
+//Mailn loop that runs when nothing is goign on with interupts
 void loop() {
   if(radio.Listen()){
     bufferOutput = buffer;
