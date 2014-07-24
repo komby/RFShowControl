@@ -70,146 +70,226 @@
 #define PIXEL_TYPE NONE
 
 
-
-
 #define FINAL_CHANNEL 12 //DO Refactor out, addition would be easy.... 
+ 
+// Just guess and check at the moment  
+// 1000000 uS / 120 Hz ) / (256 + 60) = 26(32old)brightness steps = 16.25
+#define freqStep  26
 
-
-//IS this an AC controller?
-bool acControler = AC_DC;
+//FCC_RESTRICT Description: http://learn.komby.com/wiki/58/configuration-settings#FCC_RESTRICT
+//Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
+#define FCC_RESTRICT 1
 
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
-#define RECEIVER_NODE 1
-#include <RFShowControlConfig.h>
+
+#include "RFShowControlConfig.h"
 
 bool readytoupdate=false;
 
 byte * buffer;
-
+byte * bufferOutput;
 
 //Uncomment for serial
-#define DEBUG 0
+//#define DEBUG 0
 
  
  int totalChannel = 12;
- ///0-127 aka 7bits
- //int channelLevel [] = {20,20,30,40,50,60,70,90,100,110,120,127}; //dim level 0-255 just for testing
  
-  volatile int dimLevel=255;               // Variable to use as a counter
+  volatile int dimLevel=316;               // Variable to use as a counter
   volatile boolean zero_cross = false;  // Boolean to store a "switch" to tell us if we have crossed zero
   int lastLevel;                         //This is for the Triac firing function to do a bit of math
-
+  int dataLedCycle = 120;  //set a 1 sec blink cycle
+  int dataAvaliable = 120;
 
 void setup() {  // Begin setup  
-    pinMode(2, INPUT);
-      attachInterrupt(0, zeroCrossDetect, CHANGE );      // Attach an Interrupt to Pin 2 (interrupt 0) for Zero Cross Detection
-  int freqStep = 32;                                     // Just guess and check at the moment  | 1000000 uS / 60 Hz) / 256 brightness steps = 16.25
+  pinMode(2, INPUT);
+  attachInterrupt(0, zeroCrossDetect, HIGH );      // Attach an Interrupt to Pin 2 (interrupt 0) for Zero Cross Detection
+  
   Timer1.initialize(freqStep);                           // Initialize TimerOne library for the freq we need
   Timer1.attachInterrupt(zeroCrossEvent, freqStep);      // See if we can fire the SCR.
    
   //Setup output port pins
   // B0    C0 C1 C2 C3 C4 C5    D3 D4 D5 D6 D7
   //using OR to make only the correct pins are modified.
-    DDRB = DDRB | B00000001; 
-    DDRC = DDRC | B00111111;
-    DDRD = DDRD | B11111000;
-    
+  DDRB = DDRB | B00000001; 
+  DDRC = DDRC | B00111111;
+  DDRD = DDRD | B11111000; 
+  
+  #ifdef DEBUG
+     Serial.begin(115200);
+  #else 
+     //Staus leds are disabled if debug is on
+     DDRD = DDRD | B00000011;
+  #endif 
+  
+
+  buffer[0]=255;
  
-   	Serial.begin(57600);
- 	buffer[0]=255;
-   
-    
-	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-	if(!OVER_THE_AIR_CONFIG_ENABLE)
-	{
-         int logicalControllerSequenceNum = 0;
-         radio.AddLogicalController(logicalControllerSequenceNum, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS,0);
-	}
+  radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+  if(!OVER_THE_AIR_CONFIG_ENABLE)
+     {
+        int logicalControllerSequenceNum = 0;
+        radio.AddLogicalController(logicalControllerSequenceNum, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS,0);
+     }
 	
-   	delay(2);
-
-     radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-      radio.printDetails(); 
-    
-	//initialize data buffer
-    buffer= radio.GetControllerDataBase(0);
-	
-	delay (200); //needed or leftover code?
-
-
-
+  delay(2);
+  
+  //this detects if radio is accely functioning if not the led will stay off.
+  if(radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID)){
+    PORTD =  PORTD | B00000010;
+  }
+  
+  #ifdef DEBUG
+    radio.printDetails();
+  #endif 
+  //initialize data buffer
+  buffer= radio.GetControllerDataBase(0);	
+  delay (200); //needed or leftover code?
 }
 
-void zeroCrossDetect() { 
-  if (dimLevel > 220){ //DO not trigger again until were at lowest dim level with a bit of slop
-    dimLevel=0;   
-    zero_cross = true;               // set the boolean to true to tell our dimming function that a zero cross has occurred 
 
-    //Turn off all scrs here just in case should be off already?
+void triggerOutputPin(){
+//shoudl make this and advanced option  above
+  int dimOffsetLevel = dimLevel - 30;
+  
+  if (dimOffsetLevel <= 255){
+    if(dimOffsetLevel >= 1){ 
+      ///Channel 1
+      if (buffer[0] >= dimOffsetLevel ){
+        PORTB = PORTB | B00000001; 
+      }//Channel 2
+      if (buffer[1] >= dimOffsetLevel){
+        PORTC =  PORTC | B00000001;
+      }//Channel 3
+      if (buffer[2] >= dimOffsetLevel){
+        PORTC =  PORTC | B00000010;
+      }//Channel 4
+      if (buffer[3] >= dimOffsetLevel){
+        PORTC =  PORTC | B00000100;
+      }//Channel 5
+      if (buffer[4] >= dimOffsetLevel){      
+        PORTC =  PORTC | B00001000;
+      }//Channel 6
+      if (buffer[5] >= dimOffsetLevel){        
+        PORTC =  PORTC | B00010000;
+      }//Channel 7
+      if (buffer[6] >= dimOffsetLevel){        
+        PORTC =  PORTC | B00100000;        
+      }//Channel 8
+      if (buffer[7] >= dimOffsetLevel){
+        PORTD =  PORTD | B00001000; 
+      }//Channel 9
+      if (buffer[8] >= dimOffsetLevel){
+        PORTD =  PORTD | B00010000;
+      }//Channel 10
+      if (buffer[9] >= dimOffsetLevel){
+        PORTD =  PORTD | B00100000; 
+      }//Channel 11
+      if (buffer[10] >= dimOffsetLevel){
+        PORTD =  PORTD | B01000000; 
+      }//Channel 12
+      if (buffer[11] >= dimOffsetLevel){
+        PORTD =  PORTD | B10000000;
+      }
+    }   
+  }
+}
+
+void zeroCrossDetect() {
+  if (dimLevel <= 400){
+    noInterrupts();   
+    dimLevel=316;
     PORTB =  PORTB & B11111110; 
     PORTC =  PORTC & B11000000;
-    PORTD =  PORTD & B00000111;
+    PORTD =  PORTD & B00000111; 
+    //this may break timer1 in the future
+    TCNT1 = 0; // Reset timer value attempt to stop it overfilling  
+    interrupts();
+    //flips leds on and off as needs based on interupt
+    ledDataToggle();
+   //lazy people cut and paste and so do I 
+   //I apologise to anyone the wants to remap pins:P (heres a hint dont do it)
+   //This will flip on any channels that may be set to full brightness.
+   //less noise not that it matters mutch at all
+    if (buffer[0] == 255 ){
+      PORTB = PORTB | B00000001; 
+    }//Channel 2
+    if (buffer[1] == 255){
+      PORTC =  PORTC | B00000001;
+    }//Channel 3
+    if (buffer[2] == 255){
+      PORTC =  PORTC | B00000010;
+    }//Channel 4
+    if (buffer[3] == 255){
+      PORTC =  PORTC | B00000100;
+    }//Channel 5
+    if (buffer[4] == 255){      
+      PORTC =  PORTC | B00001000;
+    }//Channel 6
+    if (buffer[5] == 255){        
+      PORTC =  PORTC | B00010000;
+    }//Channel 7
+    if (buffer[6] == 255){        
+      PORTC =  PORTC | B00100000;        
+    }//Channel 8
+    if (buffer[7] == 255){
+      PORTD =  PORTD | B00001000; 
+    }//Channel 9
+    if (buffer[8] == 255){
+      PORTD =  PORTD | B00010000;
+    }//Channel 10
+    if (buffer[9] == 255){
+      PORTD =  PORTD | B00100000; 
+    }//Channel 11
+    if (buffer[10] == 255){
+      PORTD =  PORTD | B01000000; 
+    }//Channel 12
+    if (buffer[11] == 255){
+      PORTD =  PORTD | B10000000;
+    }
+ 
   }
 } 
+
+
 //When ever one of the dimming points are reached run this to enable pins
-void zeroCrossEvent() {                   
-  if(zero_cross == true) {   
+void zeroCrossEvent() {  
+  if (dimLevel > 0){ //this will prevent this var going negative
+    dimLevel = dimLevel - 1; // decrease time step counter 
     
-int invDimLevel = dimLevel ^ 255;// 255  means off in this loop so we need to invert the value
+  }else{
+    //if we missed the zero cross fake where it should be
+    if (lastLevel >= 30){ 
+     zeroCrossDetect();
+      dimLevel = dimLevel - lastLevel;
+      lastLevel = 0;
+    }
+    lastLevel = lastLevel + 1;
+  }
+  //accely do the dimming after we check the importain stuff
+ triggerOutputPin(); 
+} 
 
-
-//TODO kingofkya THIS SHOULD BE A FUNCTION
-///Channel 1
-if (buffer[0] == invDimLevel){
-  PORTB = PORTB | B00000001; 
-}//Channel 2
-if (buffer[1] == invDimLevel){
-  PORTC =  PORTC | B00100000; 
-}//Channel 3
-if (buffer[2] == invDimLevel){
-  PORTC =  PORTC | B00010000;
-}//Channel 4
-if (buffer[3] == invDimLevel){
-  PORTC =  PORTC | B00001000;
-}//Channel 5
-if (buffer[4] == invDimLevel){
-  PORTC =  PORTC | B00000100;
-}//Channel 6
-if (buffer[1] == invDimLevel){
-  PORTC =  PORTC | B00000010;
-}//Channel 7
-if (buffer[6] == invDimLevel){
-  PORTC =  PORTC | B00000001;
-}//Channel 8
-if (buffer[7] == invDimLevel){
-  PORTD =  PORTD | B10000000;
-}//Channel 9
-if (buffer[8] == invDimLevel){
-  PORTD =  PORTD | B01000000; 
-}//Channel 10
-if (buffer[9] == invDimLevel){
-  PORTD =  PORTD | B00100000; 
-}//Channel 11
-if (buffer[10] == invDimLevel){
-  PORTD =  PORTD | B00010000; 
-}//Channel 12
-if (buffer[11] == invDimLevel){
-  PORTD =  PORTD | B00001000; 
-}
- 
-//////////////////////////////////////////////////////////////////////////////////////////
-    dimLevel = dimLevel + 1; // decrease time step counter                     
-    }                                                                 
-}
-
-void loop() {
-radio.Listen();
-
-//If we don't have to worry about zerocross just pretend we got a zerocross
-if (acControler == false){
-  if (dimLevel >= 255){
-    zeroCrossDetect();
+void ledDataToggle(){
+  if  (dataAvaliable > 0){
+    if (dataLedCycle >= 60){
+      PORTD =  PORTD | B00000001;
+    }else{
+      PORTD =  PORTD & B11111110;
+    }
+    dataLedCycle = dataLedCycle - 1;
+    dataAvaliable = dataAvaliable - 1;
+    if (dataLedCycle == 0){
+      dataLedCycle = 120;
     }
   }
+}
+
+//Mailn loop that runs when nothing is goign on with interupts
+void loop() {
+  if(radio.Listen()){
+    bufferOutput = buffer;
+    dataAvaliable = 120; //reset couter when we get data.
+   }
 }
