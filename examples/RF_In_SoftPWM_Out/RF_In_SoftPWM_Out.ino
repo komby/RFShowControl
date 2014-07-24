@@ -70,24 +70,20 @@
 #define PIXEL_TYPE NONE
 
 
-
-
-
 #define FINAL_CHANNEL 12 //DO Refactor out, addition would be easy.... 
-
-
-//IS this an AC controller?
-bool acControler = AC_DC;
  
 // Just guess and check at the moment  
 // 1000000 uS / 120 Hz ) / (256 + 60) = 26(32old)brightness steps = 16.25
 #define freqStep  26
 
+//FCC_RESTRICT Description: http://learn.komby.com/wiki/58/configuration-settings#FCC_RESTRICT
+//Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
+#define FCC_RESTRICT 1
 
  /**************END CONFIGURATION SECTION ***************************/
 //Include this after all configuration variables are set
-#define RECEIVER_NODE 1
-#include <RFPixelControlConfig.h>
+
+#include "RFShowControlConfig.h"
 
 bool readytoupdate=false;
 
@@ -108,8 +104,8 @@ byte * bufferOutput;
 
 
 void setup() {  // Begin setup  
-    pinMode(2, INPUT);
-      attachInterrupt(0, zeroCrossDetect, HIGH );      // Attach an Interrupt to Pin 2 (interrupt 0) for Zero Cross Detection
+  pinMode(2, INPUT);
+  attachInterrupt(0, zeroCrossDetect, HIGH );      // Attach an Interrupt to Pin 2 (interrupt 0) for Zero Cross Detection
   
   Timer1.initialize(freqStep);                           // Initialize TimerOne library for the freq we need
   Timer1.attachInterrupt(zeroCrossEvent, freqStep);      // See if we can fire the SCR.
@@ -117,46 +113,32 @@ void setup() {  // Begin setup
   //Setup output port pins
   // B0    C0 C1 C2 C3 C4 C5    D3 D4 D5 D6 D7
   //using OR to make only the correct pins are modified.
-    DDRB = DDRB | B00000001; 
-    DDRC = DDRC | B00111111;
-    DDRD = DDRD | B11111000;
-    
+  DDRB = DDRB | B00000001; 
+  DDRC = DDRC | B00111111;
+  DDRD = DDRD | B11111000;
  
-   	Serial.begin(115200);
- 	buffer[0]=255;
-   
-    
-	radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
-	if(!OVER_THE_AIR_CONFIG_ENABLE)
-	{
-         int logicalControllerSequenceNum = 0;
-         radio.AddLogicalController(logicalControllerSequenceNum, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS,0);
-	}
+  Serial.begin(115200);
+  buffer[0]=255;
+ 
+  radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
+  if(!OVER_THE_AIR_CONFIG_ENABLE)
+     {
+        int logicalControllerSequenceNum = 0;
+        radio.AddLogicalController(logicalControllerSequenceNum, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS,0);
+     }
 	
-   	delay(2);
-
-     radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-      radio.printDetails(); 
-    
-	//initialize data buffer
-    buffer= radio.GetControllerDataBase(0);
-	
-	delay (200); //needed or leftover code?
-
-
-
+  delay(2);
+  radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
+  radio.printDetails(); 
+  //initialize data buffer
+  buffer= radio.GetControllerDataBase(0);	
+  delay (200); //needed or leftover code?
 }
 
 
 void triggerOutputPin(){
-  noInterrupts();
+//shoudl make this and advanced option  above
   int dimOffsetLevel = dimLevel - 30;
-  interrupts();
-    if (dimLevel <= 30){   
-    //PORTB =  PORTB & B11111110; 
-   // PORTC =  PORTC & B11000000;
-   // PORTD =  PORTD & B00000111;
-  } 
   
   if (dimOffsetLevel <= 255){
     if(dimOffsetLevel >= 1){ 
@@ -202,8 +184,7 @@ void triggerOutputPin(){
 }
 
 void zeroCrossDetect() {
-  if (dimLevel <= 4
-  00){
+  if (dimLevel <= 400){
   noInterrupts();   
   dimLevel=316;
   PORTB =  PORTB & B11111110; 
@@ -214,6 +195,7 @@ void zeroCrossDetect() {
   interrupts();
   }
 } 
+
 
 //When ever one of the dimming points are reached run this to enable pins
 void zeroCrossEvent() {  
@@ -229,32 +211,13 @@ void zeroCrossEvent() {
     }
     lastLevel = lastLevel + 1;
   }
-  //38khz
-
-triggerOutputPin(); 
-
+  //accely do the dimming after we check the importain stuff
+ triggerOutputPin(); 
 }                                                                 
 
-
-
-
-
-
+//MAil loop that runs when nothing is goign on with interupts
 void loop() {
- // PORTB = PORTB | B00000001;
   if(radio.Listen()){
     bufferOutput = buffer;
    }
- // PORTB = PORTB & B11111110;
- // while(true){
-    //18khz //10khz without while
- //PORTB = PORTB | B00000001;
- //triggerOutputPin();
-// PORTB = PORTB & B11111110;
- // if (dimLevel == 20){ 
-  //    
-  
-   //PORTB = PORTB & B11111110;
- // }
-  
 }
