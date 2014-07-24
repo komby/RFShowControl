@@ -22,12 +22,8 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <EEPROM.h>
-<<<<<<< HEAD:examples/RF_In_Dim_ACDC_Out/RF_In_Dim_ACDC_Out.ino
 #include <TimerOne.h>  
-=======
-#include <TimerOne.h>
 
->>>>>>> upstream/master:examples/RF_In_SoftPWM_Out/RF_In_SoftPWM_Out.ino
 
 /*************************** CONFIGURATION SECTION *************************************************/
 // RECEIVER_UNIQUE_ID Description: http://learn.komby.com/wiki/58/configuration-settings#RECEIVER_UNIQUE_ID
