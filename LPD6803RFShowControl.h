@@ -1,8 +1,11 @@
 /*
- * GWTSControl - This class is built as an adapter to control the GWTS Mickey Ears with the RFShowControl library.
+ * LPD6803RFShowControl.h
+ * This class is built as an adapter to control the LPD6803 pixels with the RFShow Control library.
+ * It is using a library which was written by Adafruit as the main pixel logic
+ * @see https://github.com/adafruit/Adafruit-LPD6803-Library/ for more details
  *
- * Created on: June 20th, 2013
- * Author: Mat Mrosko
+ * Created on: Mar 19, 2013
+ * Author: Greg Scull
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
@@ -17,20 +20,21 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __GWTSCONTROL_H__
-#define __GWTSCONTROL_H__
+#ifndef __LPD6803RFSHOWCONTROL_H__
+#define __LPD6803RFSHOWCONTROL_H__
 
-#include <Arduino.h>
-#include <GwtS.h>
+#include <TimerOne.h>
 
 #include "IRFShowControl.h"
+#include "LPD6803.h"
 #include "RFShowControl.h"
 
-class GWTSControl: public GWTS, public IRFShowControl
+class LPD6803RFShowControl: public IRFShowControl, public LPD6803
 {
 public:
-  GWTSControl(void);
+  LPD6803RFShowControl(uint8_t pClock, uint8_t pData);
+
   void Paint(void);
 };
 
-#endif //__GWTSCONTROL_H__
+#endif /* __LPD6803RFSHOWCONTROL_H__ */

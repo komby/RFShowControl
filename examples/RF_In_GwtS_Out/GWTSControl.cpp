@@ -1,5 +1,8 @@
 /*
- * Author: Greg Scull/Mat Mrosko
+ * GWTSControl - Wrapper of the GwtS library for IRFShowControl
+ *
+ * Created on: November 25th, 2013
+ * Author: Mat Mrosko
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
@@ -14,25 +17,23 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __LPD6803_H__
-#define __LPD6803_H__
+#include "GWTSControl.h"
 
-#include <Arduino.h>
-
-class LPD6803
+GWTSControl::GWTSControl(void) : GWTS()
 {
-private:
-  uint8_t cpumax;
+}
 
-public:
-  LPD6803(uint16_t n, uint8_t dpin, uint8_t cpin);
-  void begin(void);
-  void show(void);
-  void doSwapBuffersAsap(uint16_t idx);
-  void setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
-  void setPixelColor(uint16_t n, uint16_t c);
-  void setCPUmax(uint8_t m);
-  uint16_t numPixels(void);
-};
 
-#endif //__LPD6803_H__
+/**
+ * Paint method to keep compatibility with the other Pixel types
+ *
+ */
+void GWTSControl::Paint(void)
+{
+  this->set_colors(pixels[0],
+                   pixels[1],
+                   pixels[2],
+                   pixels[3],
+                   pixels[4],
+                   pixels[5]);
+}

@@ -1,5 +1,8 @@
 /*
- * Author: Greg Scull/Mat Mrosko
+ * GECERFShowControl - This class is built as an adapter to control the GECE pixels with the RFShow Control library.
+ *
+ * Created on: June 20th, 2013
+ * Author: Mat Mrosko
  *
  * Updated: May 18, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *
@@ -14,25 +17,20 @@
  *    The Commercial Use of this Software is Prohibited.
  */
 
-#ifndef __LPD6803_H__
-#define __LPD6803_H__
+#ifndef __GECERFSHOWCONTROL_H__
+#define __GECERFSHOWCONTROL_H__
 
 #include <Arduino.h>
+#include <GEColorEffects.h>
 
-class LPD6803
+#include "IRFShowControl.h"
+#include "RFShowControl.h"
+
+class GECERFShowControl: public GEColorEffects, public IRFShowControl
 {
-private:
-  uint8_t cpumax;
-
 public:
-  LPD6803(uint16_t n, uint8_t dpin, uint8_t cpin);
-  void begin(void);
-  void show(void);
-  void doSwapBuffersAsap(uint16_t idx);
-  void setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
-  void setPixelColor(uint16_t n, uint16_t c);
-  void setCPUmax(uint8_t m);
-  uint16_t numPixels(void);
+  GECERFShowControl(uint8_t pin, int pixelCount);
+  void Paint(void);
 };
 
-#endif //__LPD6803_H__
+#endif //__GECERFSHOWCONTROL_H__
