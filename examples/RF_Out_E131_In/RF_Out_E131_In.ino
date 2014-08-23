@@ -102,12 +102,30 @@ void setup(void)
   Serial.println(F("\n[E1.31 Arduino Ethernet Transmitter ]\n"));
   printf_begin();
 
-  Serial.print(F("freeMemory()="));
-  //Serial.println(freeMemory());
   radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE);
   delayMicroseconds(1500);
 
   radio.printDetails();
+
+  Serial.print("DMX start channel= ");
+  Serial.println(DMX_CHANNEL_DATA_START);
+  Serial.print("Komby channel    = ");
+  Serial.println(TRANSMIT_CHANNEL);
+  Serial.print("IP Address       = ");
+  Serial.println(Ethernet.localIP());
+  Serial.print("MAC              = ");
+  if( mac[0] < 0x10){ Serial.print("0");} Serial.print(mac[0],HEX);
+  Serial.print(":");
+  if( mac[1] < 0x10){ Serial.print("0");} Serial.print(mac[1],HEX);
+  Serial.print(":");
+  if( mac[2] < 0x10){ Serial.print("0");} Serial.print(mac[2],HEX);
+  Serial.print(":");
+  if( mac[3] < 0x10){ Serial.print("0");} Serial.print(mac[3],HEX);
+  Serial.print(":");
+  if( mac[4] < 0x10){ Serial.print("0");} Serial.print(mac[4],HEX);
+  Serial.print(":");
+  if( mac[5] < 0x10){ Serial.print("0");} Serial.println(mac[5],HEX);
+
 }
 int maxprint=0;
 int len=0;

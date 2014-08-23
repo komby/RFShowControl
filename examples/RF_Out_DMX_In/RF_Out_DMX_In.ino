@@ -65,14 +65,21 @@
 
 #define PIXEL_TYPE                      NONE
 //Include this after all configuration variables are set
+
 #include "RFShowControlConfig.h"
+
+bool txstat = 1;
+bool initclean = 0;
 
 void setup(void)
 {
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
+  
+  pinMode(1, OUTPUT);
+  digitalWrite(1, LOW);
 
-  radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE, 0);
+  initclean = radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE, 0);
   ModifiedDMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
   ModifiedDMXSerial.init(DMXReceiver);
 }
@@ -81,7 +88,9 @@ void loop(void)
 {
   if (ModifiedDMXSerial.isPacketReady())
   {
+    digitalWrite(1, (txstat && initclean )? 1:0);
     radio.write_payload(ModifiedDMXSerial.GetPacketPointer(), 32);
     ModifiedDMXSerial.setPacketReady(false);
+    txstat= !txstat;
   }
 }
