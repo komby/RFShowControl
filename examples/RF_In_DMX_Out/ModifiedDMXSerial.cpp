@@ -342,8 +342,8 @@ ISR(USART_UDRE_vect)
 #ifdef SCOPEDEBUG
   digitalWrite(DmxISRPin, LOW);
 #endif
-  _DMXSerialWriteByte(_dmxData[_dmxChannel++]);
-
+  _DMXSerialWriteByte(_dmxData[(_dmxChannel-1)]);
+_dmxChannel++;
   if (_dmxChannel > _dmxMaxChannel) {
     _dmxChannel   = -1; // this series is done. Next time: restart with break.
     // get interrupt after this byte is actually transmitted
@@ -353,4 +353,3 @@ ISR(USART_UDRE_vect)
   digitalWrite(DmxISRPin, HIGH);
 #endif
 } // ISR(USART_UDRE_vect)
-
