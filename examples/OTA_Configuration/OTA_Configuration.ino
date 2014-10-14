@@ -48,7 +48,7 @@ static uint8_t mac[] = { 0x12, 0x34, 0x56, 0xBE, 0xEE, 0xEF };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
 // USE_DHCP Description: http://learn.komby.com/wiki/58/configuration-settings#USE_DHCP
-#define USE_DHCP                        1
+#define USE_DHCP                        0
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
