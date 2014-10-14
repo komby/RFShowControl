@@ -7,6 +7,10 @@
  * Author: Greg Scull/Mat Mrosko
  *
  * Updated: May 21, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ * Updated: October 13, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ * 		MAC address in default sketch wouldn't work with certain "smart" switches.
+ * 		Jon Chuchla gave useful information regarding mac addresses here:
+ * 		http://diychristmas.org/vb1/showthread.php?2760-Can-t-ping-komby-sandwich&p=31396&viewfull=1#post31396
  *
  * License:
  *    Users of this software agree to hold harmless the creators and
@@ -40,9 +44,11 @@
 #define NRF_TYPE                        MINIMALIST_SHIELD
 
 // MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
-static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x84 };
+static uint8_t mac[] = { 0x12, 0x34, 0x56, 0xBE, 0xEE, 0xEF };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
+// USE_DHCP Description: http://learn.komby.com/wiki/58/configuration-settings#USE_DHCP
+#define USE_DHCP                        1
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
@@ -544,11 +550,24 @@ void setup(void)
   printf("Startup\n");
 #endif
 
+#if (USE_DHCP == 1)
+  if (Ethernet.begin(mac) == 0) {
+#ifndef DEBUG
+	Serial.begin(115200);
+#endif
+    Serial.println("Failed to configure Ethernet using DHCP");
+    // no point in carrying on, so do nothing forevermore:
+    for(;/*ever*/;)
+      ;
+  }
+#else
   Ethernet.begin(mac, ip);
+#endif
+
   delay(1000);
   webserver.begin();
 #ifdef DEBUG
-  printf("Webserver up\n");
+  printf("Webserver up at %s\n", Ethernet.localIP());
 #endif
 
   radio.Initialize( radio.TRANSMITTER, pipes, RF_NODE_CONFIGURATION_CHANNEL, DATA_RATE);

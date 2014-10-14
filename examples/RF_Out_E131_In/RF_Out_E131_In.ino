@@ -1,16 +1,36 @@
 /*
-* ArduinoEthernet Shield E1.31 Transmitter
-*
-* Streaming ACN (E1.31) receiver to RF transmitter for RFShowControl receivers
-* This code can be used to send data to any RFShowControl Packet format compatible
-* Receiving device
-*
-* This sketch can be used with Unicast or Multicast.  It is recommended to set the ip address and use in unicast mode for best performance.
-*
-* Created on: June 17, 2013
-* Updated: June 25, 2014
-* Author: Greg Scull
-*/
+ * ArduinoEthernet Shield E1.31 Transmitter
+ *
+ *    Input: E1.31
+ *    Output: nRF
+ *
+ * Author: Greg Scull
+ * Created on: June 17, 2013
+ * Updated: June 25, 2014
+ * Updated: October 13, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ * 		MAC address in default sketch wouldn't work with certain "smart" switches.
+ * 		Jon Chuchla gave useful information regarding mac addresses here:
+ * 		http://diychristmas.org/vb1/showthread.php?2760-Can-t-ping-komby-sandwich&p=31396&viewfull=1#post31396
+ *
+ *
+ * Description:
+ *     Streaming ACN (E1.31) receiver to RF transmitter for RFShowControl receivers
+ *     This code can be used to send data to any RFShowControl Packet format compatible
+ *     Receiving device
+ *
+ * This sketch can be used with Unicast or Multicast.  It is recommended to set the
+ * ip address and use in unicast mode for best performance.
+ *
+ * License:
+ *    Users of this software agree to hold harmless the creators and
+ *    contributors of this software.  By using this software you agree that
+ *    you are doing so at your own risk, you could kill yourself or someone
+ *    else by using this software and/or modifying the factory controller.
+ *    By using this software you are assuming all legal responsibility for
+ *    the use of the software and any hardware it is used on.
+ *
+ *    The Commercial Use of this Software is Prohibited.
+ */
 
 
 #include <Dhcp.h>
@@ -40,7 +60,7 @@
 #define UNIVERSE                        1
 
 // MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
-static uint8_t mac[] = { 0x5B, 0xD0, 0x00, 0xEA, 0x80, 0x85 };
+static uint8_t mac[] = { 0x12, 0x34, 0x56, 0xBE, 0xEE, 0xEF };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
@@ -95,7 +115,7 @@ void setup(void)
 {
 
   uint16_t PortNr = 5568;
-  Ethernet.begin(mac,ip);
+  Ethernet.begin(mac, ip);
   Udp.begin(PortNr);
 
   Serial.begin(115200);
