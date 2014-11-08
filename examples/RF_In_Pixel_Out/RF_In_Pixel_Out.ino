@@ -47,7 +47,7 @@
 
 // PIXEL_COLOR_ORDER Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_COLOR_ORDER
 // Valid Values: RGB, RBG, GRB, GBR, BRG, BGR
-#define PIXEL_COLOR_ORDER               RGB
+#define PIXEL_COLOR_ORDER               GRB
 
 // OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/wiki/58/configuration-settings#OVER_THE_AIR_CONFIG_ENABLE
 // Valid Values: OTA_ENABLED, OTA_DISABLED
@@ -56,6 +56,16 @@
 // RECEIVER_UNIQUE_ID Description: http://learn.komby.com/wiki/58/configuration-settings#RECEIVER_UNIQUE_ID
 // Valid Values: 1-255
 #define RECEIVER_UNIQUE_ID              33
+
+// CHANNEL_GROUPING_MODE Description: http://learn.komby.com/wiki/58/configuration-settings#CHANNEL_GROUPING_MODE
+// Valid Values: SINGLE, PIXEL  //single treats as an individual channel, PIXEL Groups by 3s
+#define CHANNEL_GROUPING_MODE PIXEL
+
+// CHANNEL_REPEAT_COUNT Description: http://learn.komby.com/wiki/58/configuration-settings#CHANNEL_REPEAT_COUNT
+// Valid Values: 1-512 //use this to repeat a channel based on channel grouping mode
+#define CHANNEL_REPEAT_COUNT 5
+
+
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
@@ -69,26 +79,47 @@
 
 // HARDCODED_START_CHANNEL Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
-#define HARDCODED_START_CHANNEL         1
+//#define HARDCODED_START_CHANNEL         1
+#define HARDCODED_START_CHANNEL_1         1
+#define HARDCODED_START_CHANNEL_2         61
+const uint8_t logicalControllerStartChannels[] = {HARDCODED_START_CHANNEL_1, HARDCODED_START_CHANNEL_2 };
 
 // HARDCODED_NUM_PIXELS Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_PIXELS
 // Valid Values: 1-170
-#define HARDCODED_NUM_PIXELS            50
+#define HARDCODED_NUM_PIXELS_1            55
+#define HARDCODED_NUM_PIXELS_2            55
+
+#define FAST_SPI_CONTROL 1
+// values must be evenly divisible by their respective start channel from the previous setting
+
+#define HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 11
+#define HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 11
+const uint8_t logicalControllersNumPixelsPer[] = {HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2};
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
+// NUMBER_LOGICAL_CONTROLLERS Description http://learn.komby.com/wiki/58/configuration-settings#NUMBER_LOGICAL_CONTROLLERS
+// Valid Values: 1-3 (for now)
+#define NUMBER_LOGICAL_CONTROLLERS 2
+
 // PIXEL_DATA_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_DATA_PIN
-// Valid Values: Any arduino Analog or Digital pin, typically ~1-16
-#define PIXEL_DATA_PIN                  2
+// Valid Values: List of arduino Analog or Digital pins used for data signal, typically ~1-16 
+#define PIXEL_DATA_PIN_1                  2
+#define PIXEL_DATA_PIN_2                  3
+const uint8_t pixelDataPins[] = {PIXEL_DATA_PIN_1, PIXEL_DATA_PIN_2};
 
 // PIXEL_CLOCK_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_CLOCK_PIN
-// Valid Values: Any arduino Analog or Digital pin, typically ~1-16
-#define PIXEL_CLOCK_PIN                 4
+// Valid Values: List of arduino Analog or Digital pin(s) used for clock signal on 4 wire clocked pixels, typically ~1-16
+#define PIXEL_CLOCK_PIN_1                 4
+#define PIXEL_CLOCK_PIN_2				  6
+const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
+
+
 
 //How Bright should our LEDs start at Description:  http://learn.komby.com/wiki/58/configuration-settings#LED_BRIGHTNESS
 #define LED_BRIGHTNESS                  128 //50%
 
-//#define DEBUG                           1
+#define DEBUG                           1
 
 //FCC_RESTRICT Description: http://learn.komby.com/wiki/58/configuration-settings#FCC_RESTRICT
 //Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
@@ -112,7 +143,10 @@ void setup(void)
   uint8_t logicalControllerNumber = 0;
   if(!OVER_THE_AIR_CONFIG_ENABLE)
   {
-    radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_PIXELS * 3, 0);
+    for ( int nLogical = 0; nLogical < NUMBER_LOGICAL_CONTROLLERS; nLogical++){
+		printf("adding logical Controller\n");
+		radio.AddLogicalController(logicalControllerNumber + nLogical, logicalControllerStartChannels[nLogical], logicalControllersNumPixelsPer[nLogical] * 3, 0);
+	}
   }
 
   radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
@@ -133,37 +167,44 @@ void setup(void)
 
 
 #ifdef FAST_SPI_CONTROL
-  leds = (CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-  memset(leds, 0, countOfPixels * sizeof(struct CRGB));
+  leds1 = (CRGB*) radio.GetControllerDataBase(0);
+  leds2 = (CRGB*) radio.GetControllerDataBase(1);
+//  memset(leds, 0, countOfPixels * sizeof(struct CRGB));
   //Initalize the data for LEDs
   //todo eventually this will be a bug
   delay(200);
   LEDS.setBrightness(LED_BRIGHTNESS);
-#else
-  strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
-
-  for (int i = 0; i < strip.GetElementCount() / 3; i++)
-  {
-    strip.SetElementColor(i, strip.Color(0, 0, 0));
-  }
-  strip.Paint();
+//#else
+ // strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber));
+//
+ // for (int i = 0; i < strip.GetElementCount() / 3; i++)
+//  {
+//    strip.SetElementColor(i, strip.Color(0, 0, 0));
+//  }
+//  strip.Paint();
 #endif
 
   #if (PIXEL_TYPE == LPD_8806)
-  LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+  LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN_2, PIXEL_CLOCK_PIN_2, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == WS_2801)
-  LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+  LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN_2, PIXEL_CLOCK_PIN_2, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == SM_16716)
-  LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN, PIXEL_CLOCK_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+  LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == TM_1809)
-  LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+  LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1* CHANNEL_REPEAT_COUNT, 0);
+   LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2* CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == TM_1803)
-  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == UCS_1903)
-  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
+  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == WS_2811)
-  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN, PIXEL_COLOR_ORDER>(), leds, countOfPixels, 0);
-
+  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds1, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_1 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, HARDCODED_LOGICAL_CONTROLLER_PIXELS_PER_2 * CHANNEL_REPEAT_COUNT, 0);
   #elif ((PIXEL_TYPE != LPD_6803) && \
        (PIXEL_TYPE != WM_2999) && \
        (PIXEL_TYPE != GECE))

@@ -242,7 +242,7 @@ void RFShowControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 /************************************************************************/
 void RFShowControl::PrintControllerConfig(void)
 {
-  printf("Cntl Info:\t%d\n", this->_controllerId);
+  printf("Cntl Info:\t%lu\n", this->_controllerId);
   printf("LCntrl:\t%d\n", this->_numControllers);
   printf("Listen:\t%d\n", this->_channel);
   printf("Start:\t%lu\n", this->_startChannel);
@@ -598,8 +598,38 @@ bool RFShowControl::ProcessPacket(byte *dest, byte *p)
     int numChannelsInPacket = calcEndChannel - calcStartChannel;
 
     //Use memcpy to copy the bytes from the radio packet into the data array.
-    memcpy(&dest[calcStartDestIdx], &p[calcStartSourceIdx], numChannelsInPacket);
-
+   
+   //if not grouping use this
+   // memcpy(&dest[calcStartDestIdx], &p[calcStartSourceIdx], numChannelsInPacket);
+    
+    ///else 
+    //if we have a channel grouping this needs to be done differently
+    //we will copy 3 channels at a time in pixel mode and 1 at a time in non pixel grouping mode
+    uint8_t groupingBy =5;
+    uint8_t pixelModeGrouping = 3; //means group by 3 * number of pixels to group
+    uint8_t groupingByStartDestIdx = calcStartDestIdx;
+    uint8_t groupingBystartSourceIdx = calcStartSourceIdx;
+    //TODO ADD LOGIC FOR INVERTING LOGICAL CONTROLLER CHANNEL ORDER (Grouped, for when a second string runs with a different data direction IE the controller is in the middle of two strings.(arches, or strips where you have 100 pixels with the controller in the middle of 2 50 pixel strips)
+    printf("pc %d %d %d %d\n", packetSequence, numChannelsInPacket, calcStartDestIdx, calcStartSourceIdx);
+    for ( int copyPacketGrouped = 0; copyPacketGrouped < ( numChannelsInPacket / pixelModeGrouping); copyPacketGrouped++ )
+    {
+    //  printf_P(PSTR("bic:"));
+      for (int copyGroup =0; copyGroup < groupingBy; copyGroup++ )
+      {
+        //if (GROUPINGBYPIXEL)
+       // printf("copygroup %d, %d, \n", copyGroup, groupingBy);
+        memcpy(&dest[groupingByStartDestIdx], &p[groupingBystartSourceIdx], pixelModeGrouping);
+        //endif
+        //elese
+        //move the dest (channel based pointer over by the mode) 
+        groupingByStartDestIdx+=pixelModeGrouping;
+        //leave the source alone because we want to copy its value groupingByTimes
+      }
+      printf("grp %d, %d, \n",  groupingByStartDestIdx, groupingBystartSourceIdx);
+      //done with that group of channels so move on
+      groupingBystartSourceIdx += pixelModeGrouping;
+      //copyPacketGrouped+=pixelModeGrouping;
+    }
   }
   return retVal;
 }

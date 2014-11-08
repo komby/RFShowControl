@@ -201,6 +201,8 @@ LPD6803RFShowControl strip = LPD6803RFShowControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PI
    (PIXEL_TYPE == WS_2811))
 #include <FastLED.h>
 CRGB *leds;
+CRGB *leds1;
+CRGB *leds2;
 #define FAST_SPI_CONTROL
 #ifndef __INC_FASTSPI_LED2_H
 #error "You are missing the newest FastLED Library.  You need to download it from 'https://github.com/FastLED/FastLED' and put it in your libraries folder"
