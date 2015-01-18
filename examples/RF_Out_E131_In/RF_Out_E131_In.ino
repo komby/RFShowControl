@@ -122,7 +122,9 @@ void setup(void)
   Serial.println(F("\n[E1.31 Arduino Ethernet Transmitter ]\n"));
   printf_begin();
 
-  radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE);
+  if(radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE)){
+     Serial.print("Radio Is UP\n");
+  }
   delayMicroseconds(1500);
 
   radio.printDetails();
