@@ -124,6 +124,8 @@ void setup(void)
 
   if(radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE)){
      Serial.print("Radio Is UP\n");
+  }else{
+     resetFunc(); //IF nrf failes reset 
   }
   delayMicroseconds(1500);
 
