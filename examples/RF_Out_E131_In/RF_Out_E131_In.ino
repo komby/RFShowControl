@@ -105,6 +105,7 @@ uint8_t* validBuf;
 byte str[32];
 EthernetUDP Udp;
 
+void(* resetFunc) (void) = 0;//declare reset function at address 0
 
 bool validateRoot(uint8_t buf[]);
 bool validateDMP(uint8_t buf[]);
