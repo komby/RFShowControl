@@ -105,6 +105,7 @@ uint8_t* validBuf;
 byte str[32];
 EthernetUDP Udp;
 
+void(* resetFunc) (void) = 0;//declare reset function at address 0
 
 bool validateRoot(uint8_t buf[]);
 bool validateDMP(uint8_t buf[]);
@@ -122,7 +123,27 @@ void setup(void)
   Serial.println(F("\n[E1.31 Arduino Ethernet Transmitter ]\n"));
   printf_begin();
 
-  radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE);
+  if(radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE)){
+     Serial.println("Radio Is UP");
+  }else{
+     resetFunc(); //If nrf failes reset 
+  }
+  
+ 
+  //Convert the output from the ethernet lib to same format as ip array   
+  uint32_t value = Ethernet.localIP();
+  uint8_t ipFromEthernet[] = {value, value >> 8, value >> 16, value  >> 24};
+ //check of the hardware ip matches what shoudl have been set.
+  if((ipFromEthernet[0] == ip[0]) 
+  && (ipFromEthernet[1] == ip[1]) 
+  && (ipFromEthernet[2] == ip[2]) 
+  && (ipFromEthernet[3] == ip[3])){
+    Serial.println("Ethernet Is UP");
+  }else{
+	resetFunc(); //If nrf failes reset 
+  }
+  
+  
   delayMicroseconds(1500);
 
   radio.printDetails();
