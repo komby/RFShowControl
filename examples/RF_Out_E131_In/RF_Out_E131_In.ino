@@ -11,7 +11,13 @@
  * 		MAC address in default sketch wouldn't work with certain "smart" switches.
  * 		Jon Chuchla gave useful information regarding mac addresses here:
  * 		http://diychristmas.org/vb1/showthread.php?2760-Can-t-ping-komby-sandwich&p=31396&viewfull=1#post31396
- *
+ * Updated: February 19th, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ *		Feedback on chosen default MAC address from DMCole proved that certain network
+ *		equipment isn't happy with the 0x12, 0x34 ... type MAC address and will not
+ *		allow network traffic through as expected.  Using an address that fits the
+ *		format described by Jon, but recommended by Arduino seems to work on both the
+ *		older network equipment in use by DMCole as well as Materdaddy's equipment the
+ *		October 2014 changes were tested on.
  *
  * Description:
  *     Streaming ACN (E1.31) receiver to RF transmitter for RFShowControl receivers
@@ -60,7 +66,7 @@
 #define UNIVERSE                        1
 
 // MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
-static uint8_t mac[] = { 0x12, 0x34, 0x56, 0xBE, 0xEE, 0xEF };
+static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
