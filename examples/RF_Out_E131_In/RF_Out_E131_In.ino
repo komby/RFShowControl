@@ -11,7 +11,7 @@
  * 		MAC address in default sketch wouldn't work with certain "smart" switches.
  * 		Jon Chuchla gave useful information regarding mac addresses here:
  * 		http://diychristmas.org/vb1/showthread.php?2760-Can-t-ping-komby-sandwich&p=31396&viewfull=1#post31396
- * Updated: February 19th, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
+ * Updated: February 19th, 2015 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  *		Feedback on chosen default MAC address from DMCole proved that certain network
  *		equipment isn't happy with the 0x12, 0x34 ... type MAC address and will not
  *		allow network traffic through as expected.  Using an address that fits the
