@@ -18,6 +18,8 @@
  *		format described by Jon, but recommended by Arduino seems to work on both the
  *		older network equipment in use by DMCole as well as Materdaddy's equipment the
  *		October 2014 changes were tested on.
+ * Updated: March 14, 2014 - Dave Cole, dmcole@dmcole.com.
+ *		Corrected URL to MAC address description in Required Configuration section
  *
  * License:
  *    Users of this software agree to hold harmless the creators and
@@ -50,7 +52,7 @@
 // Valid Values: RF1, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4
 #define NRF_TYPE                        MINIMALIST_SHIELD
 
-// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC-Address
 static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };

@@ -18,6 +18,8 @@
  *		format described by Jon, but recommended by Arduino seems to work on both the
  *		older network equipment in use by DMCole as well as Materdaddy's equipment the
  *		October 2014 changes were tested on.
+ * Updated: March 14, 2014 - Dave Cole, dmcole@dmcole.com.
+ *		Corrected URL to MAC address description in Required Configuration section
  *
  * Description:
  *     Streaming ACN (E1.31) receiver to RF transmitter for RFShowControl receivers
@@ -65,7 +67,7 @@
 // Valid Values: 1-255
 #define UNIVERSE                        1
 
-// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC-Address
 static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
@@ -132,24 +134,24 @@ void setup(void)
   if(radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE)){
      Serial.println("Radio Is UP");
   }else{
-     resetFunc(); //If nrf failes reset 
+     resetFunc(); //If nrf failes reset
   }
-  
- 
-  //Convert the output from the ethernet lib to same format as ip array   
+
+
+  //Convert the output from the ethernet lib to same format as ip array
   uint32_t value = Ethernet.localIP();
   uint8_t ipFromEthernet[] = {value, value >> 8, value >> 16, value  >> 24};
  //check of the hardware ip matches what shoudl have been set.
-  if((ipFromEthernet[0] == ip[0]) 
-  && (ipFromEthernet[1] == ip[1]) 
-  && (ipFromEthernet[2] == ip[2]) 
+  if((ipFromEthernet[0] == ip[0])
+  && (ipFromEthernet[1] == ip[1])
+  && (ipFromEthernet[2] == ip[2])
   && (ipFromEthernet[3] == ip[3])){
     Serial.println("Ethernet Is UP");
   }else{
-	resetFunc(); //If nrf failes reset 
+	resetFunc(); //If nrf failes reset
   }
-  
-  
+
+
   delayMicroseconds(1500);
 
   radio.printDetails();
