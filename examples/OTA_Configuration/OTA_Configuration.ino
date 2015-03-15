@@ -18,6 +18,8 @@
  *		format described by Jon, but recommended by Arduino seems to work on both the
  *		older network equipment in use by DMCole as well as Materdaddy's equipment the
  *		October 2014 changes were tested on.
+ * Updated: March 14, 2014 - Dave Cole, dmcole@dmcole.com.
+ *		Corrected URL to MAC address description in Required Configuration section
  *
  * License:
  *    Users of this software agree to hold harmless the creators and
