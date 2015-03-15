@@ -65,7 +65,7 @@
 // Valid Values: 1-255
 #define UNIVERSE                        1
 
-// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#Mac-Address
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC-Address
 static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] =  { 192, 168, 1, 99 };
