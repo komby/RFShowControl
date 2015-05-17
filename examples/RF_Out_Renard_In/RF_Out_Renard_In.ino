@@ -1,12 +1,12 @@
 /*
- * Renard Transmitter
- *
- * TODO
- *
- *  Author: Greg Scull
- *      7/2013
- *   This transmitter uses
- */
+* Renard Transmitter
+*
+* TODO
+*
+*  Author: Greg Scull
+*      7/2013
+*   This transmitter uses
+*/
 
 #include <EEPROM.h>
 #include <nRF24L01.h>
@@ -54,8 +54,8 @@
 #define ESCAPE                          0x7F
 #define COMMAND                         0x80
 
-volatile unsigned int sub1=0;
-volatile bool packetready=false;
+volatile unsigned int sub1 = 0;
+volatile bool packetready = false;
 
 //Initialize the RF packet buffer
 byte str[RF_NUM_PACKETS][32];
@@ -63,17 +63,17 @@ byte str[RF_NUM_PACKETS][32];
 
 void setup(void)
 {
-  radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
-  UCSR0C |= (1<<USBS0);
-  Serial.begin(RENARD_BAUD_RATE);
+	radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
+	UCSR0C |= (1 << USBS0);
+	Serial.begin(RENARD_BAUD_RATE);
 }
 
 void loop(void)
 {
-  if (packetready )
-  //If there is a packet ready to write to the radio...Write it!
-  {
-    packetready=false;
-    radio.write_payload( &str[sub1-1], 32 );
-  }
+	if (packetready)
+		//If there is a packet ready to write to the radio...Write it!
+	{
+		packetready = false;
+		radio.writeFast(&str[sub1 - 1], 32);
+	}
 }

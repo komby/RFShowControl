@@ -25,9 +25,9 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
-
+#include <DMXSerial.h>
 #include "IRFShowControl.h"
-#include "ModifiedDMXSerial.h"
+
 #include "RFShowControl.h"
 
 
@@ -101,9 +101,10 @@ void setup(void)
   logicalControllerNumber = 0;
   channels = radio.GetControllerDataBase(logicalControllerNumber);
   int numChannels = radio.GetNumberOfChannels(logicalControllerNumber);
-  ModifiedDMXSerial.maxChannel(numChannels);
-
-  ModifiedDMXSerial.init(DMXController, channels);
+  DMXSerial.maxChannel(numChannels);
+  uint8_t * tmp = DMXSerial.getBuffer();
+  tmp=channels;
+  DMXSerial.init(DMXController);
 }
 
 void loop(void)

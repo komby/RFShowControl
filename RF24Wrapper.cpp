@@ -27,7 +27,7 @@
  * @param _cepin The pin attached to Chip Enable on the RF module
  * @param _cspin The pin attached to Chip Select
  */
-RF24Wrapper::RF24Wrapper(uint8_t _cepin, uint8_t _cspin): RF24(_cepin, _cspin), csn_pin(_cspin)
+RF24Wrapper::RF24Wrapper(uint8_t _cepin, uint8_t _cspin): RF24(_cepin, _cspin)
 {
 	pinMode(_cspin, OUTPUT);
 }
@@ -40,8 +40,9 @@ RF24Wrapper::~RF24Wrapper(void)
 //helper to check the channel we tried to set;
 uint8_t RF24Wrapper::GetChannel(void)
 {
-  return read_register(RF_CH);
+	return 0;
 }
+
 
 /*
  * Initalize Method
@@ -78,19 +79,20 @@ bool RF24Wrapper::Initialize(int pRole, const uint64_t *pPipes, int pChannel, rf
   if (pRole == TRANSMITTER)
   {
     this->setChannel(pChannel); //Change from the default channel...
-    channelSetSuccessfully = false;
+  /*  channelSetSuccessfully = false;
     if (this->GetChannel() == pChannel)
     {
       this->channelSetSuccessfully = true;
-    }
+    }*/
+	this->channelSetSuccessfully = true;
     this->openWritingPipe(pPipes[0]); //Open pipe for Writing
     this->openReadingPipe(1,pPipes[1]); //Open pipe for Reading...But we aren't reading anything....
     this->setPALevel(RF24_PA_MAX); //Set the power level to high!
-
-    this->write_register(CONFIG, (this->read_register(CONFIG) | _BV(PWR_UP)) & ~_BV(PRIM_RX)); //set up radio for writing!
+	//TODO Find a method in the new RF24 library to replace teh below method.
+   // this->write_register(CONFIG, (this->read_register(CONFIG) | _BV(PWR_UP)) & ~_BV(PRIM_RX)); //set up radio for writing!
     this->flush_tx(); //Clear the TX FIFO Buffers
     this->powerUp(); //Fire up the radio
-    this->ce(HIGH); //Turn on transmitter!
+   // this->ce(HIGH); //Turn on transmitter!
     return true;
   }
   else
@@ -116,42 +118,66 @@ bool RF24Wrapper::Initialize(int pRole, const uint64_t *pPipes, int pChannel, rf
 
 bool RF24Wrapper::ChangeTransmitChannel(int pChannel)
 {
-  this->ce(LOW); //Turn on transmitter!
-  this->setChannel(pChannel); //Change from the default channel...
+	this->powerDown();
+    this->setChannel(pChannel); //Change from the default channel...
 
-  this->ce(HIGH); //Turn on transmitter!
+    this->powerUp(); //Turn on transmitter!
   return true;
 }
 
-/*
- * Override base class method
- * This method was created so that we dont
- * have to directly modify the rf24 library.
- */
-void RF24Wrapper::csn(int mode)
-{
-  // Minimum ideal SPI bus speed is 2x data rate
-  // If we assume 2Mbs data rate and 16Mhz clock, a
-  // divider of 4 is the minimum we want.
-  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
-  #ifdef ARDUINO
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  SPI.setClockDivider(SPI_CLOCK_DIV2);
-  #endif
-  digitalWrite(csn_pin,mode);
-}
+///*
+// * Override base class method
+// * This method was created so that we dont
+// * have to directly modify the rf24 library.
+// */
+//void RF24Wrapper::csn(int mode)
+//{
+//  // Minimum ideal SPI bus speed is 2x data rate
+//  // If we assume 2Mbs data rate and 16Mhz clock, a
+//  // divider of 4 is the minimum we want.
+//  // CLK:BUS 8Mhz:2Mhz, 16Mhz:4Mhz, or 20Mhz:5Mhz
+//  #ifdef ARDUINO
+//  SPI.setBitOrder(MSBFIRST);
+//  SPI.setDataMode(SPI_MODE0);
+//  SPI.setClockDivider(SPI_CLOCK_DIV2);
+//  #endif
+//  digitalWrite(csn_pin,mode);
+//}
 
 /*
- * Implemented overriding method from the base RF library.
- * This just exposes the otherwise protected method.
- */
-uint8_t RF24Wrapper::write_payload(const void *buf, uint8_t len)
-{
-  return RF24::write_payload(buf, len);
-}
+// * Implemented overriding method from the base RF library.
+// * This just exposes the otherwise protected method.
+// */
+//uint8_t RF24Wrapper::write_payload(const void *buf, uint8_t len)
+//{
+////	//TODO Find out what this writeType is all about?????
+// return RF24Wrapper::write_payload(buf, len, 1);
+//}
 
-uint8_t RF24Wrapper::get_status(void)
-{
-  return RF24::get_status();
-}
+////uint8_t RF24Wrapper::write_payload(const void* buf, uint8_t data_len, const uint8_t writeType)
+//////fuint8_t RF24Wrapper::write_payload(const void *buf, uint8_t len, const uint8_t writeType)
+////{
+////
+////
+////	//TODO Find out what this writeType is all about?????
+////	return RF24::write_payload(buf, data_len, writeType);
+////}
+////uint8_t RF24Wrapper::get_status(void)
+////{
+////  return RF24::get_status();
+////}
+//
+//uint8_t RF24Wrapper::read_register(uint8_t reg)
+//{
+//	return RF24::read_register(reg); 
+//}
+//
+//uint8_t RF24Wrapper::write_register(uint8_t reg, uint8_t value)
+//{
+//	return RF24::write_register(reg, value);
+//}
+//void RF24Wrapper::ce(bool value)
+//{
+//	RF24::ce(value);
+//}
+//

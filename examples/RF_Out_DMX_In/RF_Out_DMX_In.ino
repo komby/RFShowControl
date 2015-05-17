@@ -1,39 +1,39 @@
 /*
- * SerialDMXToRFTransmitter
- *
- *    This code is a derivative of the original work done by
- *    Joe Johnson RFColor_24 Receiver Program
- *
- *    The Code which Joe wrote inspired this software, the related hardware and
- *    it was also used as a starting point for this class.
- *
- *    As with the RFColor_24 The commercial Use of this software is Prohibited.
- *    Use this software and (especially) the hardware at your own risk.
- *
- *    This code also uses a modified version of the DMXSerial library @see ModifiedDMXSerial for more information.
- *
- *    NOTE: This no longer requries the use of the hardware serial hack
- *
- * Created on: Mar 2014
- * Author: Greg Scull, komby@komby.com
- *
- * License:
- *    Users of this software agree to hold harmless the creators and
- *    contributors of this software.  By using this software you agree that
- *    you are doing so at your own risk, you could kill yourself or someone
- *    else by using this software and/or modifying the factory controller.
- *    By using this software you are assuming all legal responsibility for
- *    the use of the software and any hardware it is used on.
- *
- *    The Commercial Use of this Software is Prohibited.
- */
+* SerialDMXToRFTransmitter
+*
+*    This code is a derivative of the original work done by
+*    Joe Johnson RFColor_24 Receiver Program
+*
+*    The Code which Joe wrote inspired this software, the related hardware and
+*    it was also used as a starting point for this class.
+*
+*    As with the RFColor_24 The commercial Use of this software is Prohibited.
+*    Use this software and (especially) the hardware at your own risk.
+*
+*    This code also uses a modified version of the DMXSerial library @see ModifiedDMXSerial for more information.
+*
+*    NOTE: This no longer requries the use of the hardware serial hack
+*
+* Created on: Mar 2014
+* Author: Greg Scull, komby@komby.com
+*
+* License:
+*    Users of this software agree to hold harmless the creators and
+*    contributors of this software.  By using this software you agree that
+*    you are doing so at your own risk, you could kill yourself or someone
+*    else by using this software and/or modifying the factory controller.
+*    By using this software you are assuming all legal responsibility for
+*    the use of the software and any hardware it is used on.
+*
+*    The Commercial Use of this Software is Prohibited.
+*/
 
 #include <EEPROM.h>
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
 
-#include "ModifiedDMXSerial.h"
+#include <DMXSerial.h>
 #include "RFShowControl.h"
 
 
@@ -73,24 +73,40 @@ bool initclean = 0;
 
 void setup(void)
 {
-  pinMode(A0, OUTPUT);
-  digitalWrite(A0, HIGH);
-  
-  pinMode(1, OUTPUT);
-  digitalWrite(1, LOW);
+	pinMode(A0, OUTPUT);
+	digitalWrite(A0, HIGH);
 
-  initclean = radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE, 0);
-  ModifiedDMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
-  ModifiedDMXSerial.init(DMXReceiver);
+	pinMode(1, OUTPUT);
+	digitalWrite(1, LOW);
+
+	initclean = radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0);
+	DMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
+	DMXSerial.init(DMXReceiver);
+	DMXSerial.attachOnUpdate(&SendPackets);
 }
 
 void loop(void)
 {
-  if (ModifiedDMXSerial.isPacketReady())
-  {
-    digitalWrite(1, (txstat && initclean )? 1:0);
-    radio.write_payload(ModifiedDMXSerial.GetPacketPointer(), 32);
-    ModifiedDMXSerial.setPacketReady(false);
-    txstat= !txstat;
-  }
+	//nothing here.  DMXSerial will call the SendPackets function when a full DMX frame is here.
+}
+
+void SendPackets(void)
+{
+	uint8_t packet[32];
+	int chan_cnt = 0;
+	int dataBytesInPacket = 30;
+	uint8_t *dmxBuffer = DMXSerial.getBuffer();
+
+	uint8_t sizeofbyte = sizeof(uint8_t);
+	uint8_t sizeofpacket = sizeofbyte * 30;
+	for (int i = 0; i<18 && chan_cnt < HARDCODED_NUM_CHANNELS; i++)
+	{
+		memcpy(packet, dmxBuffer, sizeofpacket);
+		packet[30] = i;
+		dmxBuffer += 30;
+		radio.writeFast(packet, 32);
+		//blink the leds to show we are sending packets
+		digitalWrite(1, (txstat && initclean) ? 1 : 0);
+		chan_cnt += 30;
+	}
 }

@@ -27,7 +27,7 @@
 #include <SPI.h>
 
 #include "IRFShowControl.h"
-#include "printf.h"
+#include <printf.h>
 #include "RFShowControl.h"
 
 

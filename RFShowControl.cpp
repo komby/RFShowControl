@@ -88,11 +88,11 @@ bool RFShowControl::Initialize(int pRole, const uint64_t *pPipes, int pChannel, 
     this->openWritingPipe(pPipes[0]); //Open pipe for Writing
     this->openReadingPipe(1,pPipes[1]); //Open pipe for Reading...But we aren't reading anything....
     this->setPALevel(RF24_PA_MAX); //Set the power level to high!
-
-    this->write_register(CONFIG, (this->read_register(CONFIG) | _BV(PWR_UP)) & ~_BV(PRIM_RX)); //set up radio for writing!
+	//TODO Find a method in the new RF24 library to replace teh below method.
+   // this->write_register(CONFIG, (this->read_register(CONFIG) | _BV(PWR_UP)) & ~_BV(PRIM_RX)); //set up radio for writing!
     this->flush_tx(); //Clear the TX FIFO Buffers
     this->powerUp(); //Fire up the radio
-    this->ce(HIGH); //Turn on transmitter!
+   // this->ce(HIGH); //Turn on transmitter!
     return this->channelSetSuccessfully;
   }
 
@@ -400,9 +400,9 @@ bool RFShowControl::ConfigureReceiverAtStartup(uint32_t pReceiverId) {
       {
         while(!this->available());
         delay(4);
-        for(bool found = false; this->read(&this->packetData, 32) && !found;)
+        for(bool found = false;  !found ;)
         {
-
+			this->read(&this->packetData, 32);
 #ifdef DEBUG_PRINT
           printf_P(PSTR("received OTA logical\n"));
           for (int i = 0; i < 32; i++)
@@ -479,7 +479,8 @@ bool RFShowControl::Listen(void)
     for (bool done = false; !done;)
     {
       // Fetch the payload, and see if this was the last one.
-      done = this->read(&this->packetData, 32);
+      //done = this->read(&this->packetData, 32);
+	  this->read(&this->packetData, 32);
       //when process packet returns true we got the last channel we are listening to and its time to output....
       if (ProcessPacket(this->channelData, this->packetData))
       {

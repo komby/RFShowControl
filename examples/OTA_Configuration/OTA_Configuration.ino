@@ -38,7 +38,8 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
-#include <util.h>
+//Include extra util.h for htonl 
+#include "../../Ethernet/src/utility/util.h"
 
 #include "OTAConfig.h"
 #include "packets.h"
@@ -408,9 +409,10 @@ void doRFSend(WebServer &server)
 
   server.printP(writeInit);
   server << "<br/>";
-
-  while (radio.get_status() & 0x01) ; // wait for FIFO spot
-  radio.write_payload( &cfg_pkt, 32 );
+//todo komby research if this is acceptable/test me
+//  while (radio.get_status() & 0x01) ; // wait for FIFO spot
+//radio.write_payload( &cfg_pkt, 32 );
+  radio.writeFast(&cfg_pkt, 32, true);
   delayMicroseconds(5000);
   delay (PACKET_SEND_DELAY); //wait for printf to complete on receiver
   char *fred = (char *)lcfg_pkt;
@@ -427,8 +429,8 @@ void doRFSend(WebServer &server)
 #ifdef DEBUG
     Serial.println(zz);
 #endif
-    while (radio.get_status() & 0x01) ; // wait for FIFO spot
-    radio.write_payload( fred, 32 );
+  //  while (radio.get_status() & 0x01) ; // wait for FIFO spot
+    radio.writeFast( fred, 32, false);
     fred+=32;
     delayMicroseconds(5000);
     delay (PACKET_SEND_DELAY); //wait for printf to complete on receiver
