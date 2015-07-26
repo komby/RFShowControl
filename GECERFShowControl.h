@@ -21,7 +21,7 @@
 #define __GECERFSHOWCONTROL_H__
 
 #include <Arduino.h>
-#include <GEColorEffects.h>
+#include "GEColorEffects.h"
 
 #include "IRFShowControl.h"
 #include "RFShowControl.h"
