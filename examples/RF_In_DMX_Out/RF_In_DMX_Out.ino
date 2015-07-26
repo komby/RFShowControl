@@ -56,11 +56,10 @@
 
 // HARDCODED_START_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
-#define HARDCODED_START_CHANNEL         1
-
+#define HARDCODED_START_CHANNEL        1
 // HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
 // Valid Values: 1-512
-#define HARDCODED_NUM_CHANNELS          512
+#define HARDCODED_NUM_CHANNELS          135
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
@@ -101,10 +100,12 @@ void setup(void)
   logicalControllerNumber = 0;
   channels = radio.GetControllerDataBase(logicalControllerNumber);
   int numChannels = radio.GetNumberOfChannels(logicalControllerNumber);
-  DMXSerial.maxChannel(numChannels);
+
   uint8_t * tmp = DMXSerial.getBuffer();
   tmp=channels;
   DMXSerial.init(DMXController);
+    DMXSerial.maxChannel(300);
+      tmp=channels;
 }
 
 void loop(void)
