@@ -60,7 +60,6 @@ uint32_t Wheel(byte WheelPos);
 
 void setup(void)
 {
-	
 	Serial.begin(115200);
 	Serial.println("\n[TEST RF Transmitter]\n");
 	printf_begin();

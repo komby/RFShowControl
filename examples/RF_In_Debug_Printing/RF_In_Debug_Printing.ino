@@ -62,9 +62,7 @@
 #include "RFShowControlConfig.h"
 
 byte data[32];
-int prev =0;
- int packetOffset = 0;
- 
+
 void setup(void)
 {
   printf_begin();
@@ -76,28 +74,18 @@ void setup(void)
 
   radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, 0);
   radio.printDetails();
-
 }
 
 void loop(void)
 {
- 
-  
+  int packetOffset = 0;
   if (radio.available())
   {
     radio.read(&data, 32);
 
     packetOffset = data[30];
-   // printf("--%3d - %3d:*****************************\r\n", data[30] * 30, (data[30] * 30) + 30);
-
-    if (packetOffset!=0){
-    printf("%3d, ", data[30]);
-    }
-    else {
-       printf("\n\r%3d,", data[30]);
-      //printf("");
-  }
-      prev=packetOffset;
+    printf("--%3d - %3d:*****************************\r\n", data[30] * 30, (data[30] * 30) + 30);
+    printf("\n\r--%3d:", data[30] * 30);
 #ifdef DEBUG
     for (int i =0;i<30;i++)
     {

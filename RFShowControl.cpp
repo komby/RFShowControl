@@ -182,7 +182,6 @@ bool RFShowControl::Initialize(int pRole, const uint64_t *pPipes, int pChannel, 
   this->setChannel(this->_channel); //Change from the default channel...
 
   this->_rf_data_rate = pDataRate;
-  this->setDataRate(this->_rf_data_rate);
   this->channelSetSuccessfully = true;
   //Setup Receiver to listen for configuration packets on the Configuration Channel
   this->openWritingPipe(pPipes[1]); //Open pipe for Writing
@@ -477,15 +476,18 @@ bool RFShowControl::Listen(void)
   // See if there is any data in the RF buffer
   if (this->available())
   {
+    for (bool done = false; !done;)
+    {
       // Fetch the payload, and see if this was the last one.
-	    this->read(&this->packetData, 32);
-      
+      //done = this->read(&this->packetData, 32);
+	  this->read(&this->packetData, 32);
       //when process packet returns true we got the last channel we are listening to and its time to output....
       if (ProcessPacket(this->channelData, this->packetData))
       {
         //return true to the sketch and let it handle updates
         return true;
       }
+    }
   }
   return false;
 }
@@ -560,7 +562,7 @@ bool RFShowControl::ProcessPacket(byte *dest, byte *p)
       calcEndSourceIdx = packetEndChannel - packetStartChann;
 
       // MM 2014/06/29:
-      // If we end on a packet boundary and no further packets are sent before
+      // If we end on a packet boundry and no further packets are sent before
       // looping, we previously never set retVal to true in this scenario and
       // would never print our received data to the pixels.
       if ( packetEndChannel == finalChannel )
@@ -597,7 +599,6 @@ bool RFShowControl::ProcessPacket(byte *dest, byte *p)
     int numChannelsInPacket = calcEndChannel - calcStartChannel;
 
     //Use memcpy to copy the bytes from the radio packet into the data array.
-   // printf("seq %d : Start %d ,  End %d , fc %d psc %d |%d | %d |  numch %d \n", packetSequence, calcStartDestIdx,  calcStartSourceIdx, finalChannel, packetStartChann , calcStartChannel, calcEndChannel, numChannelsInPacket);
     memcpy(&dest[calcStartDestIdx], &p[calcStartSourceIdx], numChannelsInPacket);
 
   }
