@@ -79,7 +79,7 @@ bool RFShowControl::Initialize(int pRole, const uint64_t *pPipes, int pChannel, 
 
   if (pRole == TRANSMITTER)
   {
-    this->setChannel(pChannel); //Change from the default channel...
+    this->setChannel(pChannel); //Change from the default channel...\-
     channelSetSuccessfully = false;
     if (this->GetChannel() == pChannel)
     {
