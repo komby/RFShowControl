@@ -33,7 +33,8 @@
 #include <RF24.h>
 #include <SPI.h>
 
-#include <DMXSerial.h>
+
+#include "ModifiedDMXSerial.h"
 #include "RFShowControl.h"
 
 
@@ -79,34 +80,19 @@ void setup(void)
 	pinMode(1, OUTPUT);
 	digitalWrite(1, LOW);
 
-	initclean = radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL, DATA_RATE, 0);
-	DMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
-	DMXSerial.init(DMXReceiver);
-	DMXSerial.attachOnUpdate(&SendPackets);
+ initclean = radio.Initialize(radio.TRANSMITTER, pipes, TRANSMIT_CHANNEL,DATA_RATE, 0);
+ ModifiedDMXSerial.maxChannel(HARDCODED_NUM_CHANNELS);
+ ModifiedDMXSerial.init(DMXReceiver);
+
 }
 
 void loop(void)
 {
-	//nothing here.  DMXSerial will call the SendPackets function when a full DMX frame is here.
-}
-
-void SendPackets(void)
-{
-	uint8_t packet[32];
-	int chan_cnt = 0;
-	int dataBytesInPacket = 30;
-	uint8_t *dmxBuffer = DMXSerial.getBuffer();
-
-	uint8_t sizeofbyte = sizeof(uint8_t);
-	uint8_t sizeofpacket = sizeofbyte * 30;
-	for (int i = 0; i<18 && chan_cnt < HARDCODED_NUM_CHANNELS; i++)
-	{
-		memcpy(packet, dmxBuffer, sizeofpacket);
-		packet[30] = i;
-		dmxBuffer += 30;
-		radio.writeFast(packet, 32);
-		//blink the leds to show we are sending packets
-		digitalWrite(1, (txstat && initclean) ? 1 : 0);
-		chan_cnt += 30;
-	}
+  if (ModifiedDMXSerial.isPacketReady())
+  {
+    digitalWrite(1, (txstat && initclean )? 1:0);
+    radio.writeFast(ModifiedDMXSerial.GetPacketPointer(), 32);
+    ModifiedDMXSerial.setPacketReady(false);
+    txstat= !txstat;
+  }
 }

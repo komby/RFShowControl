@@ -9,9 +9,10 @@ Hardware Support:
 Arduino Uno, Atmega 168, 328 
 nRF24L01+
 
-Designed for use on komby controllers.  Works with most arduino compatible devices.
+Designed for use on komby controllers.  Works with most arduino compatible (avr) devices.
 http://www.komby.com/RF1
 http://www.komby.com/RF1_12V
+http://www.komby.com/RF1Serial
 http://www.komby.com/kombee
 
 

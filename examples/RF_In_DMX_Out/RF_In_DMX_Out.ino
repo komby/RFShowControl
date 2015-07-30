@@ -25,7 +25,7 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
-#include <DMXSerial.h>
+#include "ModifiedDMXSerial.h"
 #include "IRFShowControl.h"
 
 #include "RFShowControl.h"
@@ -76,6 +76,7 @@
 //Include this after all configuration variables are set
 #include "RFShowControlConfig.h"
 
+bool initclean = 0;
 
 uint8_t *channels;
 
@@ -86,7 +87,10 @@ void setup(void)
   //Set the output pin for the RS485 adapter to transmit
   pinMode(A0, OUTPUT);
   digitalWrite(A0, HIGH);
-
+  //setup status LED
+  pinMode(1, OUTPUT);
+  digitalWrite(1, LOW);
+  
   radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
   uint8_t logicalControllerNumber = 0;
@@ -95,17 +99,14 @@ void setup(void)
     radio.AddLogicalController(logicalControllerNumber, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS, 0);
   }
 
-  radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
+  initclean = radio.Initialize(radio.RECEIVER, pipes, LISTEN_CHANNEL, DATA_RATE, RECEIVER_UNIQUE_ID);
 
   logicalControllerNumber = 0;
   channels = radio.GetControllerDataBase(logicalControllerNumber);
   int numChannels = radio.GetNumberOfChannels(logicalControllerNumber);
+  ModifiedDMXSerial.maxChannel(numChannels);
 
-  uint8_t * tmp = DMXSerial.getBuffer();
-  tmp=channels;
-  DMXSerial.init(DMXController);
-    DMXSerial.maxChannel(300);
-      tmp=channels;
+  ModifiedDMXSerial.init(DMXController, channels);
 }
 
 void loop(void)
@@ -113,5 +114,7 @@ void loop(void)
   //we dont need to do anything here as the library is handling all the data and transmission of info.
   if (radio.Listen())
   {
+        
+        
   }
 }
