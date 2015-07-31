@@ -62,8 +62,9 @@
 #define CHANNEL_GROUPING_MODE PIXEL
 
 // CHANNEL_REPEAT_COUNT Description: http://learn.komby.com/wiki/58/configuration-settings#CHANNEL_REPEAT_COUNT
-// Valid Values: 1-512 //use this to repeat a channel based on channel grouping mode
-#define CHANNEL_REPEAT_COUNT 5
+// Valid Values: 1-512
+//use this to repeat a channel based on channel grouping mode- a setting of 1 will treat each "pixel" as a single pixel using the same three channels of data.  a setting of 2 will cause use 2 pixels for each 3 channels.etc.
+#define CHANNEL_REPEAT_COUNT 1
 
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
@@ -78,22 +79,19 @@
 
 // HARDCODED_START_CHANNEL Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
-//#define HARDCODED_START_CHANNEL         1
-//if you only have 1 string just do channel 1
 #define HARDCODED_START_CHANNEL_1         1
-//if you have 2 strings on different pins on this board set this to the first channel that the second string should use
-//#define HARDCODED_START_CHANNEL_2         31
 
 // HARDCODED_NUM_PIXELS Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_PIXELS
-// Valid Values: 1-170 ( must be divisible by Channel Repeat Count )
+// Valid Values: 1-170  ( sum of 1&2 must be less than 170 )
+
 #define HARDCODED_NUM_PIXELS_1           50
-#define HARDCODED_NUM_PIXELS_2            50
+#define HARDCODED_NUM_PIXELS_2            0
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
 // NUMBER_LOGICAL_CONTROLLERS Description http://learn.komby.com/wiki/58/configuration-settings#NUMBER_LOGICAL_CONTROLLERS
 // Valid Values: 1-3 (for now)
-#define NUMBER_LOGICAL_CONTROLLERS 2
+#define NUMBER_LOGICAL_CONTROLLERS 1
 
 // PIXEL_DATA_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_DATA_PIN
 // Valid Values: List of arduino Analog or Digital pins used for data signal, typically ~1-16
@@ -101,7 +99,7 @@
 #define PIXEL_DATA_PIN_1                  2
 //if you are brave and have a second string what pin is it on?  if not using 4 wire pixels you can also use pin 4 for use of the RF1 header
 #define PIXEL_DATA_PIN_2                  3
-const uint8_t pixelDataPins[] = {PIXEL_DATA_PIN_1, PIXEL_DATA_PIN_2};
+
 
 // PIXEL_CLOCK_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_CLOCK_PIN
 // Valid Values: List of arduino Analog or Digital pin(s) used for clock signal on 4 wire clocked pixels, typically ~1-16
@@ -117,7 +115,7 @@ const uint8_t pixelDataPins[] = {PIXEL_DATA_PIN_1, PIXEL_DATA_PIN_2};
 
 
 
-const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
+
 //How Bright should our LEDs start at Description:  http://learn.komby.com/wiki/58/configuration-settings#LED_BRIGHTNESS
 #define LED_BRIGHTNESS                  128 //50%
 
@@ -127,8 +125,11 @@ const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
 //Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
 #define FCC_RESTRICT 1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
-int countOfUnduplicatedPixels1, countOfUnduplicatedPixels2 ;
-CRGB* leds1, leds2;
+
+//const uint8_t pixelDataPins[] = {PIXEL_DATA_PIN_1, PIXEL_DATA_PIN_2};
+//const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
+
+int countOfUnduplicatedPixels1, countOfUnduplicatedPixels2;
 uint8_t* data;
 //Include this after all configuration variables are set
 #include "RFShowControlConfig.h"
@@ -148,9 +149,9 @@ void setup(void)
   {
     
     printf("adding logical Controller\n");
-    radio.AddLogicalController(0, HARDCODED_START_CHANNEL_1, HARDCODED_NUM_PIXELS_1/CHANNEL_REPEAT_COUNT * 3, 0);
+    radio.AddLogicalController(0, HARDCODED_START_CHANNEL_1, (HARDCODED_NUM_PIXELS_1/CHANNEL_REPEAT_COUNT) * 3, 0);
     if(NUMBER_LOGICAL_CONTROLLERS == 2){
-      radio.AddLogicalController(1, HARDCODED_START_CHANNEL_1+HARDCODED_NUM_PIXELS_1/CHANNEL_REPEAT_COUNT * 3, HARDCODED_NUM_PIXELS_2/CHANNEL_REPEAT_COUNT * 3, 0);
+      radio.AddLogicalController(1, HARDCODED_START_CHANNEL_1+(HARDCODED_NUM_PIXELS_1/CHANNEL_REPEAT_COUNT) * 3, (HARDCODED_NUM_PIXELS_2/CHANNEL_REPEAT_COUNT) * 3, 0);
     }
   }
 
@@ -165,31 +166,18 @@ void setup(void)
   logicalControllerNumber = 0;
   countOfUnduplicatedPixels1 = radio.GetNumberOfChannels(0)/3;
 
-  if (NUMBER_LOGICAL_CONTROLLERS > 1 )
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
   countOfUnduplicatedPixels2 = radio.GetNumberOfChannels(1)/3;
 
   #ifdef DEBUG
   Serial.print(F("Number of channels configured "));
-  printf("%d\n", countOfUnduplicatedPixels1+countOfUnduplicatedPixels2);
+  printf("%d\n", (countOfUnduplicatedPixels1+countOfUnduplicatedPixels2 )* 3);
   #endif
 
-
   #ifdef FAST_SPI_CONTROL
-  // leds = (CRGB*) (uint8_t*)calloc(countOfPixels1 + countOfPixels2,sizeof(CRGB));
-  //cheat and get the preallocated mem from the second universe for reordering space
-
   data = radio.GetControllerDataBase(0);
   leds = (CRGB*) &data[512];
-  leds1 = leds;
   
-  if (NUMBER_LOGICAL_CONTROLLERS > 1 )
-  //leds2 = &leds[countOfPixels1];
-
-
-  //  leds = (CRGB*) radio.GetControllerDataBase(logicalControllerNumber++);
-  //memset(leds, 0, countOfPixels * sizeof(struct CRGB));
-  //Initalize the data for LEDs
-  //todo eventually this will be a bug
   delay(200);
   LEDS.setBrightness(LED_BRIGHTNESS);
   #else
@@ -205,31 +193,31 @@ void setup(void)
   #if (PIXEL_TYPE == LPD_8806)
   LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN_2, PIXEL_CLOCK_PIN_2, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new LPD8806Controller<PIXEL_DATA_PIN_2, PIXEL_CLOCK_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == WS_2801)
   LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN_2, PIXEL_CLOCK_PIN_2, PIXEL_COLOR_ORDER>(), leds2, countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new WS2801Controller<PIXEL_DATA_PIN_2, PIXEL_CLOCK_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == SM_16716)
   LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds2, countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new SM16716Controller<PIXEL_DATA_PIN_1, PIXEL_CLOCK_PIN_1, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == TM_1809)
   LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1* CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, countOfUnduplicatedPixels2* CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new TM1809Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(),  leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2* CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == TM_1803)
   LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(),  leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == UCS_1903)
   LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds2, countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(),  leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
   #elif (PIXEL_TYPE == WS_2811)
   LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
-  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + countOfUnduplicatedPixels1, countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
   #elif ((PIXEL_TYPE != LPD_6803) && \
   (PIXEL_TYPE != WM_2999) && \
   (PIXEL_TYPE != GECE))
@@ -249,47 +237,39 @@ void loop(void)
   if (radio.Listen())
   {
     #ifdef FAST_SPI_CONTROL
-    
+    //how many channels of data do we need for the un-duplicated pixels?  this is the number of pixels if grouping is set to 1  its half if set to 2 etc.
     int pixelsNonDuplicated = countOfUnduplicatedPixels1+countOfUnduplicatedPixels2;
     int pixelsDuplicated = CHANNEL_REPEAT_COUNT * pixelsNonDuplicated;
     
+    //start and end for the first string of pixels
     int channelRangeStartLogical1 = 0;
     int channelRangeEndLogical1 = channelRangeStartLogical1 + countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT;
 
+    //start and end for the second string of pixels
     int channelRangeStartLogical2 = channelRangeEndLogical1;
     int channelRangeEndLogical2 = channelRangeStartLogical2 + countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT;
 
-
-
-
-    //iasdff ( CHANNEL_REPEAT_COUNT > 1 )
-    CRGB* temp = (CRGB*)data;
-    // memset(leds, 0,  pixelsDuplicated* sizeof(struct CRGB) );
     int j=0;
-
-
     for( int i = 0; i < pixelsDuplicated; i++){
       
       if (i>=CHANNEL_REPEAT_COUNT && (i % CHANNEL_REPEAT_COUNT) ==0)
       j++;
-      //for(int grouping = 0; grouping< 5; grouping++){
-      //           leds[i] = CRGB(data[j], data[j+1], data[j+2]);
-      if ( LOGICAL_DATA_ORDER_1 && i < channelRangeEndLogical1){
-        //reverse the order we copy into leds
-        leds[(channelRangeEndLogical1- 1 -i)] = temp[j];
+      //check to see if we need to reverse the order we copy into leds
+      if ( LOGICAL_DATA_ORDER_1 && i < channelRangeEndLogical1 ){
+        leds[(channelRangeEndLogical1- 1 -i)] = data[j];
       }
-      //           else if (LOGICAL_DATA_ORDER_2 && i > channelRangeEndLogical2){
-      //              leds[(channelRangeEndLogical2- 1 -i)] = temp[j];
-      //           }
+      //check to see if we need to reverse the order we copy into leds
+      else if (LOGICAL_DATA_ORDER_2 && i > channelRangeEndLogical2){
+        leds[(channelRangeEndLogical2- 1 -i)] = data[j];
+      }
+      //use the default ordering
       else {
-        leds[i] = temp[j];
+        leds[i] = data[j];
       }
-      //}
-      //duplicate pixel data before passing to leds
-
     }
     LEDS.show();
     #else
+    //TODO Refactor regular Pixel Controller to reorder like fast LED does with these parameters.
     strip.Paint();
     #endif
   }
