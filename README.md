@@ -1,5 +1,11 @@
 RFShowControl
 ==============
+BREAKING CHANGES.  Moved support from the mainiacbug RF24 library to komby/RF24.  
+
+  Follow the instructions on http://learn.komby.com/HowToUpgradeToV4 
+ 
+**************************************************************************
+
 
 RFShowControl - extension of the RF24 library for use with pixels
 
