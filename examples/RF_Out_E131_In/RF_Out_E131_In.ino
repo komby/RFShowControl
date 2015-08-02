@@ -90,7 +90,7 @@ static uint8_t ip[] = { 192, 168, 10, 205 };
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
 // DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
-//#define DEBUG                           1
+#define DEBUG                           1
 
 // REFRESH_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#REFRESH_RATE
 #define REFRESH_RATE                    0
@@ -226,33 +226,48 @@ void loop(void)
       numChannelsInPacket = ((buf[E1_31_DMP_PROP_VAL_CNT] << 8) | buf[E1_31_DMP_PROP_VAL_CNT + 1]) - 1;
       numPackets = numChannelsInPacket / 30;
       universe = ((buf[E1_31_FRAMING_UNIVERSE_ID] << 8) | buf[E1_31_FRAMING_UNIVERSE_ID + 1]);
+      uint8_t channelTmp = radio.GetChannel();
+      //printf("before %d, cu: $%d, ch %d\r\n", universe,currentUniverse, channelTmp);
+      //check and change channels if we are on the wrong universe
       if (currentUniverse != universe)
       {
         
-        currentUniverse = universe;
+
         if (universe == UNIVERSE){
+          currentUniverse = universe;
+          delayMicroseconds(4000);
+          
           radio.setChannel(TRANSMIT_CHANNEL);
-          delayMicroseconds(200);
-          transmitDataFromBuffer(buf);
+          while (radio.GetChannel() != TRANSMIT_CHANNEL)
+          delayMicroseconds(1000);
+          //          printf("univ1brhc %d, cu: $%d, ch %d\r\n", universe,currentUniverse, radio.GetChannel());
         }
         else {
+          currentUniverse = universe;
+          delayMicroseconds(4000);
           radio.setChannel(TRANSMIT_CHANNEL_2);
-
-
-          delayMicroseconds(200);
-          transmitDataFromBuffer(buf);
+          while (radio.GetChannel() != TRANSMIT_CHANNEL_2)
+          delayMicroseconds(1000);
+          //
+          delayMicroseconds(300);
+          //        printf("univ2brhc %d, cu: $%d, ch %d\r\n", universe,currentUniverse, radio.GetChannel());
         }
       }
       
+      if ((universe == UNIVERSE && channelTmp == TRANSMIT_CHANNEL) || (universe == UNIVERSE_2 && channelTmp == TRANSMIT_CHANNEL_2)) {
+        printf("send %d:%d, %d ch \n", universe,((buf[E1_31_FRAMING_UNIVERSE_ID] << 8) | buf[E1_31_FRAMING_UNIVERSE_ID + 1]), radio.GetChannel());
+        transmitDataFromBuffer(buf);
+        //delayMicroseconds(200);
+      }
       
     }
   }
-  else if (REFRESH_RATE && millis() - duration >= REFRESH_RATE)
-  {
-    //no data received re-send
-    transmitDataFromBuffer(validBuf);
-    duration = millis();
-  }
+  //  else if (REFRESH_RATE && millis() - duration >= REFRESH_RATE)
+  //  {
+  //    //no data received re-send
+  //    transmitDataFromBuffer(validBuf);
+  //    duration = millis();
+  //  }
 }
 
 void transmitDataFromBuffer(uint8_t* pBuffer)
@@ -266,7 +281,7 @@ void transmitDataFromBuffer(uint8_t* pBuffer)
     {
       memcpy(&str[0], &validBuf[r * 30 + E1_31_DMP_FIRST], 30);
       str[30] = r;
-      radio.writeFast(&str[0], 32);
+      radio.writeFast(&str[0], 32, 0);
       delayMicroseconds(_rfinterpacketdelay);
     }
     //final packet if its a partial packet
@@ -276,7 +291,7 @@ void transmitDataFromBuffer(uint8_t* pBuffer)
     {
       memcpy(&str[0], &validBuf[(r)* 30 + E1_31_DMP_FIRST], test);
       str[30] = r;
-      radio.writeFast(&str[0], 32);
+      radio.writeFast(&str[0], 32, 0);
       delayMicroseconds(_rfinterpacketdelay);
     }
   }

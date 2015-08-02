@@ -40,7 +40,7 @@ RF24Wrapper::~RF24Wrapper(void)
 //helper to check the channel we tried to set;
 uint8_t RF24Wrapper::GetChannel(void)
 {
-	return 0;
+	return RF24::getChannel();
 }
 
 
