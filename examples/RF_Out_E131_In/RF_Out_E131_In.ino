@@ -207,12 +207,7 @@ void loop(void)
     buf = buffer2;
 
     Udp.read(buf, 638);
-    //
-    //const uint64_t pPipes[2] =
-    //{
-    //0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
-    //};
-
+   
     bool validateR = validateRoot(buf);
     bool vdmp = validateDMP(buf);
     bool vfr = validateFraming(buf);
@@ -234,31 +229,27 @@ void loop(void)
         
 
         if (universe == UNIVERSE){
-          currentUniverse = universe;
-          delayMicroseconds(4000);
-          
+          currentUniverse = universe; 
           radio.setChannel(TRANSMIT_CHANNEL);
-          while (radio.GetChannel() != TRANSMIT_CHANNEL)
-          delayMicroseconds(1000);
-          //          printf("univ1brhc %d, cu: $%d, ch %d\r\n", universe,currentUniverse, radio.GetChannel());
+         
         }
         else {
           currentUniverse = universe;
-          delayMicroseconds(4000);
           radio.setChannel(TRANSMIT_CHANNEL_2);
-          while (radio.GetChannel() != TRANSMIT_CHANNEL_2)
-          delayMicroseconds(1000);
-          //
-          delayMicroseconds(300);
-          //        printf("univ2brhc %d, cu: $%d, ch %d\r\n", universe,currentUniverse, radio.GetChannel());
         }
       }
-      
+      channelTmp = radio.GetChannel();
       if ((universe == UNIVERSE && channelTmp == TRANSMIT_CHANNEL) || (universe == UNIVERSE_2 && channelTmp == TRANSMIT_CHANNEL_2)) {
-        printf("send %d:%d, %d ch \n", universe,((buf[E1_31_FRAMING_UNIVERSE_ID] << 8) | buf[E1_31_FRAMING_UNIVERSE_ID + 1]), radio.GetChannel());
+        //  printf("send %d:%d, %d ch \n", universe,((buf[E1_31_FRAMING_UNIVERSE_ID] << 8) | buf[E1_31_FRAMING_UNIVERSE_ID + 1]), radio.GetChannel());
         transmitDataFromBuffer(buf);
         //delayMicroseconds(200);
       }
+      else {
+        
+        //  printf("not sent %d:%d, %d ch \n", universe,((buf[E1_31_FRAMING_UNIVERSE_ID] << 8) | buf[E1_31_FRAMING_UNIVERSE_ID + 1]), radio.GetChannel());
+      }
+      
+      
       
     }
   }
