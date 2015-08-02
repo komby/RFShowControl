@@ -21,7 +21,7 @@
 * Updated: March 14, 2014 - Dave Cole, dmcole@dmcole.com.
 *		Corrected URL to MAC address description in Required Configuration section
 * UpdatedL July 29, 2015 - Greg Scull komby@komby.com
-*   Updated to work with newer IDE libraries and moved string prints to progmem 
+*   Updated to work with newer IDE libraries and moved string prints to progmem
 * Description:
 *     Streaming ACN (E1.31) receiver to RF transmitter for RFShowControl receivers
 *     This code can be used to send data to any RFShowControl Packet format compatible
@@ -56,7 +56,7 @@
 
 //Include extra util.h for htonl
 #include "../../Ethernet/src/utility/util.h"
-
+#include "MemoryFree.h"
 #include "E131Constants.h"
 #include "../RFShowControl/printf.h"
 #include "RFShowControl.h"
@@ -70,21 +70,22 @@
 // UNIVERSE Description: http://learn.komby.com/wiki/58/configuration-settings#UNIVERSE
 // Valid Values: 1-255
 #define UNIVERSE                        1
-
+#define UNIVERSE_2                      2
 // MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC-Address
-static uint8_t mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+static uint8_t mac[] = { 0x12, 0x34, 0x56, 0x00, 0x00, 0x00 + UNIVERSE};
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
-static uint8_t ip[] = { 192, 168, 1, 99 };
+static uint8_t ip[] = { 192, 168, 10, 205 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // TRANSMIT_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#TRANSMIT_CHANNEL
 // Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
 #define TRANSMIT_CHANNEL                10
+#define TRANSMIT_CHANNEL_2              0
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE                       RF24_250KBPS
+#define DATA_RATE                       RF24_1MBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
@@ -112,7 +113,7 @@ uint8_t buffer1[638]; //buffer to hold incoming packet,
 uint8_t buffer2[638]; //buffer to cache good universe packet
 uint8_t* buf;
 uint8_t* validBuf;
-
+uint8_t currentUniverse;
 
 byte str[32];
 EthernetUDP Udp;
@@ -180,7 +181,8 @@ void setup(void)
   if (mac[4] < 0x10){ Serial.print(F("0")); } Serial.print(mac[4], HEX);
   Serial.print(F(":"));
   if (mac[5] < 0x10){ Serial.print(F("0")); } Serial.println(mac[5], HEX);
-
+  Serial.print(F("freeMemory()="));
+  Serial.println(freeMemory());
 }
 int maxprint = 0;
 int len = 0;
@@ -189,7 +191,7 @@ long duration = millis();
 uint16_t numChannelsInPacket;
 uint8_t numPackets;
 uint16_t universe;
-int _rfinterpacketdelay = DATA_RATE == RF24_1MBPS ? 700 : 1500;
+int _rfinterpacketdelay = DATA_RATE == RF24_1MBPS ? 1 : 1500;
 boolean status;
 
 void loop(void)
@@ -205,11 +207,11 @@ void loop(void)
     buf = buffer2;
 
     Udp.read(buf, 638);
-
-    const uint64_t pPipes[2] =
-    {
-      0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
-    };
+    //
+    //const uint64_t pPipes[2] =
+    //{
+    //0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL
+    //};
 
     bool validateR = validateRoot(buf);
     bool vdmp = validateDMP(buf);
@@ -224,8 +226,25 @@ void loop(void)
       numChannelsInPacket = ((buf[E1_31_DMP_PROP_VAL_CNT] << 8) | buf[E1_31_DMP_PROP_VAL_CNT + 1]) - 1;
       numPackets = numChannelsInPacket / 30;
       universe = ((buf[E1_31_FRAMING_UNIVERSE_ID] << 8) | buf[E1_31_FRAMING_UNIVERSE_ID + 1]);
+      if (currentUniverse != universe)
+      {
+        
+        currentUniverse = universe;
+        if (universe == UNIVERSE){
+          radio.setChannel(TRANSMIT_CHANNEL);
+          delayMicroseconds(200);
+          transmitDataFromBuffer(buf);
+        }
+        else {
+          radio.setChannel(TRANSMIT_CHANNEL_2);
 
-      transmitDataFromBuffer(buf);
+
+          delayMicroseconds(200);
+          transmitDataFromBuffer(buf);
+        }
+      }
+      
+      
     }
   }
   else if (REFRESH_RATE && millis() - duration >= REFRESH_RATE)
@@ -240,7 +259,7 @@ void transmitDataFromBuffer(uint8_t* pBuffer)
 {
   int r;
 
-  if (numChannelsInPacket <= DMX_MAX_CHANNEL && numChannelsInPacket >0 && numPackets <= 18 && universe == UNIVERSE)
+  if (numChannelsInPacket <= DMX_MAX_CHANNEL && numChannelsInPacket >0 && numPackets <= 18 && (universe == UNIVERSE || universe == UNIVERSE_2))
   {
     validBuf = pBuffer;
     for (r = 0; r< numPackets; r++)
@@ -290,7 +309,7 @@ bool validateRoot(uint8_t buf[])
 {
   if (ntos(buf) != RLP_PREAMBLE_SIZE_VALID
   || ntos(buf + RLP_POST_AMBLE_SIZE) != RLP_POST_AMBLE_SIZE_VALID
-  || ntoi(buf + IDX_VECTOR_PROTOCOL) != 0x00000004)
+  || ntoi(buf + IDX_VECTOR_PROTOCOL) != E1_31_VECTOR_VAL)
   {
     return false;
   }

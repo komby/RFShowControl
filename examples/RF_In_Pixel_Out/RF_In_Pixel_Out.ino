@@ -75,7 +75,7 @@
 
 // DATA_RATE Description:  http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE                       RF24_250KBPS
+#define DATA_RATE                       RF24_1MBPS
 
 // HARDCODED_START_CHANNEL Description:  http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
@@ -85,13 +85,13 @@
 // Valid Values: 1-170  ( sum of 1&2 must be less than 170 )
 
 #define HARDCODED_NUM_PIXELS_1           50
-#define HARDCODED_NUM_PIXELS_2            0
+#define HARDCODED_NUM_PIXELS_2           50
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
 // NUMBER_LOGICAL_CONTROLLERS Description http://learn.komby.com/wiki/58/configuration-settings#NUMBER_LOGICAL_CONTROLLERS
 // Valid Values: 1-3 (for now)
-#define NUMBER_LOGICAL_CONTROLLERS 1
+#define NUMBER_LOGICAL_CONTROLLERS 2
 
 // PIXEL_DATA_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_DATA_PIN
 // Valid Values: List of arduino Analog or Digital pins used for data signal, typically ~1-16
@@ -130,7 +130,7 @@
 //const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
 
 int countOfUnduplicatedPixels1, countOfUnduplicatedPixels2;
-CRGB* data;
+uint8_t* data;
 //Include this after all configuration variables are set
 #include "RFShowControlConfig.h"
 
@@ -175,7 +175,7 @@ void setup(void)
   #endif
 
   #ifdef FAST_SPI_CONTROL
-  data = (CRGB*)radio.GetControllerDataBase(0);
+  data =  radio.GetControllerDataBase(0);
   leds = (CRGB*) &data[512];
   
   delay(200);
@@ -233,6 +233,7 @@ void setup(void)
 
 void loop(void)
 {
+  CRGB* temp = (CRGB*)data;
   //When Radio.Listen returns true its time to update the LEDs for all controllers, a full update was made
   if (radio.Listen())
   {
@@ -256,15 +257,15 @@ void loop(void)
       j++;
       //check to see if we need to reverse the order we copy into leds
       if ( LOGICAL_DATA_ORDER_1 && i < channelRangeEndLogical1 ){
-        leds[(channelRangeEndLogical1- 1 -i)] = data[j];
+        leds[(channelRangeEndLogical1- 1 -i)] =   temp[j];
       }
       //check to see if we need to reverse the order we copy into leds
       else if (LOGICAL_DATA_ORDER_2 && i > channelRangeEndLogical2){
-        leds[(channelRangeEndLogical2- 1 -i)] = data[j];
+        leds[(channelRangeEndLogical2- 1 -i)] =  temp[j];
       }
       //use the default ordering
       else {
-        leds[i] = data[j];
+        leds[i] = temp[j];
       }
     }
     LEDS.show();
