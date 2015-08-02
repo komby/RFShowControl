@@ -257,15 +257,15 @@ void loop(void)
       j++;
       //check to see if we need to reverse the order we copy into leds
       if ( LOGICAL_DATA_ORDER_1 && i < channelRangeEndLogical1 ){
-        leds[(channelRangeEndLogical1- 1 -i)] =   temp[j];
+        leds[(channelRangeEndLogical1- 1 -i)] =   (CRGB)temp[j];
       }
       //check to see if we need to reverse the order we copy into leds
       else if (LOGICAL_DATA_ORDER_2 && i > channelRangeEndLogical2){
-        leds[(channelRangeEndLogical2- 1 -i)] =  temp[j];
+        leds[(channelRangeEndLogical2- 1 -i)] =  (CRGB)temp[j];
       }
       //use the default ordering
       else {
-        leds[i] = temp[j];
+        leds[i] =  (CRGB)temp[j];
       }
     }
     LEDS.show();
