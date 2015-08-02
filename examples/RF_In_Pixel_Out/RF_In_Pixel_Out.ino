@@ -130,7 +130,7 @@
 //const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
 
 int countOfUnduplicatedPixels1, countOfUnduplicatedPixels2;
-uint8_t* data;
+CRGB* data;
 //Include this after all configuration variables are set
 #include "RFShowControlConfig.h"
 
@@ -175,7 +175,7 @@ void setup(void)
   #endif
 
   #ifdef FAST_SPI_CONTROL
-  data = radio.GetControllerDataBase(0);
+  data = (CRGB*)radio.GetControllerDataBase(0);
   leds = (CRGB*) &data[512];
   
   delay(200);
