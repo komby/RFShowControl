@@ -65,7 +65,7 @@ GWTSControl strip = GWTSControl();
 
 #include "GECERFShowControl.h"
 #include <GEColorEffects.h>
-GECERFShowControl strip = GECERFShowControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS);
+GECERFShowControl strip = GECERFShowControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS, LOGICAL_DATA_ORDER_1);
 #warning "PIXEL_COLOR_ORDER Unsupported for GECEs"
 #endif
 
@@ -161,7 +161,7 @@ RenardControl strip =  RenardControl(RENARD_BAUD_RATE);
 #if (PIXEL_TYPE == WM_2999)
 #include <WM2999.h>
 #include "WM2999RFShowControl.h"
-WM2999RFShowControl strip = WM2999RFShowControl(PIXEL_DATA_PIN);
+WM2999RFShowControl strip = WM2999RFShowControl(PIXEL_DATA_PIN_1);
 #warning "PIXEL_COLOR_ORDER Unsupported for WM2999"
 #endif
 
@@ -173,7 +173,7 @@ WM2999RFShowControl strip = WM2999RFShowControl(PIXEL_DATA_PIN);
 #endif
 #include "LPD6803RFShowControl.h"
 #include <TimerOne.h>
-LPD6803RFShowControl strip = LPD6803RFShowControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN);
+LPD6803RFShowControl strip = LPD6803RFShowControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PIN_1);
 #warning "PIXEL_COLOR_ORDER Unsupported for LPD6803"
 #endif
 

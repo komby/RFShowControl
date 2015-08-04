@@ -85,7 +85,7 @@
 // Valid Values: 1-170  ( sum of 1&2 must be less than 170 )
 
 #define HARDCODED_NUM_PIXELS_1           50
-#define HARDCODED_NUM_PIXELS_2           50
+#define HARDCODED_NUM_PIXELS_2           0
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
 /************** START OF ADVANCED SETTINGS SECTION (OPTIONAL) ****************/
@@ -93,6 +93,9 @@
 // Valid Values: 1-3 (for now)
 #define NUMBER_LOGICAL_CONTROLLERS 2
 
+//HAXOR Fix for GECE
+#define HARDCODED_NUM_PIXELS  HARDCODED_NUM_PIXELS_1
+#define HARDCODED_NUM_CHANNELS (HARDCODED_NUM_PIXELS)*3
 // PIXEL_DATA_PIN Description:  http://learn.komby.com/wiki/58/configuration-settings#PIXEL_DATA_PIN
 // Valid Values: List of arduino Analog or Digital pins used for data signal, typically ~1-16
 //for the first (or only) pixel string what pin is it on?
@@ -125,7 +128,7 @@
 //Valid Values: 1, 0  (1 will prevent the use of channels that are not allowed in North America)
 #define FCC_RESTRICT 1
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
-
+#define PIXEL_DATA_PIN PIXEL_DATA_PIN_1
 //const uint8_t pixelDataPins[] = {PIXEL_DATA_PIN_1, PIXEL_DATA_PIN_2};
 //const uint8_t pixelClockPins[] = { PIXEL_CLOCK_PIN_1, PIXEL_CLOCK_PIN_2 };
 

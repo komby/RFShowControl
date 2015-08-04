@@ -131,6 +131,8 @@ protected:
    * Data pin we're configured to use to write to our pixels.
    */
   uint8_t dataPin;
+  
+  bool invertOutputOrder;
 };
 
 #endif //__IRFSHOWCONTROL_H__

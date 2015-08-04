@@ -29,7 +29,7 @@
 class GECERFShowControl: public GEColorEffects, public IRFShowControl
 {
 public:
-  GECERFShowControl(uint8_t pin, int pixelCount);
+  GECERFShowControl(uint8_t pin, int pixelCount, bool pInvertOutputOrder = false);
   void Paint(void);
 };
 

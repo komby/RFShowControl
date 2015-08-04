@@ -19,8 +19,9 @@
 
 #include "GECERFShowControl.h"
 
-GECERFShowControl::GECERFShowControl(uint8_t pin, int pixelCount) : GEColorEffects(pin,pixelCount)
+GECERFShowControl::GECERFShowControl(uint8_t pin, int pixelCount, bool pInvertOutputOrder) : GEColorEffects(pin,pixelCount)
 {
+  this->invertOutputOrder = pInvertOutputOrder;
 }
 
 /**
@@ -30,15 +31,29 @@ void GECERFShowControl::Paint(void)
 {
   cli();
   int numPixels = numLEDs/3;
-  for ( int i = 0; i < numPixels; i++ )
-  {
-    this->set_color(i,
+  if ( !this->invertOutputOrder) {
+      for ( int i = 0; i < numPixels; i++ )
+    {
+       this->set_color(i,
                     DEFAULT_INTENSITY,
                     this->color((pixels[(i*3)])>>4,
                                 (pixels[(i*3)+1])>>4,
                                  pixels[(i*3)+2]>>4
                                 ));
+    }
   }
+  else{
+    int j=0;
+    for ( int i = numPixels-1; i >= 0; i-- )
+    {
+      this->set_color(j,   DEFAULT_INTENSITY,
+          this->color((pixels[(i*3)])>>4,
+      (pixels[(i*3)+1])>>4,
+      pixels[(i*3)+2]>>4
+      ));
+      j++;
+    }
+  }  
 
   sei();
 }
