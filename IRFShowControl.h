@@ -133,6 +133,7 @@ protected:
   uint8_t dataPin;
   
   bool invertOutputOrder;
+  int groupingBy;
 };
 
 #endif //__IRFSHOWCONTROL_H__
