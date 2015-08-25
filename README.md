@@ -2,7 +2,7 @@ RFShowControl
 ==============
 BREAKING CHANGES.  Moved support from the mainiacbug RF24 library to komby/RF24.  
 
-  Follow the instructions on http://learn.komby.com/HowToUpgradeToV4 
+  Follow the instructions on http://learn.komby.com/wiki/67/howtoupgradetov4
  
 **************************************************************************
 
