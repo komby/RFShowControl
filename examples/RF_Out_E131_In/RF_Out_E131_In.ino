@@ -64,7 +64,7 @@
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
-// Valid Values: RF1, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4
+// Valid Values: RF1, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4, MEGA_SHIELD
 #define NRF_TYPE                        MINIMALIST_SHIELD
 
 // UNIVERSE Description: http://learn.komby.com/wiki/58/configuration-settings#UNIVERSE
@@ -108,8 +108,13 @@ static uint8_t ip[] = { 192, 168, 10, 205 };
 #define DMX_CHANNEL_DATA_START          126 //DMX Packet Position 0xA8
 #define DMX_MAX_CHANNEL                 512
 
-
-uint8_t buffer1[638]; //buffer to hold incoming packet,
+// If we have a MEGA we can use a larger buffer for better performance
+// Otherwise use the smaller size for a UNO
+#if (NRF_TYPE == MEGA_SHIELD)
+uint8_t buffer1[1300]; //Make the Buffer Big
+#else
+uint8_t buffer1[638]; //Make the Buffer Small
+#endif
 uint8_t buffer2[638]; //buffer to cache good universe packet
 uint8_t* buf;
 uint8_t* validBuf;
