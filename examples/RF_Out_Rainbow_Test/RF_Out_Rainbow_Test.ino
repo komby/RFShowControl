@@ -18,7 +18,7 @@
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
-// Valid Values: RF1, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4
+// Valid Values: RF1, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4, MEGA_SHIELD
 #define NRF_TYPE                        RF1
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
