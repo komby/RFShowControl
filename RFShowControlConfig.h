@@ -19,6 +19,9 @@
 #if (NRF_TYPE == MINIMALIST_SHIELD)
   #define    __CE  9
   #define    __CSN  8
+  #elif (NRF_TYPE == MEGA_SHIELD)
+  #define    __CE  46
+  #define    __CSN  48
 #elif \
   (NRF_TYPE == RF1) || \
   (NRF_TYPE == RF1_0_2) || \

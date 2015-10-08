@@ -52,6 +52,7 @@
 #define KOMBEE                          9
 #define KOMBLINKIN						10
 #define RAPTOR12						11
+#define MEGA_SHIELD                     12
 
 //PIXEL TYPES
 #define GECE                            1
