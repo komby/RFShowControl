@@ -69,22 +69,23 @@
 
 // UNIVERSE Description: http://learn.komby.com/wiki/58/configuration-settings#UNIVERSE
 // Valid Values: 1-255
+//IF only using one universe make UNIVERSE_2 set to a universe you will not be using like 255 
 #define UNIVERSE                        1
 #define UNIVERSE_2                      2
-// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC-Address
-static uint8_t mac[] = { 0x12, 0x34, 0x56, 0x00, 0x00, 0x00 + UNIVERSE};
+
 // IP Address Description: http://learn.komby.com/wiki/58/configuration-settings#IP-Address
 static uint8_t ip[] = { 192, 168, 10, 205 };
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // TRANSMIT_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#TRANSMIT_CHANNEL
-// Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
+// Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US) if using only one universe ignore TRANSMIT_CHANNEL_2
+
 #define TRANSMIT_CHANNEL                10
 #define TRANSMIT_CHANNEL_2              0
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
-// Valid Values: RF24_250KBPS, RF24_1MBPS
+// Valid Values: RF24_250KBPS, RF24_1MBPS   ( Only use one universe at RF24_250KBPS and 1 or 2 universes at RF24_1MBPS)=
 #define DATA_RATE                       RF24_1MBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
@@ -94,6 +95,22 @@ static uint8_t ip[] = { 192, 168, 10, 205 };
 
 // REFRESH_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#REFRESH_RATE
 #define REFRESH_RATE                    0
+
+// RF_INTERPACKETDELAY_1MBPS  Description: TODO URL NEEDED 
+// When using the 1MPBS speed you need to tune this value to your hardware.  Lower is better for faster refresh rate, however hardware may need a setting of 700 to work on some hardware 
+//Valid values are 1 - 700  where most tested clone/china hardware is needing a setting around 550-700 
+#define RF_INTERPACKETDELAY_1MBPS  700 
+
+
+// RF_INTERPACKETDELAY_250KBPS  Description: TODO URL NEEDED 
+// When using the 250kbps speed you need to tune this value to your hardware.  Lower is better for faster refresh rate, however hardware may need a setting of 700 to work on some hardware 
+//Valid values are 1 - 1500  where most tested clone/china hardware is needing a setting around 750-1500 
+#define RF_INTERPACKETDELAY_250KBPS  1500 
+
+// MAC Address Description: http://learn.komby.com/wiki/58/configuration-settings#MAC-Address
+// YOU SHOULD NOT NEED TO CHANGE THIS SETTING
+static uint8_t mac[] = { 0x12, 0x34, 0x56, 0x00, 0x00, 0x00 + UNIVERSE};
+
 /********************* END OF ADVANCED SETTINGS SECTION **********************/
 
 
@@ -196,7 +213,7 @@ long duration = millis();
 uint16_t numChannelsInPacket;
 uint8_t numPackets;
 uint16_t universe;
-int _rfinterpacketdelay = DATA_RATE == RF24_1MBPS ? 1 : 1500;
+int _rfinterpacketdelay = DATA_RATE == RF24_1MBPS ? RF_INTERPACKETDELAY_1MBPS : RF_INTERPACKETDELAY_250KBPS;
 boolean status;
 
 void loop(void)
