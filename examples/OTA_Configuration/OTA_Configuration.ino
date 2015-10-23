@@ -5,7 +5,7 @@
  *    Output: OTA Configuration Packets
  *
  * Author: Greg Scull/Mat Mrosko
- *
+ * Updated: October 18, 2015- Greg Scull
  * Updated: May 21, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  * Updated: October 13, 2014 - Mat Mrosko, Materdaddy, rfpixelcontrol@matmrosko.com
  * 		MAC address in default sketch wouldn't work with certain "smart" switches.
@@ -64,6 +64,8 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
+// NOTE Receivers programmed after October 2015 should leave the DATA_RATE at RF24_250KBPS,  Receivers programmed prior to October 2015 ( beta 4 code) need to set this data rate
+to the data rate of the target receiver.
 #define DATA_RATE                       RF24_250KBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
@@ -173,9 +175,9 @@ void configInit(WebServer &server, WebServer::ConnectionType type ,char *url_tai
     "<form id=\"form1\" name=\"form1\" method=\"post\" action=\"/init\">"
     "<p>Controller ID: <input type=\"text\" name=\"controller\" id=\"controller-id\" maxlength=\"3\"/> </p>"
     "<p>Listen Rate:"
-    "<input type=\"radio\" name=\"radio\" id=\"250K\" value=\"0\" checked/> <label for=\"250K\">250 Khz</label>"
-    "<input type=\"radio\" name=\"radio\" id=\"1M\" value=\"1\" /> <label for=\"1M\">1.0 Mhz</label>"
-    "<input type=\"radio\" name=\"radio\" id=\"2M\" value=\"2\" /> <label for=\"2M\">2.0 Mhz</label>"
+    "<input type=\"radio\" name=\"radio\" id=\"250K\" value=\"0\" checked/> <label for=\"250K\">250 kbps</label>"
+    "<input type=\"radio\" name=\"radio\" id=\"1M\" value=\"1\" /> <label for=\"1M\">1.0 Mbps</label>"
+    "<input type=\"radio\" name=\"radio\" id=\"2M\" value=\"2\" /> <label for=\"2M\">2.0 Mbps</label>"
     "</p>"
     "<p>Listen Channel :"
     "<label for=\"channel\"></label> <input type=\"text\" name=\"channel\" id=\"channel\" maxlength=\"3\" />"

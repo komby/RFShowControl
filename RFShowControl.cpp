@@ -105,6 +105,8 @@ bool RFShowControl::Initialize(int pRole, const uint64_t *pPipes, int pChannel, 
       //We are setting up a receiver, Before we can come online we need configuration information
       //Check to see if we have a configuration node online.
       this->setChannel(RF_NODE_CONFIGURATION_CHANNEL); //Change from the default channel...
+	  //When doing OTA Configuration we will modify the data rate to 250kbps and reset the data rate after.
+	    this->dataRateSuccess = this->setDataRate(RF24_250KBPS); //set RF data rate
 
       //Setup Receiver to listen for configuration packets on the Configuration Channel
       this->openWritingPipe(pPipes[1]); //Open pipe for Writing
