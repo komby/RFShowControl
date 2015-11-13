@@ -18,8 +18,8 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <EEPROM.h>
-#include "printf.h"
-
+#include <printf.h>
+#include <led_sysdefs.h>
 
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
@@ -39,15 +39,15 @@
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
 // Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
-#define LISTEN_CHANNEL                  10
+#define LISTEN_CHANNEL                  7
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE                       RF24_250KBPS
+#define DATA_RATE                       RF24_1MBPS
 
 // HARDCODED_START_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
-#define HARDCODED_START_CHANNEL         1
+#define HARDCODED_START_CHANNEL         3
 
 // HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
 // Valid Values: 1
@@ -60,7 +60,7 @@
 
 
 // DEBUG Description: http://learn.komby.com/wiki/58/configuration-settings#DEBUG
-//#define DEBUG                           1
+#define DEBUG                           1
 
 // STROBE_MODE Description: http://learn.komby.com/wiki/58/configuration-settings#STROBE_MODE
 //ValidValues: 1 or 0  (on or off)
@@ -97,7 +97,7 @@ const bool ShiftPWM_balanceLoad = false;
 // There is a calculator on my website to estimate the load.
 
 unsigned char maxBrightness = 255;
-unsigned char pwmFrequency = 110;
+unsigned char pwmFrequency = 75;
 int numRegisters = 2;
 int numLeds;
 
@@ -109,7 +109,7 @@ byte * buffer;
 
 
 //Uncomment for serial
-#define DEBUG 0
+#define DEBUG 1
 
 
 //Arduino setup function.
@@ -130,21 +130,17 @@ void setup() {
 		radio.AddLogicalController(logicalControllerSequenceNum, HARDCODED_START_CHANNEL, HARDCODED_NUM_CHANNELS,0);
 	}
 	printf_begin();
-	
-	delay(200);
 
 	radio.Initialize( radio.RECEIVER, pipes, LISTEN_CHANNEL,DATA_RATE ,RECEIVER_UNIQUE_ID);
-	delay (2000);
+	delay (100);
 	
 	numLeds = radio.GetNumberOfChannels(0);
-	delay (2000);
+	delay (100);
 
 
 	radio.printDetails();
 	//initialize data buffer
 	buffer= radio.GetControllerDataBase(0);
-	delay (2000);
-	
 	
 
 	ShiftPWM.Start(pwmFrequency,maxBrightness);
@@ -152,26 +148,24 @@ void setup() {
 	
 	ShiftPWM.SetAll(0);
 
-	for (int i =0; i < numLeds;i++)
-	{
-		for (int j=0;j<255;j++){
-			ShiftPWM.SetOne(i, j);
-			delay(2);
-		}
-		delay(10);
-		for (int j=255;j>=0;j--){
-			ShiftPWM.SetOne(i, j);
-			delay(2);
-		}
-	}
-
 	
 	ShiftPWM.SetAll(0);
-	delay(400);
+	delay(100);
+
+ #ifdef DEBUG
+ for (int i =0; i < 16;i++)
+  {
+   
+      ShiftPWM.SetOne(i, 255);
+      delay(800);
+      ShiftPWM.SetOne(i, 0);
+    }
+    delay(1000);
+#endif
 	
 
 	cli();
-	delay(400);
+	delay(100);
 	
 }
 
@@ -181,11 +175,8 @@ void loop(void){
 	if (radio.Listen()){
 		
 		sei();
-		if(STROBE_MODE == 1)
-		strobeMode(millis(), buffer[0]);
-		else
-		updateLEDsWithRFData();
-		
+		strobeMode( buffer[0]);
+
 		cli();
 
 	}
@@ -208,17 +199,32 @@ void updateLEDsWithRFData(void){
 
 
 //handle the strobing randomly
-void strobeMode( int seed, int d ) {
+void strobeMode( int d ) {
 	
 	ShiftPWM.SetAll(0);
 	if (d>0){
 		
-		for(int i=0;i<4;i++)
-		{
-			ShiftPWM.SetOne(random16(seed)%16, 255);
-			delay(1);
+		
+			ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+      
+      ShiftPWM.SetOne(random8()%16, 255);
+      ShiftPWM.SetOne(random8()%16, 255);
+		
 
-		}
+		
 		//delay so you can see the strobe
 		delay(STROBE_DURATION);
 	}

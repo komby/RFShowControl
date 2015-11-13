@@ -53,6 +53,7 @@
 #define KOMBLINKIN						10
 #define RAPTOR12						11
 #define MEGA_SHIELD                     12
+#define RF1_SERIAL                      13
 
 //PIXEL TYPES
 #define GECE                            1

@@ -24,6 +24,7 @@
   #define    __CSN  48
 #elif \
   (NRF_TYPE == RF1) || \
+  (NRF_TYPE == RF1_SERIAL) || \
   (NRF_TYPE == RF1_0_2) || \
   (NRF_TYPE == RF1_1_2) || \
   (NRF_TYPE == RF1_1_3) || \
