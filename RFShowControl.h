@@ -70,8 +70,12 @@
 #define UCS_1903                        12
 #define DMX                             13
 #define STROBE							14
+#define WS_2812B                        15
+#define NEOPIXEL						16
+#define TM_1829							17
+#define APA_104						    18
+#define LPD_1886						19
 #define NONE                            999
-
 
 //RGB_BOARD_TYPE definitions
 #define DUMB_RGB						1

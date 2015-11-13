@@ -42,7 +42,7 @@
 #define NRF_TYPE                        RF1
 
 // PIXEL_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_TYPE
-// Valid Values: GECE, LPD_6803, LPD_8806, SM_16716, TM_1803, TM_1809, UCS_1903, WM_2999, WS_2801, WS_2811
+// Valid Values: GECE, LPD_6803, LPD_8806, SM_16716, TM_1803, TM_1809, UCS_1903, WM_2999, WS_2801, WS_2811,  WS_2812B, NEO_PIXEL, TM_1829, TM_1803, UCS_1903, APA_104, LPD_1886
 #define PIXEL_TYPE                      WS_2811
 
 // PIXEL_COLOR_ORDER Description: http://learn.komby.com/wiki/58/configuration-settings#PIXEL_COLOR_ORDER
@@ -221,10 +221,41 @@ void setup(void)
   LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
   if (NUMBER_LOGICAL_CONTROLLERS == 2 )
   LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  #elif (PIXEL_TYPE == WS_2812B)
+  LEDS.addLeds(new WS2812Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new WS2812Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+  #elif (PIXEL_TYPE == NEO_PIXEL)
+  LEDS.addLeds(new WS2812Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new WS2812Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+
+  #elif (PIXEL_TYPE == TM_1829)
+  LEDS.addLeds(new TM1829Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new TM1829Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+
+  #elif (PIXEL_TYPE == TM_1803)
+  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new TM1803Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+    #elif (PIXEL_TYPE == UCS_1903)
+  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new UCS1903Controller400Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+    #elif (PIXEL_TYPE == APA_104)
+  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new WS2811Controller800Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+    #elif (PIXEL_TYPE == LPD_1886)
+  LEDS.addLeds(new LPD1886Controller1250Khz<PIXEL_DATA_PIN_1, PIXEL_COLOR_ORDER>(), leds, countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT, 0);
+  if (NUMBER_LOGICAL_CONTROLLERS == 2 )
+  LEDS.addLeds(new LPD1886Controller1250Khz<PIXEL_DATA_PIN_2, PIXEL_COLOR_ORDER>(), leds + (countOfUnduplicatedPixels1 * CHANNEL_REPEAT_COUNT), countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT, 0);
+
   #elif ((PIXEL_TYPE != LPD_6803) && \
   (PIXEL_TYPE != WM_2999) && \
   (PIXEL_TYPE != GECE))
-  #error Must define PIXEL_TYPE: (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716,LPD_6803,WM_2999,GECE)
+  #error Must define PIXEL_TYPE: (WS_2801,LPD_8806,WS_2811,UCS_1903,TM_1803,SM_16716,LPD_6803,WM_2999,GECE, WS_2812B, NEO_PIXEL, TM_1829, TM_1803, UCS_1903, APA_104, LPD_1886)
   #endif
 
   #ifdef DEBUG

@@ -202,6 +202,11 @@ LPD6803RFShowControl strip = LPD6803RFShowControl(PIXEL_DATA_PIN, PIXEL_CLOCK_PI
    (PIXEL_TYPE == TM_1809) || \
    (PIXEL_TYPE == TM_1803) || \
    (PIXEL_TYPE == UCS_1903) || \
+   (PIXEL_TYPE == WS_2812B) || \
+    (PIXEL_TYPE == NEO_PIXEL) || \
+	 (PIXEL_TYPE == TM_1829) || \
+	  (PIXEL_TYPE == LPD_1886) || \
+	   (PIXEL_TYPE == APA_104) || \
    (PIXEL_TYPE == WS_2811))
 #include <FastLED.h>
 CRGB *leds;
@@ -223,6 +228,7 @@ const uint64_t pipes[2] = {
 #if ((PIXEL_TYPE != GECE) && \
     (PIXEL_TYPE != WS_2801) && \
     (PIXEL_TYPE != WS_2811) && \
+	(PIXEL_TYPE != WS_2812B) && \
     (PIXEL_TYPE != RENARD) && \
     (PIXEL_TYPE != WM_2999) && \
     (PIXEL_TYPE != LPD_6803) && \
@@ -232,7 +238,12 @@ const uint64_t pipes[2] = {
     (PIXEL_TYPE != TM_1809) && \
     (PIXEL_TYPE != TM_1803) && \
     (PIXEL_TYPE != UCS_1903) && \
-    (PIXEL_TYPE != DMX) && \ 
+    (PIXEL_TYPE != DMX) && \
+	(PIXEL_TYPE != NEO_PIXEL) && \
+	(PIXEL_TYPE != TM_1829) && \
+	(PIXEL_TYPE != LPD_1886) && \
+	(PIXEL_TYPE != APA_104) && \
+	(PIXEL_TYPE != DMX) && \
 	(PIXEL_TYPE != STROBE) && \
     (PIXEL_TYPE != NONE))
   #error "You must define PIXEL_TYPE as one of the following:"
