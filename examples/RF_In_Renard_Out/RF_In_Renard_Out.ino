@@ -108,10 +108,10 @@ void setup(void)
   logicalControllerNumber = 0;
   strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber++));
 
-  for (int i = 0; i < strip.GetElementCount(); i++)
-  {
-    strip.SetElementColor(i, strip.Color(0, 0, 0));
-  }
+//  for (int i = 0; i < strip.GetElementCount(); i++)
+//  {
+//    strip.SetElementColor(i, strip.Color(0, 0, 0));
+// }
   strip.Paint();
 }
 
