@@ -108,11 +108,10 @@ void setup(void)
 
   logicalControllerNumber = 0;
 
+
   channels = radio.GetControllerDataBase(logicalControllerNumber);
   numChannels =  radio.GetNumberOfChannels(logicalControllerNumber);
-  
-delay(1000);
- 
+
 }
 
 void loop(void)
@@ -156,5 +155,6 @@ void Paint(void)
       default:
         Serial.write(channels[i]);
         break;
-    }}
+    }
+  }
 }
