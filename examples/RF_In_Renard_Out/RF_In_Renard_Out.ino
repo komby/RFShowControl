@@ -93,6 +93,11 @@ void setup(void)
   pinMode(HEARTBEAT_PIN, OUTPUT);
   pinMode(HEARTBEAT_PIN_1, OUTPUT);
   #endif
+  
+  //Setup the tx mode for the RS485 chip
+  pinMode(A0, OUTPUT);
+  digitalWrite(A0, HIGH);
+  
     radio.EnableOverTheAirConfiguration(OVER_THE_AIR_CONFIG_ENABLE);
 
   uint8_t logicalControllerNumber = 0;
