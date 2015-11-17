@@ -81,8 +81,18 @@
 int beat = 0;
 uint8_t * channels;
 int numChannels = HARDCODED_NUM_CHANNELS;
+
+#ifndef DEBUG
+  int null_out_function(char c, FILE *stream) {return 0;}
+#endif
+
 void setup(void)
 {
+  
+#ifndef DEBUG
+  fdevopen( &null_out_function, 0 );
+#endif
+
   Serial.begin(RENARD_BAUD_RATE);
 #ifdef DEBUG
   printf_begin();
