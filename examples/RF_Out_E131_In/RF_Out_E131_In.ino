@@ -53,12 +53,11 @@
 #include <RF24.h>
 #include <SPI.h>
 
-
+#include <printf.h>
 //Include extra util.h for htonl
 #include "../../Ethernet/src/utility/util.h"
 #include "MemoryFree.h"
 #include "E131Constants.h"
-#include "../RFShowControl/printf.h"
 #include "RFShowControl.h"
 
 
