@@ -24,14 +24,14 @@
 #include <SPI.h>
 
 #include "IRFShowControl.h"
-//#include "printf.h"
+#include "RenardControl.h"
 #include "RFShowControl.h"
-
+#include <printf.h>
 
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
 // Valid Values: RF1, RF1_SERIAL, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4
-#define NRF_TYPE                        RF1
+#define NRF_TYPE                        KOMBEE
 
 // OVER_THE_AIR_CONFIG_ENABLE Description: http://learn.komby.com/wiki/58/configuration-settings#OVER_THE_AIR_CONFIG_ENABLE
 // Valid Values: OTA_ENABLED, OTA_DISABLED
@@ -45,11 +45,11 @@
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
 // LISTEN_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#LISTEN_CHANNEL
 // Valid Values: 0-83, 101-127  (Note: use of channels 84-100 is not allowed in the US)
-#define LISTEN_CHANNEL                  10
+#define LISTEN_CHANNEL                  7
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE                       RF24_250KBPS
+#define DATA_RATE                       RF24_1MBPS
 
 // HARDCODED_START_CHANNEL Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_START_CHANNEL
 // Valid Values: 1-512
@@ -57,7 +57,7 @@
 
 // HARDCODED_NUM_CHANNELS Description: http://learn.komby.com/wiki/58/configuration-settings#HARDCODED_NUM_CHANNELS
 // Valid Values: 1-512
-#define HARDCODED_NUM_CHANNELS          64
+#define HARDCODED_NUM_CHANNELS          8
 
 // RENARD_BAUD_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#RENARD_BAUD_RATE
 // Valid Values: 19200, 38400, 57600, 115200, 230400, 460800
@@ -79,7 +79,8 @@
 #include "RFShowControlConfig.h"
 
 int beat = 0;
-
+uint8_t * channels;
+int numChannels = HARDCODED_NUM_CHANNELS;
 void setup(void)
 {
   Serial.begin(RENARD_BAUD_RATE);
@@ -106,24 +107,54 @@ void setup(void)
 #endif
 
   logicalControllerNumber = 0;
-  strip.Begin(radio.GetControllerDataBase(logicalControllerNumber), radio.GetNumberOfChannels(logicalControllerNumber++));
 
-  for (int i = 0; i < strip.GetElementCount(); i++)
-  {
-    strip.SetElementColor(i, strip.Color(0, 0, 0));
-  }
-  strip.Paint();
+  channels = radio.GetControllerDataBase(logicalControllerNumber);
+  numChannels =  radio.GetNumberOfChannels(logicalControllerNumber);
+  
+delay(1000);
+ 
 }
 
 void loop(void)
 {
  if (radio.Listen())
  {
-   strip.Paint();
+   Paint();
    #if (NRF_TYPE==KOMBEE)
      beat=!beat;
      digitalWrite(HEARTBEAT_PIN, beat);  
      digitalWrite(HEARTBEAT_PIN_1, beat);  
    #endif
  }
+}
+
+
+void Paint(void)
+{
+  Serial.write(0x7E);
+  Serial.write(0x80);
+
+  for ( int i = 0; i < (numChannels); i++ )
+  {
+    switch (channels[i])
+    {
+      case 0x7D:
+        Serial.write(0x7F);
+        Serial.write(0x2F);
+        break;
+
+      case 0x7E:
+        Serial.write(0x7F);
+        Serial.write(0x30);
+        break;
+
+      case 0x7F:
+        Serial.write(0x7F);
+        Serial.write(0x31);
+        break;
+
+      default:
+        Serial.write(channels[i]);
+        break;
+    }}
 }

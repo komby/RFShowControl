@@ -24,11 +24,11 @@
 #ifndef __RFSHOWCONTROL_H__
 #define __RFSHOWCONTROL_H__
 
+ 
 #include "EEPROMUtils.h"
 #include "IRFShowControl.h"
 #include "OTAConfig.h"
 #include "RF24Wrapper.h"
-
 
 #define RF_CONFIG_STARTUP_WINDOW        10000
 #define RF_PACKET_LENGTH                32

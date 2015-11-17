@@ -23,6 +23,7 @@
 
 #include "RFShowControl.h"
 
+
 /*
  * Constructor
  *
@@ -105,8 +106,9 @@ bool RFShowControl::Initialize(int pRole, const uint64_t *pPipes, int pChannel, 
       //We are setting up a receiver, Before we can come online we need configuration information
       //Check to see if we have a configuration node online.
       this->setChannel(RF_NODE_CONFIGURATION_CHANNEL); //Change from the default channel...
+	  
 	  //When doing OTA Configuration we will modify the data rate to 250kbps and reset the data rate after.
-	    this->dataRateSuccess = this->setDataRate(RF24_250KBPS); //set RF data rate
+	  this->dataRateSuccess = this->setDataRate(RF24_250KBPS); //set RF data rate
 
       //Setup Receiver to listen for configuration packets on the Configuration Channel
       this->openWritingPipe(pPipes[1]); //Open pipe for Writing
@@ -245,12 +247,12 @@ void RFShowControl::PrintControllerConfig(ControllerInfo pControllerInfo)
 /************************************************************************/
 void RFShowControl::PrintControllerConfig(void)
 {
-  printf("Cntl Info:\t%d\n", this->_controllerId);
-  printf("LCntrl:\t%d\n", this->_numControllers);
-  printf("Listen:\t%d\n", this->_channel);
-  printf("Start:\t%lu\n", this->_startChannel);
-  printf("End:\t% lu\n", this->_endChannel);
-  printf("Num:\t%d\n", this->_endChannel - this->_startChannel);
+   printf_P(PSTR("Cntl Info:\t%d\n"), this->_controllerId);
+   printf_P(PSTR("LCntrl:\t%d\n"), this->_numControllers);
+   printf_P(PSTR("Listen:\t%d\n"), this->_channel);
+   printf_P(PSTR("Start:\t%lu\n"), this->_startChannel);
+   printf_P(PSTR("End:\t% lu\n"), this->_endChannel);
+   printf_P(PSTR("Num:\t%d\n"), this->_endChannel - this->_startChannel);
   for (int i = 0; i < this->_numControllers; i++)
   {
     PrintControllerConfig(this->_controllers[i]);

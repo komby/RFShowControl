@@ -156,9 +156,6 @@ GECERFShowControl strip = GECERFShowControl(PIXEL_DATA_PIN, HARDCODED_NUM_PIXELS
 #endif
 #endif
 #endif
-
-#include <RenardControl.h>
-RenardControl strip =  RenardControl(RENARD_BAUD_RATE);
 #endif
 
 
