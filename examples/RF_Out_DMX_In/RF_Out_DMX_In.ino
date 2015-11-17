@@ -41,7 +41,7 @@
 /********************* START OF REQUIRED CONFIGURATION ***********************/
 // NRF_TYPE Description: http://learn.komby.com/wiki/58/configuration-settings#NRF_TYPE
 // Valid Values: RF1, RF1_SERIAL, MINIMALIST_SHIELD, WM_2999_NRF, RFCOLOR_2_4
-#define NRF_TYPE                        RF1
+#define NRF_TYPE                        RF1_SERIAL
 /********************** END OF REQUIRED CONFIGURATION ************************/
 
 /****************** START OF NON-OTA CONFIGURATION SECTION *******************/
@@ -75,7 +75,7 @@ bool initclean = 0;
 void setup(void)
 {
 	pinMode(A0, OUTPUT);
-	digitalWrite(A0, HIGH);
+	digitalWrite(A0, LOW);
 
 	pinMode(1, OUTPUT);
 	digitalWrite(1, LOW);

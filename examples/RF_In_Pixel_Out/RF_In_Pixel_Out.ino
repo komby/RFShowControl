@@ -1,11 +1,9 @@
 /*
-* TODO
-*
 *    Input: nRF
 *    Output: Multiple Pixel Types (configurable below)
 *
 * Created on: May, 28th 2014
-* Author: Mat Mrosko <rfpixelcontrol@matmrosko.com>
+* Authors: Mat Mrosko <rfpixelcontrol@matmrosko.com>, Greg Scull <komby@komby.com>
 *
 * License:
 *    Users of this software agree to hold harmless the creators and
@@ -28,11 +26,11 @@
 #include <LPD6803.h>
 #include <TimerOne.h>
 #include <WM2999.h>
+#include <printf.h>
 
 #include "LPD6803.h"
 #include "IRFShowControl.h"
 #include "MemoryFree.h"
-#include "printf.h"
 #include "RFShowControl.h"
 #include "WM2999RFShowControl.h"
 

@@ -65,7 +65,7 @@ static uint8_t ip[] =  { 192, 168, 1, 99 };
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
 // NOTE Receivers programmed after October 2015 should leave the DATA_RATE at RF24_250KBPS,  Receivers programmed prior to October 2015 ( beta 4 code) need to set this data rate
-to the data rate of the target receiver.
+//to the data rate of the target receiver.
 #define DATA_RATE                       RF24_250KBPS
 /******************* END OF NON-OTA CONFIGURATION SECTION ********************/
 
@@ -92,8 +92,7 @@ void doRFSend(WebServer &server);
 // no-cost stream operator as described at
 // http://sundial.org/arduino/?page_id=119
 //
-template<class T>
-inline Print &operator <<(Print &obj, T arg)
+template<class T> inline Print &operator <<(Print &obj, T arg)
 {
   obj.print(arg);
   return obj;

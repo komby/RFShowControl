@@ -23,9 +23,9 @@
 #include <nRF24L01.h>
 #include <RF24.h>
 #include <SPI.h>
+#include <printf.h>
 
 #include "IRFShowControl.h"
-#include "printf.h"
 #include "RFShowControl.h"
 
 
