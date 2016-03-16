@@ -46,11 +46,11 @@
 
 // LISTEN_CHANNEL  Which NRF channel will be be listening on ?   Valid Values: 0-83, 101-127  
 //(Note: use of channels 84-100 is not allowed in the US)
-#define LISTEN_CHANNEL                  120
+#define LISTEN_CHANNEL                  10
 
 // DATA_RATE Description: http://learn.komby.com/wiki/58/configuration-settings#DATA_RATE
 // Valid Values: RF24_250KBPS, RF24_1MBPS
-#define DATA_RATE                       RF24_1MBPS
+#define DATA_RATE                       RF24_250KBPS
 
 // HARDCODED_START_CHANNEL  Which DMX Channel is the first output channel of this device ?  Valid Values: 1-509
 #define HARDCODED_START_CHANNEL         1
@@ -172,7 +172,7 @@ delay (200);    // Hang out a little bit to let everything stabalize
 // The Zero Cross input will trigger this every time the sine wave crosses zero, no matter what the main loop is doing
 // This will trigger at zero degrees and 180 degrees of the sine wave
 void zeroCrossDetect() {
-  if (dimLevel <= 400){          // why 400 ?????  how could it ever get this large ?
+  if (dimLevel <= 400){          // why 400 ? it should never get this large
     noInterrupts();              // Disable interrupts to prevent the Zerocross from interrupting itself !
     dimLevel=(numSteps);         // Set Dim Level to the maximum numbers of steps (off)
     // Turn off the TRIAC Gates so if we cross zero they will turn off. Triacs stay latched on until they cross zero
@@ -189,35 +189,7 @@ void zeroCrossDetect() {
     
     //flips status led on and off as needs based on interupt
     ledDataToggle();  // with real zero cross, this should be flashing every second
-    
-    // This will turn on any channels that may be set to full brightness (255).
-    // We are writing directly to the output pins so make sure to change only the pins we use for Triacs
-    // We use OR "|" here to allow any of non-triac pins to remain unchanged
-      //Channel 1
-//    if (buffer[0] == 255 ){      // Read the contents of Channel 1's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTD = PORTD | B00100000; // CH1 Sets Pin 5 of port D (pin 9) ON, leaving other pins alone by way of the OR function
-//    }//Channel 2
-//    if (buffer[1] == 255){       // Read the contents of Channel 2's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTD = PORTD | B01000000; // CH2 Sets Pin 6 of port D (pin 10) ON, leaving other pins alone by way of the OR function
-//    }//Channel 3
-//    if (buffer[2] == 255){       // Read the contents of Channel 3's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTB = PORTB | B00000010; // CH3 Sets Pin 1 of port B (pin 5) ON, leaving other pins alone by way of the OR function
-//    }//Channel 4
-//    if (buffer[3] == 255){       // Read the contents of Channel 4's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTB = PORTB | B00000100; // CH4 Sets Pin 2 of port B (pin 6) ON, leaving other pins alone by way of the OR function
-//    }//Channel 5
-//    if (buffer[4] == 255 ){      // Read the contents of Channel 1's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTC = PORTC | B00000010; // CH1 Sets Pin 1 of port C (pin A1) ON, leaving other pins alone by way of the OR function
-//    }//Channel 6
-//    if (buffer[5] == 255){       // Read the contents of Channel 2's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTC = PORTC | B00000100; // CH2 Sets Pin 2 of port C (pin A2) ON, leaving other pins alone by way of the OR function
-//    }//Channel 7
-//    if (buffer[6] == 255){       // Read the contents of Channel 3's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTC = PORTC | B00001000; // CH3 Sets Pin 3 of port C (pin A3) ON, leaving other pins alone by way of the OR function
-//    }//Channel 8
-//    if (buffer[7] == 255){       // Read the contents of Channel 4's buffer, if it is DMX 255 we want to turn the Triac on now
-//      PORTC = PORTC | B00010000; // CH4 Sets Pin 4 of port C (pin A4) ON, leaving other pins alone by way of the OR function
-//    }
+   
   }    
 } 
 
