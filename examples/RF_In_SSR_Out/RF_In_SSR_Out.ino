@@ -263,7 +263,7 @@ void ledDataToggle(){
 //Main loop that runs when nothing is going on with interupts
 void loop() {
   if(radio.Listen()){
-    bufferOutput = buffer; // This sets up the channel shifting if start channrl is not 1
+    bufferOutput = buffer; // This sets up the channel shifting if start channel is not 1
     dataAvaliable = 120; //reset couter when we get data.
     // Set up to print out channel data if we are in DEBUG mode
     // This may mess up the trigger timing because of the delay induced, so only use 
