@@ -1,5 +1,7 @@
 RFShowControl
 ==============
+
+[![Join the chat at https://gitter.im/komby/RFShowControl](https://badges.gitter.im/komby/RFShowControl.svg)](https://gitter.im/komby/RFShowControl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 BREAKING CHANGES.  Moved support from the mainiacbug RF24 library to komby/RF24.  
 
   Follow the instructions on http://learn.komby.com/wiki/67/howtoupgradetov4
