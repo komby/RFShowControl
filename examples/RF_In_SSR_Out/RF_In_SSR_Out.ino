@@ -56,7 +56,7 @@
 #define HARDCODED_START_CHANNEL         1
 
 // HARDCODED_NUM_CHANNELS  The Triac Expansion Board supports 1 to 4 channels. The SSR8 supports 1 to 8 channels.   Valid Values: 1-8
-#define HARDCODED_NUM_CHANNELS          8
+#define HARDCODED_NUM_CHANNELS          4
 
 // AC_FREQUENCY_50  If your AC Frequency is 50HZ, you need to uncomment the next line
 //#define AC_FREQUENCY_50
