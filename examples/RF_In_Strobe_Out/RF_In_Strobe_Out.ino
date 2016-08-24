@@ -10,6 +10,9 @@
 *  Updated 2016/08/21
 *      Author: Mat Mrosko, rfshowcontrol@matmrosko.com
 *      Comment: Add DUMB_BLINKER support
+*  Updated 2016/06/04
+*      Author: Jim Hewitt, jimboha2@gmail.com
+*      Comment: fixed DUMB_BLINKER
 *
 */
 
