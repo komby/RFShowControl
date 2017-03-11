@@ -115,6 +115,9 @@
 #define LOGICAL_DATA_ORDER_2 0
 
 
+// REVERSE_EVERY
+// Valid Values: 0 (ignore) any value > n to reverse every n pixels
+#define REVERSE_EVERY 0
 
 
 //How Bright should our LEDs start at Description:  http://learn.komby.com/wiki/58/configuration-settings#LED_BRIGHTNESS
@@ -263,6 +266,41 @@ void setup(void)
   #endif
 }
 
+int reverseEveryN(int pixelId) {
+  #ifdef REVERSE_EVERY
+  bool reverse = false;
+  if (REVERSE_EVERY == 0)
+  {
+    return pixelId;
+    }
+  else if (pixelId > REVERSE_EVERY)
+  {
+    int g = 0;
+      for( int i = REVERSE_EVERY; i < pixelId; i+=REVERSE_EVERY){
+        reverse=!reverse;
+        g++;
+      }
+      if (reverse){
+          int minPixel = (g * REVERSE_EVERY);
+          int tmpPixel = pixelId - minPixel; //Should be between 0 and REVERSE_EVERY;
+
+          int newPixel = tmpPixel - REVERSE_EVERY;
+          return minPixel + abs(newPixel) + 1;
+        }
+        else {
+          return pixelId;
+        }
+  }
+  else {
+    
+    return pixelId;
+    }
+    #else
+    return pixelId;
+    #endif
+    
+}
+
 void loop(void)
 {
   CRGB* temp = (CRGB*)data;
@@ -283,22 +321,23 @@ void loop(void)
     int channelRangeEndLogical2 = channelRangeStartLogical2 + countOfUnduplicatedPixels2 * CHANNEL_REPEAT_COUNT;
 
     int j=0;
+    int k=0;
     for( int i = 0; i < pixelsDuplicated; i++){
       
       if (i>=CHANNEL_REPEAT_COUNT && (i % CHANNEL_REPEAT_COUNT) ==0)
       j++;
+      k=i;
       //check to see if we need to reverse the order we copy into leds
       if ( LOGICAL_DATA_ORDER_1 && i < channelRangeEndLogical1 ){
-        leds[(channelRangeEndLogical1- 1 -i)] =   (CRGB)temp[j];
+          k=(channelRangeEndLogical1- 1 -i);     
+ 
       }
       //check to see if we need to reverse the order we copy into leds
       else if (LOGICAL_DATA_ORDER_2 && i > channelRangeEndLogical2){
-        leds[(channelRangeEndLogical2- 1 -i)] =  (CRGB)temp[j];
+         k=(channelRangeEndLogical2- 1 -i);
       }
-      //use the default ordering
-      else {
-        leds[i] =  (CRGB)temp[j];
-      }
+      k = reverseEveryN(k);
+      leds[i] =  (CRGB)temp[j];
     }
     LEDS.show();
     #else
