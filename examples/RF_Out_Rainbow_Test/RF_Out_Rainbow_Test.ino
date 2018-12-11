@@ -130,7 +130,7 @@ Modified by Greg scull to handle RF transmission.
 */
 void rainbow(int num)
 {
-	int i, j;
+	uint32_t i, j;
 
 	for (j = 0; j < 256; j++) // 3 cycles of all 256 colors in the wheel
 	{
